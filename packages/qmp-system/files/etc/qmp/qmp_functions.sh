@@ -43,11 +43,23 @@ qmp_check_device() {
 	ip link show $1 1> /dev/null 2>/dev/null
 	return $?
 }
-
+# Function qmp_set_vlan()
+#
+# This function creates a VLAN interface on top of an interface in order to
+# isolate the routing protocol traffic there:
+#
+#  - 802.1 VLANs are used for wireless interfaces.
+#  - 802.1ad (QinQ) VLANs are used for wired devices since qMp > 3.2.1
 qmp_set_vlan() {
   local viface="$1" # lan/wan/meshX
   local vid=$2
+
+  echo "Setting VLAN $vid for interface $viface"
   [ -z "$viface" ] || [ -z "$vid" ] && return
+
+  or_viface="$viface"
+  viface="$(echo $viface | sed -r 's/\./_/g')"
+  
 
   uci set network.${viface}_${vid}=device
   if [ -e "/sys/class/net/$dev/phy80211" ]; then
@@ -61,10 +73,10 @@ qmp_set_vlan() {
   uci set network.${viface}_${vid}.name=${viface}_${vid}
   if [ -e "/sys/class/net/$dev/phy80211" ]; then
     # 802.1q VLANs for wireless interfaces
-    uci set network.${viface}_${vid}.ifname='@'${viface}
+    uci set network.${viface}_${vid}.ifname='@'${or_viface}
   else
     # 802.1ad VLANs for wired interfaces
-    uci set network.${viface}_${vid}.ifname=$3
+    uci set network.${viface}_${vid}.ifname=$or_viface
   fi
   uci set network.${viface}_${vid}.vid=${vid}
 
@@ -144,28 +156,30 @@ qmp_get_devices() {
   local devices=""
 
   if [ "$1" == "mesh" ]; then
-    local brlan_enabled=0
-    for dev in $(uci get qmp.interfaces.mesh_devices 2>/dev/null); do
-
-        # Looking if device is defined as LAN, in such case dev=br-lan, but only once
-        # except eth1 for RouterStation Pro
-        if ! ( [[ "$dev" == "eth1" ]] && qmp_is_routerstationpro ) ; then
-            for landev in $(uci get qmp.interfaces.lan_devices 2>/dev/null); do
-                if [ "$landev" == "$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ; then
-                    if [ $brlan_enabled -eq 0 ]; then
-                        dev="br-lan"
-                        brlan_enabled=1
-                    else
-                        dev=""
-                    fi
-                    break
-                fi
-            done
-        fi
-
-      [ -n "$dev" ] && devices="$devices $dev"
-    done
-  fi
+		devices="$(uci get qmp.interfaces.mesh_devices 2>/dev/null)"
+	fi
+  #   local brlan_enabled=0
+  #   for dev in $(uci get qmp.interfaces.mesh_devices 2>/dev/null); do
+	# 
+  #       # Looking if device is defined as LAN, in such case dev=br-lan, but only once
+  #       # except eth1 for RouterStation Pro
+  #       if ! ( [[ "$dev" == "eth1" ]] && qmp_is_routerstationpro ) ; then
+  #           for landev in $(uci get qmp.interfaces.lan_devices 2>/dev/null); do
+  #               if [ "$landev" == "$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ; then
+  #                   if [ $brlan_enabled -eq 0 ]; then
+  #                       dev="br-lan"
+  #                       brlan_enabled=1
+  #                   else
+  #                       dev=""
+  #                   fi
+  #                   break
+  #               fi
+  #           done
+  #       fi
+	# 
+  #     [ -n "$dev" ] && devices="$devices $dev"
+  #   done
+  # fi
 
   if [ "$1" == "lan" ]; then
      devices="$(uci get qmp.interfaces.lan_devices 2>/dev/null)"
@@ -797,31 +811,32 @@ fi
     then
     local counter=1
 
-	for dev in $(qmp_get_devices mesh); do
-	for protocol_vid in $(uci get qmp.networks.mesh_protocol_vids); do
+  for dev in $(qmp_get_devices mesh); do
+    echo "Configuring interface $dev in BMX6"
 
-	local protocol_name="$(echo $protocol_vid | awk -F':' '{print $1}')"
+    for protocol_vid in $(uci get qmp.networks.mesh_protocol_vids); do
+      local protocol_name="$(echo $protocol_vid | awk -F':' '{print $1}')"
 
-	if [ "$protocol_name" = "bmx6" ] ; then
+      if [ "$protocol_name" = "bmx6" ] ; then
+        # Check if the current device is configured as no-vlan
+        local use_vlan=1
+        for no_vlan_int in $(qmp_uci_get interfaces.no_vlan_devices); do
+          [ "$no_vlan_int" == "$dev" ] && use_vlan=0
+        done
 
-	# Check if the current device is configured as no-vlan
-	local use_vlan=1
-	for no_vlan_int in $(qmp_uci_get interfaces.no_vlan_devices); do
-		[ "$no_vlan_int" == "$dev" ] && use_vlan=0
-	done
+        # Check if the protocol has VLAN tag configured
+        local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
+        [ -z "$vid" -o $vid -lt 1 ] && use_vlan=0
 
-	# Check if the protocol has VLAN tag configured
-	local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
-	[ -z "$vid" -o $vid -lt 1 ] && use_vlan=0
+        # Check if the protocol has VLAN tag configured
+        local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
+        [ -z "$vid" -o $vid -lt 1 ] && use_vlan=0
 
-	# Check if the protocol has VLAN tag configured
-	local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
-	[ -z "$vid" -o $vid -lt 1 ] && use_vlan=0
-
-	# If vlan tagging
-		if [ $use_vlan -eq 1 ]; then
-			local viface="$(qmp_get_virtual_iface $dev)"
-			local ifname="${viface}_${vid}"
+        # If vlan tagging
+        if [ $use_vlan -eq 1 ]; then
+          # For interfaces like eth0.1, replace the dot with an underscore
+          local viface="$(echo $dev | sed -r 's/\./_/g')"
+          local ifname="${viface}_${vid}"
 
 	# If not vlan tagging
 		else

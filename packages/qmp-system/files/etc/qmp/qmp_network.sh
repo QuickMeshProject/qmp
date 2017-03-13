@@ -357,10 +357,9 @@ qmp_configure_mesh() {
 
 			# if no vlan is specified do not use vlan
 			[ -z "$vid" ] && vid=1 && use_vlan=0
-
 			# virtual interface
 			local viface=$(qmp_get_virtual_iface $dev)
-
+      echo "device $dev is in viface $viface"
 			# put typical IPv6 prefix (2002::), otherwise ipv6 calc assumes mapped or embedded ipv4 address
 			local ip6_suffix="2002::${counter}${vid}"
 
@@ -368,33 +367,23 @@ qmp_configure_mesh() {
 			# in case of not use vlan tag, device definition is not needed.
 			[ $use_vlan -eq 1 ] && {
 
-				#### [QinQ]
-				####
-				#### Using the rescue interface here does not make much sense as of
-				#### current qMp status and does not work for 802.1-ad
-				####
-				#### # If device is WAN use rescue for the VLAN tag
-				####
-				if [ $(qmp_get_devices wan | grep -c $dev) -gt 0 ]; then
-					qmp_set_vlan ${viface}_rescue $vid $dev
-				else
-					qmp_set_vlan $viface $vid $dev
-				fi
+      qmp_set_vlan $dev $vid
 			}
 
+      dev="$(echo $dev | sed -r 's/\./_/g')"
 			# Configure IPv6 address only if mesh_prefix48 is defined (bmx6 does not need it)
 			if qmp_uci_test qmp.networks.${protocol_name}_mesh_prefix48; then
 				local ip6="$(qmp_get_ula96 $(uci get qmp.networks.${protocol_name}_mesh_prefix48):: $primary_mesh_device $ip6_suffix 128)"
 				echo "Configuring $ip6 for $protocol_name"
-				qmp_uci_set_raw network.${viface}_$vid.proto=static
-				qmp_uci_set_raw network.${viface}_$vid.ip6addr="$ip6"
+				qmp_uci_set_raw network.${dev}_$vid.proto=static
+				qmp_uci_set_raw network.${dev}_$vid.ip6addr="$ip6"
 			else
-				qmp_uci_set_raw network.${viface}_$vid.proto=none
-				qmp_uci_set_raw network.${viface}_$vid.auto=1
+				qmp_uci_set_raw network.${dev}_$vid.proto=none
+				qmp_uci_set_raw network.${dev}_$vid.auto=1
 			fi
 		done
 
-		qmp_configure_rescue_ip_device "$dev" "$viface"
+		echo qmp_configure_rescue_ip_device "$dev" "$viface"
 		counter=$(( $counter + 1 ))
 	done
 	fi
@@ -407,10 +396,15 @@ qmp_configure_rescue_ip_device() {
 	local viface="$2"
 
 	if qmp_is_in "$dev" $(qmp_get_devices wan) || [ "$dev" == "br-lan" ]; then
+    echo "WAN_OR_LAN"
 		# If it is WAN or LAN
 		qmp_configure_rescue_ip $dev ${viface}_rescue
-		qmp_attach_device_to_interface $dev ${viface}_rescue
+    if qmp_is_in "$dev" $(qmp_get_devices wan) ; then
+		    #qmp_attach_device_to_interface $dev ${viface}_rescue
+        qmp_attach_device_to_interface $dev $viface
+      fi
 	elif qmp_is_in "$dev" $(qmp_get_devices mesh) && [ "$dev" != "br-lan" ]; then
+    echo "MESH_NOT_LAN"
 		# If it is only mesh device
 		qmp_configure_rescue_ip $dev
 		qmp_attach_device_to_interface $dev $viface
