@@ -367,7 +367,7 @@ qmp_configure_mesh() {
 			# in case of not use vlan tag, device definition is not needed.
 			[ $use_vlan -eq 1 ] && {
 
-      qmp_set_vlan $dev $vid
+      qmp_set_vlan $dev $vid $viface
 			}
 
       dev="$(echo $dev | sed -r 's/\./_/g')"
@@ -383,7 +383,13 @@ qmp_configure_mesh() {
 			fi
 		done
 
-		echo qmp_configure_rescue_ip_device "$dev" "$viface"
+    # Rescue IPs are no longer needed since all the interfaces have link-local
+    # IPv6 address. However, the radios must be "assigned" to some interface to
+    # bring them up; otherwise the VLAN interface on top of the radio interface
+    # can't be brought up
+    if [ -e "/sys/class/net/$dev/phy80211" ]; then
+      qmp_configure_rescue_ip_device "$dev" "$viface"
+    fi
 		counter=$(( $counter + 1 ))
 	done
 	fi

@@ -51,39 +51,41 @@ qmp_check_device() {
 #  - 802.1 VLANs are used for wireless interfaces.
 #  - 802.1ad (QinQ) VLANs are used for wired devices since qMp > 3.2.1
 qmp_set_vlan() {
-  local viface="$1" # lan/wan/meshX
-  local vid=$2
+  local iface="$1" # The physical interface
+  local vid=$2     # The VLAN
+  local liface=$3  # The logical interface lan/wan_X/mesh_Y
 
-  echo "Setting VLAN $vid for interface $viface"
-  [ -z "$viface" ] || [ -z "$vid" ] && return
+  echo "Setting VLAN $vid for interface $iface"
+  [ -z "$iface" ] || [ -z "$vid" ] && return
 
-  or_viface="$viface"
-  viface="$(echo $viface | sed -r 's/\./_/g')"
-  
+  # Replace dots by underscores to use the interface name as part of another one
+  local uiface="$(echo $iface | sed -r 's/\./_/g')" 
 
-  uci set network.${viface}_${vid}=device
+  uci set network.${uiface}_${vid}=device
   if [ -e "/sys/class/net/$dev/phy80211" ]; then
     # 802.1q VLANs for wireless interfaces
-    uci set network.${viface}_${vid}.type=8021q
+    uci set network.${uiface}_${vid}.type=8021q
   else
     # 802.1ad VLANs for wired interfaces
-    uci set network.${viface}_${vid}.type=8021ad
+    uci set network.${uiface}_${vid}.type=8021ad
   fi
 
-  uci set network.${viface}_${vid}.name=${viface}_${vid}
+  uci set network.${uiface}_${vid}.name=${uiface}_${vid}
   if [ -e "/sys/class/net/$dev/phy80211" ]; then
-    # 802.1q VLANs for wireless interfaces
-    uci set network.${viface}_${vid}.ifname='@'${or_viface}
+    # VLANs for wireless interfaces need to be configured on top of the
+    # logical interface the radio is put in (e.g. mesh_w0 for wlan0)
+    uci set network.${uiface}_${vid}.ifname='@'${liface}
   else
-    # 802.1ad VLANs for wired interfaces
-    uci set network.${viface}_${vid}.ifname=$or_viface
+    # VLANs for wired interfaces are configured directly on top of the physical
+    # interface (e.g. eth0.2, eth1)
+    uci set network.${uiface}_${vid}.ifname=${iface}
   fi
-  uci set network.${viface}_${vid}.vid=${vid}
+  uci set network.${uiface}_${vid}.vid=${vid}
 
-  uci set network.${viface}_${vid}_ad=interface
-  uci set network.${viface}_${vid}_ad.ifname=${viface}_${vid}
-  uci set network.${viface}_${vid}_ad.proto=${none}
-  uci set network.${viface}_${vid}_ad.auto=1
+  uci set network.${uiface}_${vid}_ad=interface
+  uci set network.${uiface}_${vid}_ad.ifname=${uiface}_${vid}
+  uci set network.${uiface}_${vid}_ad.proto=${none}
+  uci set network.${uiface}_${vid}_ad.auto=1
   uci commit network
 
 }
