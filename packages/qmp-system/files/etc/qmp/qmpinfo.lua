@@ -60,7 +60,7 @@ function qmpinfo.get_devices()
 	local sysnet = "/sys/class/net/" 
 	local qmp_devs = qmpinfo.get_qmp_devices() 
 
-	for d in nixio.fs.dir(sysnet) do 
+	for d in nixio.fs.dir(sysnet) do
 		local is_qmp_dev = isInTable(qmp_devs,d) 
 		if is_qmp_dev or nixio.fs.stat(sysnet..d..'/device',"type") ~= nil then
 			if is_qmp_dev or (string.find(d,"%.") == nil and string.find(d,"ap") == nil) then
@@ -71,9 +71,11 @@ function qmpinfo.get_devices()
 						table.insert(phydevs.wifi,d) 
 					else 
 
-						local toadd = true 
+            local toadd = true 
 						for e in nixio.fs.dir(sysnet) do 
-							if toadd == true and string.match(e, d) and nixio.fs.stat(sysnet..d..'/upper_'..e,"type") ~= nil then
+							-- if device e is a switched port of device d (e.g. if e=eth0.1 and d=eth0)
+							-- but not if e=eth0_12 and d=eth0
+							if toadd == true and string.match(e, d .. '%.') and nixio.fs.stat(sysnet..d..'/upper_'..e,"type") ~= nil then
 								toadd = false
 							end
 						end
