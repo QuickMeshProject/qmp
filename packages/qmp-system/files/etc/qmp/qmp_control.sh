@@ -67,10 +67,16 @@ configure_system() {
 	/etc/init.d/uhttpd restart
 }
 
-enable_ns_ppt() {
+enable_ns_xm_ppt() {
 	echo 8 > /sys/class/gpio/export
 	echo out > /sys/class/gpio/gpio8/direction
 	echo 1 > /sys/class/gpio/gpio8/value
+}
+
+enable_ns_xw_ppt() {
+	echo 2 > /sys/class/gpio/export
+	echo out > /sys/class/gpio/gpio2/direction
+	echo 1 > /sys/class/gpio/gpio2/value
 }
 
 publish_hna() {
@@ -169,9 +175,10 @@ help() {
 	echo ""
 	echo "Other:"
 	echo " apply_services			: Start/stop services depending on qmp configuration"
-	echo " enable_ns_ppt			: Enable PoE passtrough from NanoStation M2/5 devices. Be careful with this option!"
+	echo " enable_ns_xm_ppt		: Enable PoE passtrough from NanoStation XM M2/M5 devices. Be careful with this option!"
+	echo " enable_ns_xw_ppt		: Enable PoE passtrough from NanoStation XW M2/M5 devices. Be careful with this option!"
 	echo " upgrade [URL]			: Upgrade system. By default to the last version, but image url can be provided to force"
-	echo " hard_reboot			: Performs a hard reboot (using kernel sysrq)"
+	echo " hard_reboot				: Performs a hard reboot (using kernel sysrq)"
 
 	echo ""
 	exit 0
