@@ -238,13 +238,13 @@ nodedevs_wifi = {}
 for i,v in ipairs(devices.wifi) do
 		wmode = m:field(ListValue, "_"..v.."_mode", translatef("Wireless interface <strong>%s</strong>",v))
     wmode:value("adhoc","Ad hoc (mesh)")
-    wmode:value("80211s","[EXPERIMENTAL] 802.11s (mesh)")
+    wmode:value("80211s","802.11s (mesh)")
     wmode:value("ap","Access point (mesh)")
     wmode:value("client","Client (mesh)")
     wmode:value("aplan","Access point (LAN)")
     wmode:value("clientwan","Client (WAN)")
     wmode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
-    wmode:value("80211s_aplan","[EXPERIMENTAL] 802.11s (mesh) + access point (LAN)")
+    wmode:value("80211s_aplan","802.11s (mesh) + access point (LAN)")
     wmode:value("none","Disabled")
 	  wmode.default = "adhoc_ap"
 

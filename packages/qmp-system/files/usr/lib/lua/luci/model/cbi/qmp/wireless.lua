@@ -91,13 +91,13 @@ for _,wdev in ipairs(wdevs) do
 	-- Mode
 	mode = s_wireless:option(ListValue,"mode","Mode")
         mode:value("adhoc","Ad hoc (mesh)")
-        mode:value("80211s","[EXPERIMENTAL] 802.11s (mesh)")
+        mode:value("80211s","802.11s (mesh)")
         mode:value("ap","Access point (mesh)")
         mode:value("client","Client (mesh)")
         mode:value("aplan","Access point (LAN)")
         mode:value("clientwan","Client (WAN)")
         mode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
-        mode:value("80211s_aplan","[EXPERIMENTAL] 802.11s (mesh) + access point (LAN)")
+        mode:value("80211s_aplan","802.11s (mesh) + access point (LAN)")
         mode:value("none","Disabled")
 
 	-- Channel
