@@ -90,13 +90,13 @@ for _,wdev in ipairs(wdevs) do
 
 	-- Mode
 	mode = s_wireless:option(ListValue,"mode","Mode")
-        mode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
         mode:value("adhoc","Ad hoc (mesh)")
-        mode:value("ap","Access point (mesh)")
-        mode:value("aplan","Access point (LAN)")
-        mode:value("client","Client (mesh)")
-        mode:value("clientwan","Client (WAN)")
         mode:value("80211s","[EXPERIMENTAL] 802.11s (mesh)")
+        mode:value("ap","Access point (mesh)")
+        mode:value("client","Client (mesh)")
+        mode:value("aplan","Access point (LAN)")
+        mode:value("clientwan","Client (WAN)")
+        mode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
         mode:value("80211s_aplan","[EXPERIMENTAL] 802.11s (mesh) + access point (LAN)")
         mode:value("none","Disabled")
 
@@ -112,7 +112,7 @@ for _,wdev in ipairs(wdevs) do
 			if ch.channel < 15 then channel:value(ch.channel .. 'b', ch.channel .. 'b') end
 		end
 	end
-	
+
 	-- Txpower
 	txpower = s_wireless:option(ListValue,"txpower",translate("Transmission power (dBm)"),translate("Radio power in dBm. Each 3 dB increment doubles the power."))
 	for _,t in ipairs(qmpinfo.get_txpower(mydev)) do
@@ -123,22 +123,22 @@ for _,wdev in ipairs(wdevs) do
 	-- http://luci.subsignal.org/trac/wiki/Documentation/CBI#a.maxlengthnil
 	-- http://luci.subsignal.org/trac/browser/luci/trunk/libs/web/luasrc/cbi.lua?rev=9834#L1463
 
-	-- Network ESSID for adhoc                                                                                               
+	-- Network ESSID for adhoc
    local essid = s_wireless:option(Value,"name","Ad hoc ESSID",
 		translate("ESSID (network name) to broadcast in ad hoc mode. Every node can use a different one."))
-	essid.maxlength = 32                               
-	essid.default = "qMp"                              
+	essid.maxlength = 32
+	essid.default = "qMp"
 	essid:depends("mode","adhoc")
 	essid:depends("mode","adhoc_ap")
-                                                                                                                                           
+
 	-- Network name for 80211s
 	local mesh80211s = s_wireless:option(Value,"mesh80211s","802.11s network",
 		translate("Name of the 802.11s mesh network. All the nodes must use the same network name."))
 	mesh80211s.maxlength = 32
-	mesh80211s.default = "qMp"	
+	mesh80211s.default = "qMp"
 	mesh80211s:depends("mode","80211s")
 	mesh80211s:depends("mode","80211s_aplan")
-	
+
 	-- Network ESSID for ap or client
 	local essidap = s_wireless:option(Value,"essidap","AP ESSID",
 		translate("Name of the WiFi network (ESSID) for access point or client mode."))
@@ -185,4 +185,3 @@ end
 
 
 return m
-

@@ -177,15 +177,16 @@ nodemask:value("255.255.255.248", "255.255.255.248 (/29, 6 hosts)")
 
 nodemask.datatype="ip4addr"
 
-local interface_mode_help
-interface_mode_help = m:field(DummyValue,"interface_mode_help")
-interface_mode_help.rawhtml = true
-interface_mode_help.default = "<strong>"..translate("Interface modes").."</strong>".."<br/> <br/>"..translate("Select the working mode of the network interfaces")..":<br/> <br/> · "..translate("LAN mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)").."<br/> · "..translate("WAN mode is used on interfaces connected to an Internet up-link or any other gateway connection").."<br/> · "..translate("Mesh mode is used on wireless interfaces to join the qMp mesh and, on wired interfaces, to link with other qMp devices").."<br/> · "..translate("AP mode is used on wireless interfaces to act as an access point and provide connectivity to end-users").."<br/> <br/>"
-
 if networkmode == "community" then
 	nodeip.default=uciout:get("qmp","networks","lan_address")
 	nodemask.default=uciout:get("qmp","networks","lan_netmask")
 end
+
+local wired_interface_mode_help
+wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
+wired_interface_mode_help.rawhtml = true
+wired_interface_mode_help.default = "<strong>"..translate("Wired interfaces").."</strong>".."<br/> <br/>"..translate("Select the working mode of the wired network interfaces")..":<br/> <br/> · "..translate("LAN mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)").."<br/> · "..translate("WAN mode is used on interfaces connected to an Internet up-link or any other gateway connection").."<br/> · "..translate("Mesh mode is used to link with other mesh nodes via cable").."<br/> · "..translate("AP mode is used on wireless interfaces to act as an access point and provide connectivity to end-users").."<br/> <br/>"
+
 
 -- Get list of devices {{ethernet}{wireless}}
 devices = qmpinfo.get_devices()
@@ -204,20 +205,20 @@ local function is_a(dev, what)
 end
 
 for i,v in ipairs(devices.eth) do
-		tmp = m:field(ListValue, "_" .. v, translatef("Wired interface <strong>%s</strong>",v))
-	tmp:value("Mesh")
-	tmp:value("Lan")
-	tmp:value("Wan")
+	emode = m:field(ListValue, "_" .. v, translatef("Wired interface <strong>%s</strong>",v))
+	emode:value("Mesh")
+	emode:value("Lan")
+	emode:value("Wan")
 
 	if is_a(v, "lan_devices") then
-		tmp.default = "Lan"
+		emode.default = "Lan"
 	elseif is_a(v, "wan_devices") then
-		tmp.default = "Wan"
+		emode.default = "Wan"
 	elseif is_a(v, "mesh_devices") then
-		tmp.default = "Mesh"
+		emode.default = "Mesh"
 	end
 
-	nodedevs_eth[i] = {v,tmp}
+	nodedevs_eth[i] = {v,emode}
 end
 
 -- MeshAll option for wired devices
@@ -226,33 +227,46 @@ meshall = m:field(Flag, "_meshall", translate("Use mesh in all wired devices"),t
 meshall.default = "0"
 
 -- Wireless devices
+
+local wireless_interface_mode_help
+wireless_interface_mode_help = m:field(DummyValue,"wireless_interface_mode_help")
+wireless_interface_mode_help.rawhtml = true
+wireless_interface_mode_help.default = "<strong>"..translate("Wireless interfaces").."</strong>".."<br/> <br/>"..translate("Select the working mode of the wireless network interfaces")..":<br/> <br/> · "..translate("<strong>Ad hoc (mesh)</strong> mode is used to link with other mesh nodes operating in ad hoc mode)") .."<br/> · "..translate("<strong>802.11s (mesh)</strong> mode is used to link with other mesh nodes operating in ad hoc mode") .."<br/> · "..translate("<strong>AP (mesh)</strong> mode is used to create an access point for other mesh nodes to connect as clients") .."<br/> · "..translate("<strong>Client (mesh)</strong> mode is used to link with a mesh node operating in AP mode") .."<br/> · "..translate("<strong>AP (LAN)</strong> mode is used to generate an access point for end users' devices") .."<br/> · "..translate("<strong>Client (WAN)</strong> mode is used to link work as a client of an access point providing an up-link Internet access") .."<br/> · "..translate("<strong>Ad hoc (mesh) + AP (LAN)</strong> combines both modes on a single interface") .."<br/> · "..translate("<strong>802.11s (mesh) + AP (LAN)</strong> combines both modes on a single interface").."<br/> <br/>"
+
 nodedevs_wifi = {}
 
 for i,v in ipairs(devices.wifi) do
-		tmp = m:field(ListValue, "_" .. v, translatef("Wireless interface <strong>%s</strong>",v))
-	tmp:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
-    tmp:value("adhoc","Ad hoc (mesh)")
-    tmp:value("ap","Access point (mesh)")
-    tmp:value("aplan","Access point (LAN)")
-    tmp:value("client","Client (mesh)")
-    tmp:value("clientwan","Client (WAN)")
-    tmp:value("80211s","[EXPERIMENTAL] 802.11s (mesh)")
-    tmp:value("80211s_aplan","[EXPERIMENTAL] 802.11s (mesh) + access point (LAN)")
+		wmode = m:field(ListValue, "_"..v.."_mode", translatef("Wireless interface <strong>%s</strong>",v))
+    wmode:value("adhoc","Ad hoc (mesh)")
+    wmode:value("80211s","[EXPERIMENTAL] 802.11s (mesh)")
+    wmode:value("ap","Access point (mesh)")
+    wmode:value("client","Client (mesh)")
+    wmode:value("aplan","Access point (LAN)")
+    wmode:value("clientwan","Client (WAN)")
+    wmode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
+    wmode:value("80211s_aplan","[EXPERIMENTAL] 802.11s (mesh) + access point (LAN)")
+    wmode:value("none","Disabled")
+	  wmode.default = "adhoc_ap"
 
-    tmp:value("none","Disabled")
-
-	tmp.default = "adhoc_ap"
+    wchan = m:field(ListValue, "_".. v.."_chan", translate("Channel"))
+    for _,ch in ipairs(qmpinfo.get_channels(v)) do
+      wchan:value(ch.channel, ch.channel)
+      if ch.ht40p then wchan:value(ch.channel .. '+', ch.channel .. '+') end
+      if ch.ht40m then wchan:value(ch.channel .. '-', ch.channel .. '-') end
+      if ch.channel < 15 then wchan:value(ch.channel .. 'b', ch.channel .. 'b') end
+    end
 
 	-- Check if the device is adhoc_ap mode, then Mode=AP MeshAll=1
 	uciout:foreach("qmp","wireless", function (s)
 		if s.device == v then
 			if s.mode ~= nil then
-				tmp.default = s.mode
+				wmode.default = s.mode
+        wchan.default = s.channel
 			end
 		end
 	end)
 
-	nodedevs_wifi[i] = {v,tmp}
+	nodedevs_wifi[i] = {v,wmode,wchan}
 end
 
 
@@ -266,7 +280,7 @@ function netmode.write(self, section, value)
 
 	if mode == "community" then
 		local community_name = communityname:formvalue(section)
-		
+
 		uciout:set("qmp","roaming","ignore","1")
 		uciout:set("qmp","networks","publish_lan","1")
 		uciout:set("qmp","networks","lan_address",nodeip)
@@ -275,7 +289,7 @@ function netmode.write(self, section, value)
 		uciout:set("qmp","node","device_name",device_name)
 		uciout:set("qmp","node","community_name",community_name)
 
-		
+
 		if community_name == "Guifi.net" then
 			local mesh_name = guifimeshname:formvalue(section)
 			local device_id = guifideviceid:formvalue(section)
@@ -306,8 +320,8 @@ function netmode.write(self, section, value)
 	local meshall = meshall:formvalue(section)
 
 	for i,v in ipairs(nodedevs_eth) do
-		devmode = v[2]:formvalue(section)
 		devname = v[1]
+    devmode = v[2]:formvalue(section)
 
 		if devmode == "Lan" then
 			lan_devices = lan_devices..devname.." "
@@ -319,9 +333,11 @@ function netmode.write(self, section, value)
 		end
 	end
 
-	for i,v in ipairs(nodedevs_wifi) do
-		devmode = v[2]:formvalue(section)
+  for i,v in ipairs(nodedevs_wifi) do
 		devname = v[1]
+    devmode = v[2]:formvalue(section)
+    devchan = v[3]:formvalue(section)
+
 
 		if (devmode == "AP" and meshall == "1") or devmode == "Mesh" then
 			mesh_devices = mesh_devices..devname.." "
@@ -329,13 +345,14 @@ function netmode.write(self, section, value)
 			lan_devices = lan_devices..devname.." "
 		end
 
-		function setmode(s)
+		function setwmode(s)
 			if s.device == devname then
 				uciout:set("qmp",s['.name'],"mode",devmode)
+        uciout:set("qmp",s['.name'],"channel",devchan)
 			end
 		end
-		uciout:foreach("qmp","wireless",setmode)
-	end
+		uciout:foreach("qmp","wireless",setwmode)
+  end
 
 	uciout:set("qmp","interfaces","lan_devices",lan_devices)
 	uciout:set("qmp","interfaces","wan_devices",wan_devices)
