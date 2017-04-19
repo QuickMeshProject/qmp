@@ -70,6 +70,7 @@ communityname.datatype="string"
 communityname:value("Bogotá Mesh","Bogotá Mesh")
 communityname:value("DigitalMerthyr","Digital Merthyr")
 communityname:value("Guifi.net","Guifi.net")
+communityname:value("NYCMesh","NYC Mesh")
 
 if uciout:get("qmp","node","community_name") ~= nil then
 	communityname.default=uciout:get("qmp","node","community_name")

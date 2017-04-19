@@ -42,7 +42,8 @@ if networkmode == "community" then
 	community_name:value("Bogotá Mesh","Bogotá Mesh")
 	community_name:value("DigitalMerthyr","Digital Merthyr")
 	community_name:value("Guifi.net","Guifi.net")
-	
+	community_name:value("NYCMesh","NYC Mesh")
+
 	guifimesh_name = device_section:option(Value, "mesh_name", translate ("Mesh Network name"), translate("Select a predefined Mesh Network or type your own name."))
 	guifimesh_name:depends("community_name","Guifi.net")
 	guifimesh_name.datatype="string"
@@ -90,4 +91,3 @@ end
 
 
 return m
-
