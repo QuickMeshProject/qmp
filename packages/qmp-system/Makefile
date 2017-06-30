@@ -25,9 +25,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-QMP_RELEASE?=r20170207-3
-QMP_PKGRELEASE=r20170207-3
-QMP_CODENAME?=testing
+QMP_RELEASE?=4.0-rc1
+QMP_PKGRELEASE=r20170630-1
+QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-system
