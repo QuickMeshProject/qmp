@@ -25,11 +25,13 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-QMP_RELEASE?=r20161013-1
+QMP_RELEASE?=testing
+QMP_PKGRELEASE=r20161013-1
 QMP_CODENAME?=testing
+QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-big-node
-PKG_VERSION:=$(QMP_RELEASE)
+PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
 PKG_RELEASE:=$(QMP_CODENAME)
 PKG_LICENSE:=GPL-2.0+
 
@@ -45,7 +47,7 @@ define Package/qmp-big-node
   DEPENDS:= +qmp-small-node \
 	+qmp-tinyproxy +tinymce \
 	+openssl-util +luci-ssl \
-	+lsof +wget +bmon +bwm-ng +ebtables +pv 
+	+lsof +wget +bmon +bwm-ng +ebtables +pv
 endef
 
 define Package/qmp-big-node/description
