@@ -1,0 +1,591 @@
+#!/bin/bash
+
+RESULT=0
+
+[ -f options.conf.local ] && . options.conf.local || . options.conf
+[ -f ${flavors_file}.local ] && . ${flavors_file}.local || . ${flavors_file}
+
+[ ! -d "$tmp_dir" ] && mkdir -p "$tmp_dir"
+[ ! -d "$downloads_dir" ] && mkdir -p "$downloads_dir"
+[ ! -d "$bin_output" ] && mkdir -p "$bin_output"
+[ ! -d "$files_dir" ] && mkdir -p "$files_dir"
+J=${J:-$make_j}
+
+usage() {
+    echo "Usage: $0 [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]] 
+                [--download-all|build-all|update-feeds] [--targets|flavors|communities|profiles=<target>] 
+                [-b <target> [--no-update|no-link-ib|remote|clean|force-local|package=<pkg>]]
+                [-c <target> [--profile=<profile>|no-update|remote|flavor=<flavor>|community=<path>|extra-pkg=<list>]] 
+                [--help]"
+    echo ""
+    echo "    --help                     : show full help with examples"
+    echo "    --download-all             : download all SDK and ImageBuilders"
+    echo "    --build-all	               : build SDK for all available tagets"
+    echo "    --cook-all	               : cook firmwares for all available targets and profiles"
+    echo "    --targets                  : list all officialy supported targets"
+    echo "    --profiles=<target>        : list available hardware profiles for a specific target"
+    echo "    --flavors                  : list available LibreMesh flavors for cooking"
+    echo "    --communities              : list available community profiles"
+    echo "    --update-feeds             : update previously downloaded feeds (only works for Git feeds)"
+    echo "    -f                         : download feeds based on feeds.conf.default file. Feeds will be shared among all targets"
+    echo "       --force                 : force reinstall of feeds (remove old if exist)"
+    echo "    -d <target>                : download SDK and ImageBuilder for specific target"
+    echo "       --sdk                   : download only SDK"
+    echo "       --ib                    : download only ImageBuilder"
+    echo "       --force                 : force reinstall of SDK and/or ImageBuilder (remove old if exist)"
+    echo "    -i <target>                : install local/custom SDK or ImageBuilder"
+    echo "       --sdk-file=<file>       : specify SDK file to unpack"
+    echo "       --ib-file=<file>        : specify ImageBuilder file to unpack"
+    echo "    -b <target>                : build SDK for specific target and link it to the ImageBuilder"
+    echo "       --no-link-ib            : do not download and link ImageBuilder when building the SDK"
+    echo "       --no-update             : do not update feeds when building SDK"
+    echo "       --clean                 : clean sources before compiling"
+    echo "       --package=<pkg_name>    : build only a package (and its dependencies)"
+    echo "       --force-local           : force installation of all local SDK compiled packages when cooking firmware"
+    echo "    -c <target>                : cook the firmware for specific target. Can be used with next options"
+    echo "       --profile=<profile>     : use <profile> when cooking firmware (default is all available target profiles)"
+    echo "       --flavor=<flavor>       : use <flavor> when cooking firmware (default $default_flavor)"
+    echo "       --extra-pkg=<pkg_list>  : specify extra packages (separated by spaces) for including into the output firmware"
+    echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
+    echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
+    echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
+    echo ""
+}
+
+examples() {
+    echo "Examples:"
+    echo ""
+    echo " - Build packages using the SDK and cook the firmware for target tl-wdr3500-v1 and flavor generic (all in one command)"
+    echo ""
+    echo "    $0 -c ar71xx/generic --flavor=lime_default --profile=tl-wdr3500-v1"
+    echo ""
+    echo " - Cook the firmware without compiling the SDK but using only remote precompiled binaries"
+    echo ""
+    echo "    $0 -c ar71xx/generic --remote --flavor=lime_mini --profile=tl-wdr3500-v1"
+    echo ""
+    echo " - Build SDK and cook ar71xx target with all available profiles (step by step)"
+    echo ""
+    echo "    $0 -d ar71xx/generic                        # download SDK and IB "
+    echo "    $0 -f                                       # download and prepare feeds"
+    echo "    $0 -b ar71xx/generic                        # build the SDK and link it to IB"
+    echo "    $0 -c ar71xx/generic --flavor=lime_default  # cook all firmwares for target ar71xx/generic"
+    echo ""
+    echo " - If you want to use an existing community network profile, specify it when cooking (in addition to the device profile)"
+    echo ""
+    echo "    $0 -c ar71xx/generic --flavor=lime_default --community=quintanalibre.org.ar/comun --profile=tl-wdr3500-v1"
+    echo ""
+    echo " - If not profile defined, cook all profiles of target. Also --extra-pkg option can be used to add extra packages when cooking"
+    echo ""
+    echo "    $0 -c ar71xx/generic --flavor=lime_zero --extra-pkg=\"luci-proto-3g iperf\""
+    echo ""
+    echo " - To see/debug build errors use J (number of threads) and V (verbose) system vars"
+    echo ""
+    echo "    J=1 V=s $0 -b ar71xx/generic --profile=tl-wdr3500-v1"
+}
+
+list_targets() {
+    cat $targets_list
+}
+
+cook() {
+    local target="$1"
+    local profile="$2"
+    local ib="$release/$target/ib"
+    local output_dir="$PWD/$bin_output/$target/$profile/$flavor"
+
+    [ ! -d "$ib" ] && {
+        echo "-> ImageBuilder for target $target not ready"
+        download_ib $target
+    }
+
+    [ -n "$use_remote_pkgs" ] && {
+        local arch=`get_arch_from_ib $target`
+        echo "-> Using remote repository for ImageBuilder, architecture: $arch"
+        cat $ib/repositories.original.conf $remote_pkg_repos | sed s/"{ARCH}"/$arch/g > $ib/repositories.conf
+    }
+
+    [ -z "$use_remote_pkgs" ] && {
+        [ ! -f $ib/repositories.sdk.conf ] && build_sdk $target
+        cp -f $ib/repositories.sdk.conf $ib/repositories.conf
+    }
+
+    echo "-> Cooking $target/$profile"
+    [ ! -d "$output_dir" ] && mkdir -p $output_dir
+    local ib_files=""
+    local myfiles="$PWD/$files_dir"
+    [ -n "$community_files" ] && myfiles="$community_files"
+    local fw_extra_name="$flavor"
+    [ -n "$community" ] && fw_extra_name="$community-$community_profile"
+    find $myfiles/* 2>/dev/null && ib_files="FILES=$myfiles" # if files directory is empty, IB crashes
+    [ "$profile" == "Default" ] && profile="" # if profile is Default better leave it blank. some targets do not have any profile
+    [ -n "$profile" ] && profile="PROFILE=$profile"
+    [ -n "$no_update" ] && force_no_update="NO_UPDATE=1"
+    [ -f "files_remove" ] && files_remove="FILES_REMOVE=$(pwd)/files_remove"
+    make -C $ib image $profile PACKAGES="${!flavor} $PKG" EXTRA_IMAGE_NAME="$fw_extra_name" BIN_DIR="$output_dir" $ib_files $force_no_update $files_remove
+    ERROR=$?
+    if (($ERROR != 0)); then
+      echo -e "\n-> Firmware not cooked, something wrong happened on the ImageBuilder compilation process"
+      ERROR_PROFILES="$ERROR_PROFILES $target/$profile/$flavor"
+    else
+      echo -e "\n-> Firmware for target $target, profile $profile and flavor $flavor cooked!\nFind the binaries in $output_dir directory"
+    fi
+    return $ERROR
+}
+
+cook_all_profiles() {
+    local target=$1
+    echo -n -e "\n-> Cooking ALL profiles for target $target"
+    for p in `get_profile_names`; do
+      local log="$tmp_dir/$(echo $target.$p | sed s/"\/"/-/g).log"
+      echo -n -e "\n--> Cooking $target $p"
+      (cook $target $p &> $log) && { echo -n ": SUCCESS!"; mv $log $log.ok; } || {
+          mv $log $log.fail; echo -n ": FAIL! (log at $log.fail)"; }
+    done
+    [ -n "$ERROR_PROFILES" ] && echo "-> Profiles with errors: $ERROR_PROFILES"
+}
+
+cook_all_targets() {
+    for t in $(list_targets); do
+      cook_all_profiles $t
+    done
+    [ -n "$ERROR_PROFILES" ] && echo "-> Profiles with errors: $ERROR_PROFILES"
+}
+
+clean_sdk() {
+    local target="$1"
+    local sdk="$release/$target/sdk"
+    echo "--> Cleaning SDK before compiling"
+    make -j$J V=$V -C $sdk package/clean
+}
+
+build_sdk() {
+    local target="$1"
+    local sdk="$release/$target/sdk"
+    local ib="$release/$target/ib"
+
+    [ ! -d "$sdk" ] && {
+        echo "-> SDK for target $target not found"
+        download_sdk $target
+    }
+    
+    echo "-> Building $sdk"
+    
+    [ -f "$feeds_file" ] || { 
+        echo "-> Local feeds file not found"
+        download_feeds
+    }
+    cp -f "$feeds_file" "$sdk/feeds.conf"
+    [ -z "$no_update" ] && (cd $sdk && scripts/feeds update -a) || (cd $sdk && scripts/feeds update -i)
+
+    [ -n "$sdk_clean" ] && clean_sdk $target
+
+    for r in $sdk_install_repos; do
+        (cd $sdk && scripts/feeds install -p $r -a)
+    done
+    for p in $sdk_install_packages; do
+        (cd $sdk && scripts/feeds install $p)
+    done
+
+    [ -n "$package" ] && {
+        build_pkg $sdk $package
+        return
+    }
+
+    cp ${sdk_config}.local $sdk/.config 2>/dev/null || cp ${sdk_config} $sdk/.config
+    make -C $sdk defconfig
+    make -j$J -C $sdk V=$V && [ -z "$no_link_ib" ] && {
+        [ -f "$ib/repositories.original.conf" ] || download_ib $target
+        cat $ib/repositories.original.conf > $tmp_dir/repositories.sdk.conf
+        echo "-> Linking IB with SDK"
+        [ -n "$force_local" ] && echo "-> Force all local packages is on"
+        echo "" >> $tmp_dir/repositories.sdk.conf
+        echo "##SDK_repos" >> $tmp_dir/repositories.sdk.conf
+        for r in $PWD/$sdk/bin/packages/*/*; do
+          [ -z "$force_local" ] && {
+            case $r in
+            # we build the master branch of the routing feed, hence
+            # don't include it in the filter
+            *base | *luci | *packages | *telephony)
+               continue
+              ;;
+            esac
+          }
+          echo "src sdk_$(basename $r) file:$r" >> $tmp_dir/repositories.sdk.conf
+        done
+        # Add target packages (kmods) if force-local enabled
+        [ -n "$force_local" ] && {
+            local target_pkg_dir="$PWD/$sdk/bin/targets/$target/packages"
+            [ -d "$target_pkg_dir" ] && \
+            echo "src sdk_target file:$target_pkg_dir" >> $tmp_dir/repositories.sdk.conf
+        }
+        echo "" >> $tmp_dir/repositories.sdk.conf
+        cp -f $tmp_dir/repositories.sdk.conf $ib/repositories.sdk.conf
+        echo "-> Using custom $tmp_dir/repositories.sdk.conf"
+    } || echo "-> Error compiling SDK"
+}
+
+build_pkg() {
+  local sdk=$1
+  local pkg=$2
+  local output_dir=$PWD/$bin_output/packages
+  [ ! -d $output_dir ] && mkdir -p $output_dir
+  echo "-> Building package $pkg on sdk $sdk"
+  make -j$J V=$V -C $sdk package/$pkg/{clean,compile,install} && {
+  echo "-> Build of $pkg successful"
+  local pkg_file=$(find $sdk/bin/packages -type f -name "${pkg}*.ipk")
+  cp -f $pkg_file $output_dir/
+  echo "-> You can find it on $output_dir/$pkg_file"
+  } || echo "-> Build error, see full output using V=s J=1 ./cooker <options>"
+}
+
+download_feeds() {
+    local feeds_template="$feeds_default_file"
+    [ -f "${feeds_template}.local" ] && feeds_template=${feeds_template}.local
+
+    [ -f "$feeds_file" ] && [ -z "$force_install" ] && {
+        echo "-> Feeds already downloaded, doing nothing. Use --force to reinstall"
+        return
+    }
+
+    [ -f $feeds_file ] && rm -f $feeds_file
+    [ ! -d $feeds_dir ] && mkdir -p "$feeds_dir"
+    echo "-> Using feeds from file $feeds_template"
+    echo "-> Downloading feeds into $feeds_dir/"
+
+    while read feed; do
+        echo "$feed" | grep -q ^src-git || continue
+        name="$(echo $feed | awk '{print $2}')"
+        full_url="$(echo $feed | awk '{print $3}')"
+        [ -d $feeds_dir/$name ] && rm -rf $feeds_dir/$name
+        if echo "$full_url" | grep \;; then
+            url="$(echo $full_url | awk -F\; '{print $1}')"
+            branch="$(echo $full_url | awk -F\; '{print $2}')"
+            git clone $url -b $branch $feeds_dir/$name
+        elif echo "$full_url" | grep \^; then
+            url="$(echo $full_url | awk -F\^ '{print $1}')"
+            commit="$(echo $full_url | awk -F\^ '{print $2}')"
+            git clone $url $feeds_dir/$name
+            ( cd $feeds_dir/$name && git checkout $commit )
+        fi
+        echo "src-link $name $PWD/$feeds_dir/$name" | tee -a $feeds_file
+    done < $feeds_template
+}
+
+download_communities() {
+    [ ! -d "$communities_dir" ] && {
+        echo "-> Downloading communities repository"
+        git clone $communities_git $communities_dir || {
+            echo "-> Cannot fetch communities repository"
+            exit 1
+        }
+    }
+}
+
+list_communities() {
+    download_communities
+    find $communities_dir/ -maxdepth 1 -type d | grep -v .git | \
+      while read c; do echo ${c#*/}; done | grep -v ^$
+}
+
+update_feeds() {
+    for f in $feeds_dir/*; do
+        [ -d $f/.git ] && (cd $f && git pull)
+    done
+}
+
+build_all_sdk() {
+    for t in $(cat $targets_list); do build_sdk $t; done
+}
+
+download_all() {
+    cat $targets_list | while read t; do download_sdk $t; download_ib $t; done
+}
+
+download_sdk() {
+    local target="$1"
+    [ -z "$target" ] && {
+        echo "-> You must specify target to download, check $targets_list file"
+        usage
+        exit 1
+    }
+    local url="$base_url/$target"
+    local output="$release/$target"
+    [ ! -d "$output" ] && mkdir -p "$output"
+    
+    local sdk_file="$(wget -q -O- $url | grep lede-sdk | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    echo "-> Downloading $url/$sdk_file"
+    wget -c "$url/$sdk_file" -O "$tmp_dir/$sdk_file" || {
+        echo "-> Error, cannot download SDK $url/$sdk_file"
+        exit 1
+    }
+    unpack_sdk $tmp_dir/$sdk_file $output
+}
+
+unpack_sdk() {
+    local file="$1"
+    local output="$2"
+    [ -d $output/sdk ] && [ -z "$force_install" ] && {
+        echo "-> SDK for $target already exist, doing nothing. Use --force to reinstall"
+    } || {
+        echo "-> Unpacking SDK to $output"
+        tar xf $file -C $output/ && {
+            [ -d $output/sdk ] && rm -rf $output/sdk
+            mv $output/lede-sdk* $output/sdk
+            rm -rf $output/sdk/dl
+            local dl=$downloads_dir
+            echo $dl | grep -q / || dl="$PWD/$dl"
+            ln -s $dl $output/sdk/dl
+            #rm -f $TMP/$SDK_FILE
+        } || echo "-> Error installing SDK"
+    }
+}
+
+download_ib() {
+    local target="$1"
+    [ -z "$target" ] && {
+        echo "-> You must specify target to download, check $targets_list file"
+        usage
+        exit 1
+    }
+    local url="$base_url/$target"
+    local output="$release/$target"
+    [ ! -d "$output" ] && mkdir -p "$output"
+    local ib_file="$(wget -q -O- $url | grep lede-imagebuilder | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    echo "-> Downloading $url/$ib_file"
+    wget -c "$url/$ib_file" -O "$tmp_dir/$ib_file" || {
+        echo "-> Error, cannot download ImageBuilder $url/$ib_file"
+        exit 1
+    }
+    unpack_ib $tmp_dir/$ib_file $output
+}
+
+unpack_ib() {
+     local file="$1"
+     local output="$2"
+     [ -d $output/ib ] && [ -z "$force_install" ] && {
+        echo "-> ImageBuilder for $target already exist, doing nothing. Use --force to reinstall"
+     } || {
+        echo "-> Unpacking ImageBuilder to $output"
+        tar xf $file -C $output/ && {
+           [ -d $output/ib ] && rm -rf $output/ib
+           mv $output/lede-imagebuilder* $output/ib
+           cp -f $output/ib/repositories.conf $output/ib/repositories.original.conf
+           sed -i 's%^src/gz .*_routing .*$%# &%' $output/ib/repositories.original.conf
+       } || echo "-> Error installing ImageBuilder"
+    }
+}
+
+list_flavors() {
+    cat flavors.conf | egrep -v "^_|^#|^$" | awk -F= '{print $1}'
+}
+
+get_profile_names() {
+    local profiles="$(cat $release/$target/ib/.profiles.mk 2>/dev/null | grep ^PROFILE_NAMES | \
+      sed -e s/"PROFILE_NAMES = Default"//g -e s/DEVICE_//g)"
+    profiles="${profiles:-Default}"
+    echo "$profiles"
+}
+
+get_arch_from_ib() {
+    local target=$1
+    [ ! -d $release/$target/ib ] && download_ib $target
+    grep CONFIG_TARGET_ARCH_PACKAGES $release/$target/ib/.config | cut -d= -f2 | tr -d \"
+}
+
+list_profiles() {
+    local target="$1"
+    [ ! -d $release/$target/ib ] && download_ib $target
+    make -C $release/$target/ib info
+}
+
+[ -z "$1" ] && usage
+OPTS=$(getopt -o hd:fb:c:d:i: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
+update-feeds,no-update,no-link-ib,only-sdk,only-ib,remote,ib,sdk,sdk-file:,ib-file:,help,force,clean,\
+communities,community:,cook-all,package:,extra-pkg:,force-local -n $0 -- "$@")
+eval set -- "$OPTS"
+
+while true; do
+    case $1 in
+        --help)
+            usage
+            examples
+            break
+        ;;
+        --download-all)
+            download_all
+            break
+        ;;
+        --build-all)
+            build_all=1
+            shift
+        ;;
+        --cook-all)
+            cook_all=1
+            shift
+        ;;
+        --targets)
+            list_targets
+            break
+        ;;
+        --profiles)
+            list_profiles $2
+            break
+        ;;
+        --flavors)
+            list_flavors
+            break
+        ;;
+        --communities)
+            list_communities
+            break
+        ;;
+        --update-feeds)
+            update_feeds
+            break
+        ;;
+        --no-update)
+            no_update=1
+            shift
+        ;;
+        --no-link-ib)
+            no_link_ib=1
+            shift
+        ;;
+        -d)
+            download=1
+            target=$2
+            shift;shift
+        ;;
+        --sdk)
+            only_sdk=1
+            shift
+        ;;
+        --ib)
+            only_ib=1
+            shift
+        ;;
+        --force)
+            force_install=1
+            shift
+        ;;
+        -i)
+            local_install=1
+            target=$2
+            shift;shift
+        ;;
+        --sdk-file)
+            sdk_path=$2
+            shift;shift
+        ;;
+        --ib-file)
+            ib_path=$2
+            shift;shift
+        ;;
+        -f)
+            download_feeds=1
+            shift
+        ;;
+        -b)
+            build_sdk=1
+            target=$2
+            shift;shift
+        ;;
+        --clean)
+           sdk_clean=1
+           shift
+        ;;
+        --package)
+          package=$2
+          shift;shift
+        ;;
+        -c)
+            cook=1
+            target="$2"
+            shift;shift
+        ;;  
+        --profile)
+            profile="$2"
+            shift;shift
+        ;;
+        --flavor)
+            flavor="$2"
+            shift;shift
+        ;;
+        --remote)
+            use_remote_pkgs="1"
+            shift
+        ;;
+        --force-local)
+            force_local="1"
+            shift
+        ;;
+        --community)
+            community="${2%/*}"
+            community_profile="${2#*/}"
+            shift;shift
+        ;;
+        --extra-pkg)
+            PKG="$2"
+            shift;shift
+        ;;
+        -h)
+            usage
+            break
+        ;;
+        --)
+            shift
+            break
+        ;;
+        *)
+        ;;
+    esac
+done
+
+flavor=${flavor:-$default_flavor}
+profile=${profile:-Default}
+
+[ "$local_install" == "1" ] && {
+  [ -n "$sdk_path" ] && unpack_sdk "$sdk_path" $release/$target
+  [ -n "$ib_path" ] && unpack_ib "$ib_path" $release/$target
+  [ -z "$sdk_path$ib_path" ] && {
+    echo "-> Either --sdk-file or --ib-file must be specified (or both)"
+    exit 1
+  }
+}
+
+[ "$download" == "1" ] && {
+    [ "$only_sdk" == "1" ] && download_sdk $target
+    [ "$only_ib" == "1" ] && download_ib $target
+    [ -z "$only_sdk$only_ib" ] && download_sdk $target && download_ib $target
+}
+
+[ "$download_feeds" == "1" ] && {
+    download_feeds
+}
+
+[ "$build_sdk" == "1" ] && build_sdk $target
+
+[ "$cook" == "1" ] && {
+    [ -n "$community" ] && [ -z "$community_profile" ] && {
+        echo "-> If community is defined you must also specify its profile: --community=name/profile"
+        exit 0
+    } || [ -n "$community" ] && {
+        download_communities
+        community_files="$PWD/$communities_dir/$community/$community_profile"
+        [ ! -d "$community_files" ] && {
+            echo "-> The community and profile specified does not exist ($community_files)"
+            exit 0
+        } || echo "-> Using Community files from $community_files"
+    }
+    if [ "$profile" == "Default" ]; then
+      cook_all_profiles $target
+    else
+      cook $target $profile
+      RESULT=$?
+    fi
+}
+
+[ "$build_all" == "1" ] && build_all_sdk
+[ "$cook_all" == "1" ] && cook_all_targets
+
+exit $RESULT
