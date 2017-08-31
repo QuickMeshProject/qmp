@@ -26,7 +26,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_RELEASE?=trunk
-QMP_PKGRELEASE=r20170831-2
+QMP_PKGRELEASE=r20170831-3
 QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
