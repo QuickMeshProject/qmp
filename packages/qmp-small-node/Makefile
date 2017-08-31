@@ -26,27 +26,27 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_RELEASE?=4.0-rc1
-QMP_PKGRELEASE=r20170630-1
+QMP_PKGRELEASE=r20170831-2
 QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-small-node
 PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
 PKG_RELEASE:=$(QMP_CODENAME)
-PGK_LICENSE:=GPL-2.0+
+PKG_LICENSE:=GPL-2.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-small-node
+  TITLE:=Quick Mesh Project (qMp) standard node (8 MB flash devices)
   SECTION:=net
   CATEGORY:=qMp
-  TITLE:=Standard qMp node (8 MB flash devices)
-  URL:=http://qmp.cat
+  URL:=https://qmp.cat
   DEPENDS:= +qmp-tiny-node \
 	+iputils-arping +iputils-clockdiff +tcpdump-mini +b6m +b6m-spread \
-	+iputils-ping6 +mtr +netperf \
+	+iputils-ping6 +mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
 	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
 	+luci +luci-lib-libremap-system +luci-lib-libremap-location \
@@ -54,14 +54,14 @@ define Package/qmp-small-node
 endef
 
 define Package/qmp-small-node/description
- This metapackage installs the packages required for setting up a typical qMp node:
+ This metapackage provides a standard qMp node with the following features:
+  - qMp system configuration files and scripts
   - BMX6 routing protocol
-  - Luci web interface
-  - qMp system configuration files
+  - Full LuCI web interface
   - IP/TCP utils
-  - b6m and libremap
+  - LibreMap and b6m tools
   - SNMP and Munin
-  - IP over IP support
+  - IP over IP tunneling support
 
  It is intended to be used on devices with 8 MB of flash or more.
 endef
@@ -74,11 +74,11 @@ define Build/Compile
 endef
 
 define Build/Prepare
- mkdir -p $(PKG_BUILD_DIR)
+	mkdir -p $(PKG_BUILD_DIR)
 endef
 
 define Package/qmp-small-node/install
-    $(INSTALL_DIR) $(1)/etc/qmp
+	$(INSTALL_DIR) $(1)/etc/qmp
 endef
 
 $(eval $(call BuildPackage,qmp-small-node))

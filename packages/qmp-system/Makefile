@@ -26,7 +26,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_RELEASE?=4.0-rc1
-QMP_PKGRELEASE=r20170630-1
+QMP_PKGRELEASE=r20170831-3
 QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
@@ -40,16 +40,23 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-system
-  TITLE:=Quick Mesh Project system files
+  TITLE:=Quick Mesh Project (qMp) system files
   SECTION:=net
   CATEGORY:=qMp
-  URL:=http://qmp.cat
+  URL:=https://qmp.cat
   DEPENDS:=+libuci-lua +lua +libiwinfo-lua +wpad-mini +kmod-ipt-nat +luci-base\
-   +bmx6 +bmx6-uci-config +bmx6-json +bmx6-sms +gwck-qmp +ip +iw +iwinfo
+   +bmx6 +bmx6-uci-config +bmx6-json +gwck-qmp +ip +iw +iwinfo +bmx6-sms
 endef
 
 define Package/qmp-system/description
- System files required for configuring a qMp node
+ This package contains the basic system files and scripts required for
+ configuring and running a qMp node.
+
+ To have a fully working qMp node, it is strongly recommended to install one of
+ the following packages:
+  - qmp-tiny-node: minimalistic node (4 MB flash devices)
+  - qmp-small-node: standard node (8 MB flash devices)
+  - qmp-big-node: full-featured node (8+ MB flash devices)
 endef
 
 define Build/Prepare

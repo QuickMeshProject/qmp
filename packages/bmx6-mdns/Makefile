@@ -21,26 +21,29 @@
 #	Pau Escrich <p4u@dabax.net>
 #
 
+
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
+QMP_RELEASE?=4.0-rc1
+QMP_PKGRELEASE=r20170831-1
+QMP_CODENAME?=Macondo
+QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
+
 PKG_NAME:=bmx6-mdns
-PKG_VERSION:=0.1
-PKG_RELEASE:=2
+PKG_VERSION:=0.1.1
+PKG_RELEASE:=$(QMP_CODENAME)
 PKG_LICENSE:=GPL-2.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
-QMP_RELEASE?=4.0-rc1
-QMP_CODENAME?=Macondo
-QMP_BUILDDATE:=$(shell date +%Y%m%d_%H%M)
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/bmx6-mdns
-  TITLE:=bmx6 distributed DNS
+  TITLE:=Distributed DNS server based on BMX6 using bmx6-sms plugin
   SECTION:=net
   CATEGORY:=qMp
-  URL:=http://qmp.cat
+  URL:=https://qmp.cat
   DEPENDS:=+bmx6-sms
 endef
 
