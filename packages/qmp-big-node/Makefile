@@ -40,7 +40,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-big-node
-  TITLE:=Quick Mesh Project (qMp) full-featured node (8+ MB flash devices)
+  TITLE:=Quick Mesh Project (qMp) full-featured node (8+ MB flash)
   SECTION:=net
   CATEGORY:=qMp
   URL:=https://qmp.cat
