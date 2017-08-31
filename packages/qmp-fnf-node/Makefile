@@ -47,7 +47,7 @@ define Package/qmp-fnf-node
   +luci-theme-qmp \
   +firewall \
   +ip +iputils-ping6 \
-  +tcpdump-mini +igmpproxy +bwm +collectd
+  +tcpdump-mini +igmpproxy +bwm-ng +collectd
 endef
 
 define Package/qmp-fnf-node/description

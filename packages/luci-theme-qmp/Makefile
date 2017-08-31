@@ -30,7 +30,7 @@ define Package/luci-theme-qmp
   SECTION:=theme
   CATEGORY:=qMp
   TITLE:=Luci qMp theme
-  DEPENDS:=+luci-mod-admin-core
+  DEPENDS:=+luci-mod-admin-mini
 endef
 
 define Package/luci-theme-qmp/description
