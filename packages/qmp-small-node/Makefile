@@ -26,7 +26,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_RELEASE?=trunk
-QMP_PKGRELEASE=r20170831-1
+QMP_PKGRELEASE=r20170831-2
 QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
@@ -46,7 +46,7 @@ define Package/qmp-small-node
   URL:=https://qmp.cat
   DEPENDS:= +qmp-tiny-node \
 	+iputils-arping +iputils-clockdiff +tcpdump-mini +b6m +b6m-spread \
-	+iputils-ping6 +mtr +netperf +luci-mod-admin-full +bmx6-sms \
+	+iputils-ping6 +mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
 	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
 	+luci +luci-lib-libremap-system +luci-lib-libremap-location \

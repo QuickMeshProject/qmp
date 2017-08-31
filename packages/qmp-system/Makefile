@@ -26,7 +26,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_RELEASE?=trunk
-QMP_PKGRELEASE=r20170831-1
+QMP_PKGRELEASE=r20170831-2
 QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
@@ -45,7 +45,7 @@ define Package/qmp-system
   CATEGORY:=qMp
   URL:=https://qmp.cat
   DEPENDS:=+libuci-lua +lua +libiwinfo-lua +wpad-mini +kmod-ipt-nat +luci-base\
-   +bmx6 +bmx6-uci-config +bmx6-json +gwck-qmp +ip +iw +iwinfo
+   +bmx6 +bmx6-uci-config +bmx6-json +gwck-qmp +ip +iw +iwinfo +bmx6-sms
 endef
 
 define Package/qmp-system/description
