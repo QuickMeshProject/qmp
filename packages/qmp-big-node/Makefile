@@ -25,9 +25,9 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-QMP_RELEASE?=testing
-QMP_PKGRELEASE=r20161013-1
-QMP_CODENAME?=testing
+QMP_RELEASE?=trunk
+QMP_PKGRELEASE=r20170831-1
+QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-big-node
@@ -35,15 +35,15 @@ PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
 PKG_RELEASE:=$(QMP_CODENAME)
 PKG_LICENSE:=GPL-2.0+
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-big-node
+  TITLE:=Quick Mesh Project (qMp) full-featured node (8+ MB flash devices)
   SECTION:=net
   CATEGORY:=qMp
-  TITLE:=Full-featured qMp node with addons (8 MB flash)
-  URL:=http://qmp.cat
+  URL:=https://qmp.cat
   DEPENDS:= +qmp-small-node \
 	+qmp-tinyproxy +tinymce \
 	+openssl-util +luci-ssl \
@@ -51,21 +51,22 @@ define Package/qmp-big-node
 endef
 
 define Package/qmp-big-node/description
- This metapackage installs the extra addon packages for big qMp nodes:
+ This metapackage provides a full-blown qMp node with all the features and extra
+ addons:
+  - qMp system configuration files and scripts
   - BMX6 routing protocol
-  - Luci web interface (HTTP/HTTPS)
-  - qMp system configuration files
+  - Full LuCI web interface (via HTTPS with SSL)
   - IP/TCP utils
-  - b6m and libremap
+  - LibreMap and b6m tools
   - SNMP and Munin
-  - IP over IP support
-  - Tinyproxy
+  - IP over IP tunneling support
+  - Tinyproxy with captive portal
 
- It is intended to be used on devices with 8 MB of flash or more.
+ It is intended to be used on devices with more than 8 MB of flash.
 endef
 
 define Build/Prepare
- mkdir -p $(PKG_BUILD_DIR)
+	mkdir -p $(PKG_BUILD_DIR)
 endef
 
 define Build/Configure
@@ -75,7 +76,7 @@ define Build/Compile
 endef
 
 define Package/qmp-big-node/install
-    $(INSTALL_DIR) $(1)/etc/qmp
+	$(INSTALL_DIR) $(1)/etc/qmp
 endef
 
 $(eval $(call BuildPackage,qmp-big-node))
