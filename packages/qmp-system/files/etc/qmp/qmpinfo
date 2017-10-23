@@ -46,14 +46,14 @@ end
 
 function print_devices()
 	local _,v,devs
-	if op1 == nil then
-		devs = qmpinfo.get_devices().all
-	elseif op1 == "wifi" then
+	if op1 == "wifi" then
 		devs = qmpinfo.get_devices().wifi
-	else
+	elseif op1 == "eth" then
 		devs = qmpinfo.get_devices().eth
+	else
+		devs = qmpinfo.get_devices().all
 	end
-	
+
 	for _,v in ipairs(devs) do
 		print(v)
 	end
