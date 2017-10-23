@@ -20,9 +20,8 @@ SOURCE_WIRELESS=1
 ##############################
 # Prepare wireless interface
 #############################
-# Prepare de WiFi interfaces
+# Delete the wifi-iface interface in /etc/config/wireless and create an empty one
 # First parameter: device
-
 qmp_prepare_wireless_iface() {
 	local device=$1
 	qmp_uci_test wireless.$device && qmp_uci_del_raw wireless.$device
@@ -132,6 +131,7 @@ qmp_configure_wifi_device() {
 	# 80211s_aplan ====> 802.11s (mesh) + access poin (LAN)
 
 	local mode="$(qmp_uci_get @wireless[$id].mode)"
+  local dev_disabled="0"
 
 	# Remove $device and also unneeded white spaces
 	local allmeshdevs="$(qmp_uci_get interfaces.mesh_devices)"
@@ -187,7 +187,7 @@ qmp_configure_wifi_device() {
 			qmp_uci_set interfaces.lan_devices "$landevs"
 			qmp_uci_set interfaces.wan_devices "$wandevs"
 			echo "Interface $device is not managed by the qMp system"
-			return
+      dev_disabled="1"
 			;;
 	esac
 
@@ -249,7 +249,7 @@ qmp_configure_wifi_device() {
 	local network="$(qmp_get_virtual_iface $device)"
 	local key="$(qmp_uci_get @wireless[$id].key)"
 	[ $(echo "$key" | wc -c) -lt 8 ] && encrypt="none" || encrypt="psk2"
-	
+
 	local dev_id="$(echo $device | tr -d [A-z])"
 	dev_id=${dev_id:-$(date +%S)}
 	local radio="radio$dev_id"
@@ -268,6 +268,7 @@ qmp_configure_wifi_device() {
 	echo "HTmode        $htmode"
 	echo "11mode        $mode11"
 	echo "Mrate         $mrate"
+  echo "Disabled     $dev_disabled"
 	echo "------------------------"
 
 	[ -z $essidap ] && essidap=$(echo ${name:0:29})"-AP"
@@ -278,17 +279,14 @@ qmp_configure_wifi_device() {
 		mode="adhoc"
 		vap=1
 	}
-	
+
 	[ $mode == "80211s_aplan" ] && {
 		mode="80211s"
 		vap=1
 	}
 
 	device_template="$TEMPLATE_BASE/device.$driver-$mode11"
-	iface_template="$TEMPLATE_BASE/iface.$mode"
-	vap_template="$TEMPLATE_BASE/iface.ap"
-
-	[ ! -f "$device_template" ] || [ ! -f "$iface_template" ]  && qmp_error "Template $template not found"
+	[ ! -f "$device_template" ] && qmp_error "Device template $device_template not found"
 
 	cat $device_template | grep -v ^# | grep -v "^list " | sed \
 	 -e s/"#QMP_RADIO"/"$radio"/ \
@@ -299,7 +297,13 @@ qmp_configure_wifi_device() {
 	 -e s/"#QMP_MRATE"/"$mrate"/ \
 	 -e s/"#QMP_HTMODE"/"$htmode"/ \
 	 -e s/"#QMP_TXPOWER"/"$txpower"/ > $TMP/qmp_wifi_device
+  echo "wireless.$radio.disabled="$dev_disabled >> $TMP/qmp_wifi_device
 
+  [ $mode != "none" ] && {
+    echo $device
+  iface_template="$TEMPLATE_BASE/iface.$mode"
+  [ ! -f "$iface_template" ] && qmp_error "Interface template $iface_template not found"
+  echo $device
 	qmp_prepare_wireless_iface $device
 
     echo "Mode is $mode"
@@ -318,8 +322,11 @@ qmp_configure_wifi_device() {
 	 -e s/"#QMP_KEY"/"$key"/ \
 	 -e s/"#QMP_MODE"/"$mode"/ > $TMP/qmp_wifi_iface
 
+}
 
 	# If virtual AP interface has to be configured
+  vap_template="$TEMPLATE_BASE/iface.ap"
+  [ ! -f "$vap_template" ] && qmp_error "Virtual AP template $vap_template not found"
 	[ "$vap" == "1" ] && {
 		qmp_prepare_wireless_iface ${device}ap
 		cat $vap_template | grep -v ^# | sed \
@@ -332,19 +339,21 @@ qmp_configure_wifi_device() {
 		 -e s/"#QMP_KEY"/"$key"/ \
 		 -e s/"#QMP_MODE"/"ap"/ >> $TMP/qmp_wifi_iface
 	}
-
+echo "AAAA 16"
 	qmp_uci_import $TMP/qmp_wifi_iface
+  echo "AAAA 16b"
 	qmp_uci_import $TMP/qmp_wifi_device
-
+echo "AAAA 17"
 	# List arguments (needed for HT capab)
 	cat $device_template | grep -v ^# | grep "^list " | sed s/"^list "//g | sed \
 	 -e s/"#QMP_RADIO"/"$radio"/ | while read l; do
 		qmp_uci_add_list_raw $l
 	done
-
+echo "AAAA 18"
 	uci reorder wireless.$radio=0
 	#uci reorder wireless.@wifi-iface[$index]=16
 	uci commit wireless
+  echo "AAAA 18"
 }
 
 #############################
@@ -550,7 +559,7 @@ qmp_reset_wifi() {
 	#Generating default wifi configuration
 	country="$(uci get qmp.wireless.country 2>/dev/null)"
 	country="${country:-US}"
-	
+
 	mv /etc/config/wireless /tmp/wireless.old
 	wifi config
 	sed -i s/"disabled '1'"/"country $country"/g /etc/config/wireless
