@@ -62,10 +62,6 @@ end
 --                s_wireless_main:option(Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes2."))
   end
 
--- Button Rescan Wifi devices
-confwifi = s_wireless_main:option(Button, "_confwifi", translate("Reconfigure"),
-translate("Rescan and reconfigure all devices. <br/>Use it just in case you have added or changed a device."))
-
 -- BSSID
 bssid = s_wireless_main:option(Value,"bssid","BSSID")
 
