@@ -11,6 +11,7 @@ function print_help()
 	print("	channels <dev>		: supported channels and supported HT40 type (+/-) ")
 	print("	txpower <dev>		: supported transmission powers")
 	print("	devices [wifi|eth]	: print all physical network devices")
+	print("	radios			: print all wireless network physical interfaces")
 	print("	ipv4			: print all ipv4 from this computer (excluding localhost)")
 	print("	hostname		: print device hostname")
 	print("	bwtest <ipv6>		: perform a bandwidth test")
@@ -58,6 +59,17 @@ function print_devices()
 		print(v)
 	end
 end
+
+
+function print_radios()
+	local _,v,devs
+	devs = qmpinfo.get_radios()
+
+	for _,v in ipairs(devs) do
+		print(v)
+	end
+end
+
 
 function print_txpower()
 	local data = qmpinfo.get_txpower(op1)
@@ -144,6 +156,8 @@ elseif question == "txpower" then
 	print_txpower()
 elseif question == "devices" then
 	print_devices()
+elseif question == "radios" then
+		print_radios()
 elseif question == "ipv4" then
 	print_ipv4()
 elseif question == "hostname" then
@@ -161,4 +175,3 @@ elseif question == "version" then
 else
 	print_help()
 end
-
