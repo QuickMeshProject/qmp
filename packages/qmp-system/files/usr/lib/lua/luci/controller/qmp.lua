@@ -38,13 +38,15 @@ function index()
 	entry({"qmp","status"}, template("admin_status/index"), "Status", 2).dependent=false
 
 	entry({"qmp","configuration"}, cbi("qmp/easy_setup"), "Device configuration", 4).dependent=false
-	entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 1).dependent=false
-	entry({"qmp","configuration","basic"}, cbi("qmp/basic"), "Basic settings", 2).dependent=false
-	entry({"qmp","configuration","network"}, cbi("qmp/network"), "Network settings", 3).dependent=false
-	entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced network settings", 1).dependent=false
-	entry({"qmp","configuration","wifi"}, cbi("qmp/wireless"), "Wireless settings", 4).dependent=false
-	entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 5).dependent=false
-	entry({"qmp","configuration","gateways"}, cbi("qmp/gateways"), "qMp gateways", 6).dependent=false
+	entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
+	entry({"qmp","configuration","basic"}, cbi("qmp/basic"), "Basic settings", 20).dependent=false
+	entry({"qmp","configuration","network"}, cbi("qmp/network_basic"), "Network settings", 30).dependent=false
+	entry({"qmp","configuration","network","basic"}, cbi("qmp/network_basic"), "Basic settings", 31).dependent=false
+	entry({"qmp","configuration","network","wired"}, cbi("qmp/network_wired"), "Wired interfaces", 32).dependent=false
+	entry({"qmp","configuration","network","wireless"}, cbi("qmp/network_wireless"), "Wireless interfaces", 33).dependent=false
+	entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced settings", 34).dependent=false
+	entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 40).dependent=false
+	entry({"qmp","configuration","gateways"}, cbi("qmp/gateways"), "qMp gateways", 50).dependent=false
 
 	entry({"qmp","tools"}, call("action_tools"), "Tools", 5).dependent=false
 	entry({"qmp","tools","tools"}, call("action_tools"), "Network testing", 1).dependent=false
@@ -63,7 +65,7 @@ function action_status()
 	local ipv4 = qmp.get_ipv4()
 	local hostname = qmp.get_hostname()
 	local uname = qmp.get_uname()
-	local version = qmp.get_version() 
+	local version = qmp.get_version()
 
 	luci.template.render("qmp/overview",{ipv4=ipv4,hostname=hostname,uname=uname,version=version})
 end
@@ -83,4 +85,3 @@ end
 function action_map()
 	luci.template.render("qmp/b6m")
 end
-
