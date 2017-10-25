@@ -156,7 +156,7 @@ end
 -------------------------
 
 function m.on_commit(self,map)
-  http.redirect("/luci-static/resources/qmp/wait_short.html")
+  http.redirect("/luci-static/resources/qmp/wait_long.html")
 
   -- Public mode:
   -- generate public mesh address and publish the whole LAN to the mesh
