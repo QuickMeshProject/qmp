@@ -26,15 +26,20 @@ local uciout = uci.cursor()
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"
 
--- Page header
-m = SimpleForm("qmp", translate("qMp easy setup"), translate("This page provides a fast and simple way to configure the basic settings of a qMp device.") .. " " .. translate("Use the form below to specify the required settings, such as the node mode, name or identifier, IP address and interface operation modes.") .. "<br/> <br/>" .. translate("You can refer to the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
+------------
+-- Header --
+------------
+m = SimpleForm("qmp", translate("qMp easy setup"), translate("This page provides a fast and simple way to configure the basic settings of a qMp device.") .. " " .. translate("Use the form below to specify the required settings, such as the node mode, name or identifier, IP address and interface operation modes.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
+---------------------------
+-- Device identification --
+---------------------------
 
 -- Device name
 local devicename_help
 local devicename_help = m:field(DummyValue,"_devicename_help")
 devicename_help.rawhtml = true
-devicename_help.default = "<strong>"..translate("Device name and identification").."</strong>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
+devicename_help.default = "<h3>"..translate("Device identification").."</h3>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
 
 local devicename = m:field(Value, "_devicename", " ", translate("Use only alphanumeric characters, dots, dashes and underscores."))
 devicename.datatype="hostname"
@@ -93,17 +98,22 @@ if uciout:get("qmp","node","device_id") ~= nil then
 end
 
 
+----------------------------------------
+-- Node mode and public IPv4 address  --
+----------------------------------------
+
 -- Node mode
 local mode_help
 mode_help = m:field(DummyValue,"mode_help")
 mode_help.rawhtml = true
-mode_help.default = "<strong>" .. translate("Node mode") .. "</strong>" .. "<br/> <br/>" ..
+mode_help.default = "<h3>" .. translate("Node mode and mesh-wide public IPv4 address") .. "</h3>" .. "<br/> <br/>" ..
+                    translate("The <em>node mode</em> option defines whether qMp makes the devices connected to the LAN interfaces of the node visible to the rest of the mesh network or hidden behind a NAT.") .. " " ..
+                    translate("Static, long-term deployments such as <em>community networks</em> usually choose <em>public</em> mode, whereas quick, temporal or ephemeral deployments usually choose <em>natted</em> mode.") .. "<br/> <br/>" ..
                     translate("Choose an operating mode for this node:") .. "<br/> <br/>" ..
-                    translate("· <i><strong>public</strong></i> mode, for making local devices connected to this node accessible from anywhere in the mesh network") .. "<br/>" ..
-                    translate("· <i><strong>natted</strong></i> mode, for keeping local devices connected to this node hidden from the rest of the mesh by a NAT") .. "<br/> <br/>"
-                    translate("Static, long-term deployments such as <i>community networks</i> usually choose <i>public</i> mode, whereas quick, temporal or ephemeral deployments usually choose <i>natted</i> mode.")
+                    translate("· <em>public</em> mode, for making local devices connected to this node accessible from anywhere in the mesh network") .. "<br/>" ..
+                    translate("· <em>natted</em> mode, for keeping local devices connected to this node hidden from the rest of the mesh by a NAT") .. "<br/> <br/>"
 
-nodemode = m:field(ListValue, "_nodemode", translate(" "), translate("Select <i>public</i> or <i>natted</i> mode."))
+nodemode = m:field(ListValue, "_nodemode", translate(" "), translate("Select <em>public</em> or <em>natted</em> mode."))
 nodemode:value("community","public")
 nodemode:value("roaming","natted")
 
@@ -128,9 +138,8 @@ local roaming_ipaddress_help
 roaming_ipaddress_help = m:field(DummyValue,"roaming_ipaddress_help")
 roaming_ipaddress_help.rawhtml = true
 roaming_ipaddress_help:depends("_nodemode","roaming")
-roaming_ipaddress_help.default = "<strong>" .. translate("Mesh-wide public IPv4 address and network mask") .. "</strong>" .. "<br/> <br/>" ..
-                                  translate("In <i>natted</i> mode, all qMp devices in the mesh network need a unique IPv4 address with a /32 netmask.") .. " " ..
-                                  translate("If unsure about which one to select, leave the field blank and a random one will be assigned automatically.").."<br/> <br/>"
+roaming_ipaddress_help.default = translate("In <em>natted</em> mode, all qMp devices in the mesh network need a unique IPv4 address with a /32 netmask.") .. " " ..
+                                 translate("If unsure about which one to select, leave the field blank and a random one will be assigned automatically.").."<br/> <br/>"
 
 local nodeip_roaming =  m:field(Value, "_nodeip_roaming", " ", translate("Write the mesh-wide public IPv4 address for this device with a /32 netmask, or leave it blank to get a random one."))
 nodeip_roaming:depends("_nodemode","roaming")
@@ -148,26 +157,23 @@ nodeip_roaming.default=rip
 
 
 -- Mesh IPv4 address (public)
-
 local community_addressing_help
 community_addressing_help = m:field(DummyValue,"community_addressing_help")
 community_addressing_help.rawhtml = true
 community_addressing_help:depends("_nodemode","community")
-community_addressing_help.default = "<strong>" .. translate("Mesh-wide public IPv4 address and network mask") .. "</strong>" .. "<br/> <br/>" ..
-                                  translate("In <i>public</i> mode, all qMp devices in the mesh network need a unique IPv4 address and a subnetwork mask.") .. " " ..
+community_addressing_help.default = "<strong>" .. " " .. "</strong>" .. "<br/> <br/>" ..
+                                  translate("In <em>public</em> mode, all qMp devices in the mesh network need a unique IPv4 address and a subnetwork mask.") .. " " ..
                                   translate("Specify the IP address and the subnetwork mask for this device, according to the planning of your community network or deployment.") .. " " ..
                                   translate("End-user devices will get an IPv4 address within the valid range determined by these two values.").."<br/> <br/>"
 
-local nodeip = m:field(Value, "_nodeip", " ",
-translate("Main IPv4 address for this device."))
-
+local nodeip = m:field(Value, "_nodeip", " ", translate("Main IPv4 address for this device."))
 nodeip:depends("_nodemode","community")
 nodeip.default = "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1"
 nodeip.optional=false
 nodeip.datatype="ip4addr"
 
-local nodemask = m:field(Value, "_nodemask"," ",
-translate("Network mask to be used with the IPv4 address above."))
+-- Mesh IPv4 netmask (public)
+local nodemask = m:field(Value, "_nodemask"," ", translate("Network mask to be used with the IPv4 address above."))
 nodemask:depends("_nodemode","community")
 nodemask.default = "255.255.255.224"
 nodemask:value("255.255.255.0", "255.255.255.0 (/24, 254 hosts)")
@@ -176,7 +182,6 @@ nodemask:value("255.255.255.192", "255.255.255.192 (/26, 62 hosts)")
 nodemask:value("255.255.255.224", "255.255.255.224 (/27, 30 hosts)")
 nodemask:value("255.255.255.240", "255.255.255.240 (/28, 14 hosts)")
 nodemask:value("255.255.255.248", "255.255.255.248 (/29, 6 hosts)")
-
 nodemask.datatype="ip4addr"
 
 if networkmode == "community" then
@@ -185,16 +190,20 @@ if networkmode == "community" then
 end
 
 
+------------------------
+-- Network interfaces --
+------------------------
+
 -- Wired interfaces
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
 wired_interface_mode_help.rawhtml = true
-wired_interface_mode_help.default = "<strong>" .. translate("Wired interfaces") .. "</strong>" .. "<br/> <br/>" ..
+wired_interface_mode_help.default = "<h3>" .. translate("Network interfaces") .. "</h3>" .. "<br/> <br/>" ..
                                     translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
-                                    translate("· <strong>LAN</strong> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
-                                    translate(" · <strong>WAN</strong> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
-                                    translate(" · <strong>None</strong>, to not use the interface neither as LAN nor as WAN") .. "<br/> <br/>" ..
-                                    translate(" · <strong>Mesh via wired interface</strong> is used to expand the mesh network when connecting the wired interface to other qMp devices") .. "<br/> <br/>"
+                                    translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
+                                    translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
+                                    translate(" · <em>None</em>, to not use the interface neither as LAN nor as WAN") .. "<br/> <br/>" ..
+                                    translate(" · <em>Mesh via wired interface</em> is used to expand the mesh network when connecting the wired interface to other qMp devices") .. "<br/> <br/>"
 
 -- Get list of devices {{ethernet}{wireless}}
 devices = qmpinfo.get_devices()
@@ -241,17 +250,20 @@ for i,v in ipairs(devices.eth) do
   nodedevs_ethmesh[i] = {v,emeshmode}
 end
 
---[[ MeshAll option for wired devices is deprecated
-
-meshall = m:field(Flag, "_meshall", translate("Use mesh in all wired devices"),translate("If this option is enabled, all the wired network devices will be used for meshing"))
-meshall.default = "0"
-]]--
 
 -- Wireless interfaces
 local wireless_interface_mode_help
 wireless_interface_mode_help = m:field(DummyValue,"wireless_interface_mode_help")
 wireless_interface_mode_help.rawhtml = true
-wireless_interface_mode_help.default = "<strong>"..translate("Wireless interfaces").."</strong>".."<br/> <br/>"..translate("Select the working mode of the wireless network interfaces")..":<br/> <br/> · "..translate("<strong>Ad hoc (mesh)</strong> mode is used to link with other mesh nodes operating in ad hoc mode") .."<br/> · "..translate("<strong>802.11s (mesh)</strong> mode is used to link with other mesh nodes operating in ad hoc mode") .."<br/> · "..translate("<strong>AP (mesh)</strong> mode is used to create an access point for other mesh nodes to connect as clients") .."<br/> · "..translate("<strong>Client (mesh)</strong> mode is used to link with a mesh node operating in AP mode") .."<br/> · "..translate("<strong>AP (LAN)</strong> mode is used to generate an access point for end users' devices") .."<br/> · "..translate("<strong>Client (WAN)</strong> mode is used to link work as a client of an access point providing an up-link Internet access") .."<br/> · "..translate("<strong>Ad hoc (mesh) + AP (LAN)</strong> combines both modes on a single interface") .."<br/> · "..translate("<strong>802.11s (mesh) + AP (LAN)</strong> combines both modes on a single interface").."<br/> <br/>"
+wireless_interface_mode_help.default = translate("Select the working mode of the wireless network interfaces:") .. "<br/> <br/>" ..
+                                       translate("· <em>Ad hoc (mesh)</em> mode is used to link with other mesh nodes operating in ad hoc mode") .. "<br/>" ..
+                                       translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in ad hoc mode") .."<br/>" ..
+                                       translate("· <em>AP (mesh)</em> mode is used to create an access point for other mesh nodes to connect as clients") .. "<br/>" ..
+                                       translate("· <em>Client (mesh)</em> mode is used to link with a mesh node operating in AP mode") .. "<br/>" ..
+                                       translate("· <em>AP (LAN)</em> mode is used to generate an access point for end users' devices") .. "<br/>" ..
+                                       translate("· <em>Client (WAN)</em> mode is used to link work as a client of an access point providing an up-link Internet access") .. "<br/>"..
+                                       translate("· <em>Ad hoc (mesh) + AP (LAN)</em> combines both modes on a single interface") .. "<br/>" ..
+                                       translate("· <em>802.11s (mesh) + AP (LAN)</strong> combines both modes on a single interface").."<br/> <br/>"
 
 nodedevs_wifi = {}
 
