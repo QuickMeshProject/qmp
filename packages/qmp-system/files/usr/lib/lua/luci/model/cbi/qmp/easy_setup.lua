@@ -335,6 +335,7 @@ function nodemode.write(self, section, value)
     uciout:set("qmp","networks","bmx6_ipv4_prefix24","10.202.0")
     uciout:set("qmp","networks","olsr6_ipv4_address","")
     uciout:set("qmp","networks","olsr6_ipv4_prefix24","10.201")
+    uciout:set("qmp","node","device_name",device_name)
     if nodeip_roaming == nil then
       uciout:set("qmp","networks","bmx6_ipv4_address","")
     else
