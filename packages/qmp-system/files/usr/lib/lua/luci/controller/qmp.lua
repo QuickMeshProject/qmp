@@ -34,23 +34,23 @@ function index()
 	overview.sysauth = "root"
 	overview.sysauth_authenticator = "htmlauth"
 
-	-- Rest of entries
+	-- Menu entries
 	entry({"qmp","status"}, template("admin_status/index"), "Status", 2).dependent=false
 
-	entry({"qmp","configuration"}, cbi("qmp/easy_setup"), "Device configuration", 4).dependent=false
-	entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
-	entry({"qmp","configuration","basic"}, cbi("qmp/basic"), "Basic settings", 20).dependent=false
-	entry({"qmp","configuration","network"}, cbi("qmp/network_basic"), "Network settings", 30).dependent=false
-	entry({"qmp","configuration","network","basic"}, cbi("qmp/network_basic"), "Basic settings", 31).dependent=false
-	entry({"qmp","configuration","network","wired"}, cbi("qmp/network_wired"), "Wired interfaces", 32).dependent=false
-	entry({"qmp","configuration","network","wireless"}, cbi("qmp/network_wireless"), "Wireless interfaces", 33).dependent=false
-	entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced settings", 34).dependent=false
-	entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 40).dependent=false
-	entry({"qmp","configuration","gateways"}, cbi("qmp/gateways"), "qMp gateways", 50).dependent=false
+  entry({"qmp","configuration"}, cbi("qmp/easy_setup"), "Device configuration", 4).dependent=false
+    entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
+  entry({"qmp","configuration","basic"}, cbi("qmp/basic"), "Basic settings", 20).dependent=false
+  entry({"qmp","configuration","network"}, cbi("qmp/network_basic"), "Network settings", 30).dependent=false
+    entry({"qmp","configuration","network","basic"}, cbi("qmp/network_basic"), "Basic settings", 31).dependent=false
+    entry({"qmp","configuration","network","wired"}, cbi("qmp/network_wired"), "Wired interfaces", 32).dependent=false
+    entry({"qmp","configuration","network","wireless"}, cbi("qmp/network_wireless"), "Wireless interfaces", 33).dependent=false
+    entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced settings", 34).dependent=false
+  entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 40).dependent=false
+  entry({"qmp","configuration","gateways"}, cbi("qmp/gateways"), "qMp gateways", 50).dependent=false
 
 	entry({"qmp","tools"}, call("action_tools"), "Tools", 5).dependent=false
 	entry({"qmp","tools","tools"}, call("action_tools"), "Network testing", 1).dependent=false
-	if nixio.fs.stat("/usr/lib/lua/luci/model/cbi/qmp/mdns.lua","type") ~= nil then
+  if nixio.fs.stat("/usr/lib/lua/luci/model/cbi/qmp/mdns.lua","type") ~= nil then
 		entry({"qmp","tools","mDNS"}, cbi("qmp/mdns"), "DNS mesh", 1).dependent=false
 	end
 	-- entry({"qmp","tools","splash"}, call("action_splash"), "Splash", 2).dependent=false
