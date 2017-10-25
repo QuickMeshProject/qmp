@@ -35,12 +35,13 @@ eth_section:option(Value, "dns", "DNS nameservers",translate("Define the nameser
 -- Option: lan addresses
 eth_section:option(Value, "lan_address", "LAN IP address",translate("IPv4 address for the LAN interfaces."))
 
--- Option: lan addresses
-eth_section:option(Value, "lan_netmask", "LAN netmask",translate("IPv4 netmask for the LAN interfaces."))
+-- Option: lan netmask
+lannetmask=eth_section:option(Value, "lan_netmask", "LAN netmask",translate("IPv4 netmask for the LAN interfaces."))
+lannetmask.datatype="ip4addr"
 
 -- Option: publish lan
 --eth_section:option(Flag, "publish_lan", "Publish LAN", "Publish LAN network through the mesh")
- 
+
 -- Option: disable dhcp lan
 eth_section:option(Flag, "disable_lan_dhcp", "Disable DHCP server in LAN",
 translate("Disable DHCP server in LAN network (not recommended)."))
@@ -97,4 +98,3 @@ end
 
 
 return m
-
