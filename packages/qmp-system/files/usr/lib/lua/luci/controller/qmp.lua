@@ -39,7 +39,7 @@ function index()
 
   entry({"qmp","configuration"}, cbi("qmp/easy_setup"), "Device configuration", 4).dependent=false
     entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
-  entry({"qmp","configuration","basic"}, cbi("qmp/basic"), "Basic settings", 20).dependent=false
+  entry({"qmp","configuration","node"}, cbi("qmp/node"), "Node settings", 20).dependent=false
   entry({"qmp","configuration","network"}, cbi("qmp/network_basic"), "Network settings", 30).dependent=false
     entry({"qmp","configuration","network","basic"}, cbi("qmp/network_basic"), "Basic settings", 31).dependent=false
     entry({"qmp","configuration","network","wired"}, cbi("qmp/network_wired"), "Wired interfaces", 32).dependent=false
