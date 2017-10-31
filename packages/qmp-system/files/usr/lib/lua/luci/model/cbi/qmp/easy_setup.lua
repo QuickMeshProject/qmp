@@ -120,7 +120,9 @@ nodemode:value("roaming","natted")
 local networkmode
 if uciout:get("qmp","roaming","ignore") == "1" then
   local ipv4 = uciout:get("qmp","networks","bmx6_ipv4_address")
-  local ipv4mask = string.find(ipv4,"/")
+  if ipv4 ~= nil then
+   local ipv4mask = string.find(ipv4,"/")
+  end
   if ipv4mask ~= nil then
     ipv4 = string.sub(ipv4,1,ipv4mask-1)
   end
