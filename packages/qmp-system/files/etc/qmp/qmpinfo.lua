@@ -46,33 +46,34 @@ function qmpinfo.get_qmp_devices()
 	return devs
 end
 
+
 -- returns all the physical devices as a table
 --  in table.wifi only the wifi ones
 --  in table.eth only the non-wifi ones
-function qmpinfo.get_devices() 
-	local d 
-	local phydevs = {} 
-	phydevs.wifi = {} 
+function qmpinfo.get_devices()
+	local d
+	local phydevs = {}
+	phydevs.wifi = {}
 	phydevs.all = {}
 	phydevs.eth = {}
 	local ignored = util.split( uci:get("qmp","interfaces","ignore_devices") or ""," ")
 
-	local sysnet = "/sys/class/net/" 
-	local qmp_devs = qmpinfo.get_qmp_devices() 
+	local sysnet = "/sys/class/net/"
+	local qmp_devs = qmpinfo.get_qmp_devices()
 
 	for d in nixio.fs.dir(sysnet) do
-		local is_qmp_dev = isInTable(qmp_devs,d) 
+		local is_qmp_dev = isInTable(qmp_devs,d)
 		if is_qmp_dev or nixio.fs.stat(sysnet..d..'/device',"type") ~= nil then
 			if is_qmp_dev or (string.find(d,"%.") == nil and string.find(d,"ap") == nil) then
 				local ignore = isInTable(ignored,d)
 
-				if not ignore then 
+				if not ignore then
 					if nixio.fs.stat(sysnet..d..'/phy80211',"type") ~= nil then
-						table.insert(phydevs.wifi,d) 
-					else 
+						table.insert(phydevs.wifi,d)
+					else
 
-            local toadd = true 
-						for e in nixio.fs.dir(sysnet) do 
+            local toadd = true
+						for e in nixio.fs.dir(sysnet) do
 							-- if device e is a switched port of device d (e.g. if e=eth0.1 and d=eth0)
 							-- but not if e=eth0_12 and d=eth0
 							if toadd == true and string.match(e, d .. '%.') and nixio.fs.stat(sysnet..d..'/upper_'..e,"type") ~= nil then
@@ -91,7 +92,31 @@ function qmpinfo.get_devices()
 		end
 	end
 
-	return phydevs 
+  table.sort(phydevs)
+	return phydevs
+end
+
+
+-- Get a sorted array with the wireless (IEEE 802.11) radio devices (e.g. radio0, radio1, radio2)
+function qmpinfo.get_radios()
+
+  local rdevices = {}
+  local conn = ubus.connect()
+
+  if conn then
+    local status = conn:call("network.wireless", "status", {})
+
+    -- Check all the devices returned by the Ubus call
+    for k, v in pairs(status) do
+      table.insert(rdevices, k)
+    end
+
+    conn:close()
+  end
+
+  table.sort(rdevices)
+
+  return rdevices
 end
 
 -- deprecated
@@ -338,4 +363,3 @@ function qmpinfo.get_key()
 end
 
 return qmpinfo
-
