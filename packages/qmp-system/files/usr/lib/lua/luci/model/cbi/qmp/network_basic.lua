@@ -22,7 +22,7 @@ local util = require "luci.util"
 local ip = require "luci.ip"
 local uciout = uci.cursor()
 
-m = Map("qmp", "qMp basic network settings", translate("This page allows to configure the basic network settings qMp device, like the node mode or the mesh-wide public IPv4 address.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
+m = Map("qmp", "qMp basic network settings", translate("This page allows to configure the basic network settings of a qMp device, like the node mode or the mesh-wide public IPv4 address.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 -- Network mode change was requested, rebuild and reload page
 if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then

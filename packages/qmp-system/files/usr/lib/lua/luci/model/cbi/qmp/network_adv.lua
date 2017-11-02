@@ -1,27 +1,24 @@
 --[[
-    Copyright (C) 2011 Fundacio Privada per a la Xarxa Oberta, Lliure i Neutral guifi.net
+  qMp - Quick Mesh Project - https://www.qmp.cat
+  Copyright © 2011-2017 Fundació Privada per a la Xarxa Oberta, Lliure i Neutral, guifi.net
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-    The full GNU General Public License is included in this distribution in
-    the file called "COPYING".
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
 require("luci.sys")
 local http = require "luci.http"
-m = Map("qmp", "qMp advanced network settings")
+m = Map("qmp", "qMp advanced network settings", translate("This page allows to configure the advanced network settings of a qMp device, like IPv4 and IPv6 addresses, prefixes, DHCP behaviour, etc.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 ethernet_interfaces = { 'eth', 'ath', 'wlan' }
 wireless_interfaces = { 'ath', 'wlan' }
@@ -85,7 +82,7 @@ overlapping_section:option(Value, "dhcp_offset", "DHCP offset",
 translate("Offset to calculate the first IP to give via DHCP"))
 
 -- Option: Leassetime
-overlapping_section:option(Value, "qmp_leasetime", "DHCP leas etime",translate("Lease time for the DHCP server"))
+overlapping_section:option(Value, "qmp_leasetime", "DHCP lease time",translate("Lease time for the DHCP server"))
 
 
 ----------------------

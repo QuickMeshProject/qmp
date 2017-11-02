@@ -39,7 +39,7 @@ m = SimpleForm("qmp", translate("qMp easy setup"), translate("This page provides
 local devicename_help
 local devicename_help = m:field(DummyValue,"_devicename_help")
 devicename_help.rawhtml = true
-devicename_help.default = "<h3>"..translate("Device identification").."</h3>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
+devicename_help.default = "<legend>"..translate("Device identification").."</legend>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
 
 local devicename = m:field(Value, "_devicename", " ", translate("Use only alphanumeric characters, dots, dashes and underscores."))
 devicename.datatype="hostname"
@@ -106,7 +106,7 @@ end
 local mode_help
 mode_help = m:field(DummyValue,"mode_help")
 mode_help.rawhtml = true
-mode_help.default = "<h3>" .. translate("Node mode and mesh-wide public IPv4 address") .. "</h3>" .. "<br/> <br/>" ..
+mode_help.default = "<legend>" .. translate("Node mode and mesh-wide public IPv4 address") .. "</legend>" .. "<br/> <br/>" ..
   translate("The <em>node mode</em> option defines whether qMp makes the devices connected to the LAN interfaces of the node visible to the rest of the mesh network or hidden behind a NAT.") .. " " ..
   translate("Static, long-term deployments such as <em>community networks</em> usually choose <em>public</em> mode, whereas quick, temporal or ephemeral deployments usually choose <em>natted</em> mode.") .. "<br/> <br/>" ..
   translate("Choose an operating mode for this node:") .. "<br/> <br/>" ..
@@ -200,7 +200,7 @@ end
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
 wired_interface_mode_help.rawhtml = true
-wired_interface_mode_help.default = "<h3>" .. translate("Network interfaces") .. "</h3>" .. "<br/> <br/>" ..
+wired_interface_mode_help.default = "<legend>" .. translate("Network interfaces") .. "</legend>" .. "<br/> <br/>" ..
   translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
   translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
   translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..

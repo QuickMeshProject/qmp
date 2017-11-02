@@ -1,26 +1,19 @@
 --[[
-    Copyright (C) 2011 Fundacio Privada per a la Xarxa Oberta, Lliure i Neutral guifi.net
+  qMp - Quick Mesh Project - https://www.qmp.cat
+  Copyright © 2011-2017 Fundació Privada per a la Xarxa Oberta, Lliure i Neutral, guifi.net
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-    The full GNU General Public License is included in this distribution in
-    the file called "COPYING".
-
- Contributors:
-	Simó Albert i Beltran
-
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
 require("luci.sys")
@@ -31,7 +24,7 @@ local uci = require "uci"
 
 
 
-m = Map("qmp", "qMp wireless interfaces settings")
+m = Map("qmp", translate("qMp wireless network interfaces"), translate("This page allows to configure the operation mode of the wireless network interfaces (i.e. WiFi interfaces).") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 local uci = luci.model.uci.cursor()
 local wdevs = qmpinfo.get_wifi_index()
@@ -99,7 +92,7 @@ for _,wdev in ipairs(wdevs) do
   mode:value("none","Disabled")
 
   -- Channel
-  channel = s_wireless:option(ListValue,"channel","Channel",translate("WiFi channel to be used in this device.<br/>Selecting channels with + or - enables 40MHz bandwidth."))
+  channel = s_wireless:option(ListValue,"channel","Channel",translate("WiFi channel to be used in this device.") .. " " ..translate ("Selecting channels with + or - enables 40MHz bandwidth."))
   mymode = m.uci:get("qmp",wdev,"mode")
 
   for _,ch in ipairs(qmpinfo.get_channels(mydev)) do

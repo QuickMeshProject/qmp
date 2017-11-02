@@ -29,7 +29,7 @@ qmpinfo = require "qmpinfo"
 ------------
 -- Header --
 ------------
-m = SimpleForm("qmp", translate("qMp wired network interfaces"), translate("This page allows to configure the operation mode of the wired network interfaces (e.g. Ethernet interfaces.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
+m = SimpleForm("qmp", translate("qMp wired network interfaces"), translate("This page allows to configure the operation mode of the wired network interfaces (i.e. Ethernet interfaces).") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 ------------------------
 -- Network interfaces --
@@ -39,7 +39,7 @@ m = SimpleForm("qmp", translate("qMp wired network interfaces"), translate("This
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
 wired_interface_mode_help.rawhtml = true
-wired_interface_mode_help.default = "<h3>" .. translate("Network modes") .. "</h3>" ..
+wired_interface_mode_help.default = "<legend>" .. translate("Network modes") .. "</legend>" .. " </br>" ..
   translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
   translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
   translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
@@ -82,7 +82,7 @@ end
 local wired_interface_mesh_help
 wired_interface_mesh_help = m:field(DummyValue,"wired_interface_mesh_help")
 wired_interface_mesh_help.rawhtml = true
-wired_interface_mesh_help.default = "<h3>" .. translate("Mesh over cable") .. "</h3>" ..
+wired_interface_mesh_help.default = "<legend>" .. translate("Mesh over cable") .. "</legend>" .. " </br>" ..
   translate("Select which wired devices will be used to expand the mesh via cable.") .. " " .. translate("<em>Mesh via wired interface</em> is used to expand the mesh network when connecting the wired interface to other qMp devices") .. "<br/> <br/>"
 
 nodedevs_ethmesh = {}
