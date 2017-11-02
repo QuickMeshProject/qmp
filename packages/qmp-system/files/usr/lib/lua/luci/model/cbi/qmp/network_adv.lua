@@ -87,6 +87,16 @@ translate("Offset to calculate the first IP to give via DHCP"))
 -- Option: Leassetime
 overlapping_section:option(Value, "qmp_leasetime", "DHCP leas etime",translate("Lease time for the DHCP server"))
 
+
+----------------------
+-- Special settings
+----------------------
+special_section = m:section(NamedSection, "interfaces", "qmp", translate("Special settings"), translate("Use this section to disable VLAN tagging in certain interfaces or to exclude them from qMp."))
+special_section.addremove = False
+
+no_vlan = special_section:option(Value, "no_vlan_devices", translate("VLAN-untagged devices"),translate("Devices that will not be used with VLAN tagging (it is recommended to leave it blank)"))
+ignore_devs = special_section:option(Value, "ignore_devices", translate("Excluded devices"),translate("Devices that will not be used by qMp"))
+
 --------------------------
 -- Commit
 -------------------------
