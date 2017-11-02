@@ -1,70 +1,157 @@
 --[[
-    Copyright (C) 2011 Fundacio Privada per a la Xarxa Oberta, Lliure i Neutral guifi.net
+  qMp - Quick Mesh Project - https://www.qmp.cat
+  Copyright © 2011-2017 Fundació Privada per a la Xarxa Oberta, Lliure i Neutral, guifi.net
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-    The full GNU General Public License is included in this distribution in
-    the file called "COPYING".
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
-package.path = package.path .. ";/etc/qmp/?.lua"
-qmpinfo = require "qmpinfo"                     
-require("luci.sys")
 
+local sys = require "luci.sys"
 local http = require "luci.http"
-m = Map("qmp", "qMp network settings")
+local ip = require "luci.ip"
+local util = require "luci.util"
+local uci  = require "luci.model.uci"
+local uciout = uci.cursor()
 
-eth_section = m:section(NamedSection, "interfaces", "qmp", translate("Network mode"), translate("Select the working mode of the wired network interfaces: <br/> · LAN mode is used to provide end-users connectivity and a DHCP will be enabled to assign IP addresses to the devices connecting.<br/> · WAN mode is used on interfaces connected to an Internet up-link or any other gateway connection.<br/> <br/>LAN and WAN modes are mutually exclusive. <strong>Do not set an interface in both LAN and WAN modes.</strong>"))
-eth_section.addremove = False
+package.path = package.path .. ";/etc/qmp/?.lua"
+qmpinfo = require "qmpinfo"
 
-mesh_section = m:section(NamedSection, "interfaces", "qmp", translate("Mesh interfaces"), translate("Select the devices that will be used in the mesh network. It is recommended to select them all."))
-eth_section.addremove = False
+------------
+-- Header --
+------------
+m = SimpleForm("qmp", translate("qMp wired network interfaces"), translate("This page allows to configure the operation mode of the wired network interfaces (e.g. Ethernet interfaces.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
-special_section = m:section(NamedSection, "interfaces", "qmp", translate("Special settings"), translate("Use this section to disable VLAN tagging in certain interfaces or to exclude them from qMp."))
-mesh_section.addremove = False
+------------------------
+-- Network interfaces --
+------------------------
 
--- Getting the physical (real) interfaces
-net_int = qmpinfo.get_devices().all
+-- Ethernet devices' mode
+local wired_interface_mode_help
+wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
+wired_interface_mode_help.rawhtml = true
+wired_interface_mode_help.default = "<h3>" .. translate("Network modes") .. "</h3>" ..
+  translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
+  translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
+  translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
+  translate(" · <em>None</em>, to not use the interface neither as LAN nor as WAN") .. "<br/>"
 
--- Option: lan_devices
-lan = eth_section:option(MultiValue, "lan_devices", translate("LAN mode"),translate("Interfaces used to provide end-user connectivity (DHCP server)"))
-local i,l
-for i,l in ipairs(net_int) do
-	lan:value(l,l)
+-- Get list of devices {{ethernet}{wireless}}
+devices = qmpinfo.get_devices()
+
+nodedevs_eth = {}
+
+local function is_a(dev, what)
+  local x
+  for x in util.imatch(uciout:get("qmp", "interfaces", what)) do
+    if dev == x then
+      return true
+    end
+  end
+  return false
 end
 
--- Option wan_device
-wan = eth_section:option(MultiValue, "wan_devices", "WAN mode","Interfaces connected to an Internet up-link or any other gateway (DHCP client)")
-for i,l in ipairs(net_int) do
-	wan:value(l,l)
+for i,v in ipairs(devices.eth) do
+  emode = m:field(ListValue, "_" .. v, translatef("Wired interface <strong>%s</strong>",v))
+  emode:value("Lan", translate("LAN"))
+  emode:value("Wan", translate("WAN"))
+  emode:value("none", translate("None"))
+
+  if is_a(v, "lan_devices") then
+    emode.default = "Lan"
+  elseif is_a(v, "wan_devices") then
+    emode.default = "Wan"
+  else
+    emode.default = "none"
+  end
+
+  nodedevs_eth[i] = {v,emode}
 end
 
--- Option mesh_devices
-mesh = mesh_section:option(MultiValue, "mesh_devices", "MESH devices","Devices used for meshing (it is recommended to check them all)")
-for i,l in ipairs(net_int) do
-        mesh:value(l,l)
+
+-- Cabled mesh
+local wired_interface_mesh_help
+wired_interface_mesh_help = m:field(DummyValue,"wired_interface_mesh_help")
+wired_interface_mesh_help.rawhtml = true
+wired_interface_mesh_help.default = "<h3>" .. translate("Mesh over cable") .. "</h3>" ..
+  translate("Select which wired devices will be used to expand the mesh via cable.") .. " " .. translate("<em>Mesh via wired interface</em> is used to expand the mesh network when connecting the wired interface to other qMp devices") .. "<br/> <br/>"
+
+nodedevs_ethmesh = {}
+
+for i,v in ipairs(devices.eth) do
+  emeshmode = m:field(ListValue, "_" .. v .."mesh", translatef("Mesh via <strong>%s</strong>",v))
+  emeshmode:value("Mesh", translate("Yes"))
+  emeshmode:value("none", translate("No"))
+
+  if is_a(v, "mesh_devices") then
+    emeshmode.default = "Mesh"
+  else
+    emeshmode.default = "none"
+  end
+
+nodedevs_ethmesh[i] = {v,emeshmode}
 end
 
-no_vlan = special_section:option(Value, "no_vlan_devices", translate("VLAN-untagged devices"),translate("Devices that will not be used with VLAN tagging (it is recommended to leave it blank)"))
+function emode.write(self, section, value)
 
-ignore_devs = special_section:option(Value, "ignore_devices", translate("Excluded devices"),translate("Devices that will not be used by qMp"))
+  local lan_devices = ""
+  local wan_devices = ""
+  local mesh_devices = ""
 
-function m.on_commit(self,map)
-	http.redirect("/luci-static/resources/qmp/wait_long.html")
-	luci.sys.call('qmpcontrol configure_network > /tmp/qmp_control_network.log &')
+  -- Keep wireless devices unmodified
+  for i,v in ipairs(devices.wifi) do
+    if is_a(v, "lan_devices") then
+      lan_devices = lan_devices .. v .. " "
+    end
+    if is_a(v, "wan_devices") then
+      wan_devices = wan_devices .. v .. " "
+    end
+    if is_a(v, "mesh_devices") then
+      mesh_devices = mesh_devices .. v .. " "
+    end
+  end
+
+  for i,v in ipairs(nodedevs_eth) do
+    devname = v[1]
+    devmode = v[2]:formvalue(section)
+
+    if devmode == "Lan" then
+      lan_devices = lan_devices..devname.." "
+    elseif devmode == "Wan" then
+      wan_devices = wan_devices..devname.." "
+    end
+  end
+
+  for i,v in ipairs(nodedevs_ethmesh) do
+    devname = v[1]
+    devmode = v[2]:formvalue(section)
+
+    if devmode == "Mesh" then
+      mesh_devices = mesh_devices..devname.." "
+    end
+  end
+
+  uciout:set("qmp","interfaces","lan_devices",lan_devices)
+  uciout:set("qmp","interfaces","wan_devices",wan_devices)
+  uciout:set("qmp","interfaces","mesh_devices",mesh_devices)
+
+  uciout:commit("qmp")
+  apply()
+end
+
+function apply(self)
+  http.redirect("/luci-static/resources/qmp/wait_long.html")
+  luci.sys.call('(qmpcontrol configure_wifi ; qmpcontrol configure_network) &')
 end
 
 
 return m
-
