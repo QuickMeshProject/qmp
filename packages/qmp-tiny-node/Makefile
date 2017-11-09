@@ -40,7 +40,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-tiny-node
-  TITLE:=Quick Mesh Project (qMp) minimalistic node (4 MB flash devices)
+  TITLE:=Quick Mesh Project (qMp) minimalistic node (4 MB flash)
   SECTION:=net
   CATEGORY:=qMp
   URL:=https://qmp.cat

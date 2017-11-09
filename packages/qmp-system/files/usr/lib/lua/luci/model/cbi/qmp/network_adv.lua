@@ -1,27 +1,24 @@
 --[[
-    Copyright (C) 2011 Fundacio Privada per a la Xarxa Oberta, Lliure i Neutral guifi.net
+  qMp - Quick Mesh Project - https://www.qmp.cat
+  Copyright © 2011-2017 Fundació Privada per a la Xarxa Oberta, Lliure i Neutral, guifi.net
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-    The full GNU General Public License is included in this distribution in
-    the file called "COPYING".
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
 require("luci.sys")
 local http = require "luci.http"
-m = Map("qmp", "qMp advanced network settings")
+m = Map("qmp", "qMp advanced network settings", translate("This page allows to configure the advanced network settings of a qMp device, like IPv4 and IPv6 addresses, prefixes, DHCP behaviour, etc.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 ethernet_interfaces = { 'eth', 'ath', 'wlan' }
 wireless_interfaces = { 'ath', 'wlan' }
@@ -35,12 +32,13 @@ eth_section:option(Value, "dns", "DNS nameservers",translate("Define the nameser
 -- Option: lan addresses
 eth_section:option(Value, "lan_address", "LAN IP address",translate("IPv4 address for the LAN interfaces."))
 
--- Option: lan addresses
-eth_section:option(Value, "lan_netmask", "LAN netmask",translate("IPv4 netmask for the LAN interfaces."))
+-- Option: lan netmask
+lannetmask=eth_section:option(Value, "lan_netmask", "LAN netmask",translate("IPv4 netmask for the LAN interfaces."))
+lannetmask.datatype="ip4addr"
 
 -- Option: publish lan
 --eth_section:option(Flag, "publish_lan", "Publish LAN", "Publish LAN network through the mesh")
- 
+
 -- Option: disable dhcp lan
 eth_section:option(Flag, "disable_lan_dhcp", "Disable DHCP server in LAN",
 translate("Disable DHCP server in LAN network (not recommended)."))
@@ -84,7 +82,17 @@ overlapping_section:option(Value, "dhcp_offset", "DHCP offset",
 translate("Offset to calculate the first IP to give via DHCP"))
 
 -- Option: Leassetime
-overlapping_section:option(Value, "qmp_leasetime", "DHCP leas etime",translate("Lease time for the DHCP server"))
+overlapping_section:option(Value, "qmp_leasetime", "DHCP lease time",translate("Lease time for the DHCP server"))
+
+
+----------------------
+-- Special settings
+----------------------
+special_section = m:section(NamedSection, "interfaces", "qmp", translate("Special settings"), translate("Use this section to disable VLAN tagging in certain interfaces or to exclude them from qMp."))
+special_section.addremove = False
+
+no_vlan = special_section:option(Value, "no_vlan_devices", translate("VLAN-untagged devices"),translate("Devices that will not be used with VLAN tagging (it is recommended to leave it blank)"))
+ignore_devs = special_section:option(Value, "ignore_devices", translate("Excluded devices"),translate("Devices that will not be used by qMp"))
 
 --------------------------
 -- Commit
@@ -97,4 +105,3 @@ end
 
 
 return m
-
