@@ -7,7 +7,16 @@ Basic usage example for cooking a firmware for TpLink 4300:
 
 ## Preparing the local environment
 
+### Building in running system
+
 Before using lime-sdk, make sure your Linux system has the required dependencies installed. You might follow these instructions (look for _Examples of Package Installations_) https://lede-project.org/docs/guide-developer/install-buildsystem
+
+### Building in docker container
+
+Install [Docker](https://www.docker.com/get-docker) and run the following command:
+
+	docker build -t cooker .
+	docker run -it cooker -v "$(pwd":/app --<parameters>
 
 ## Targets, profiles and flavors
 LibreMesh can be used on many different devices (target and profile) and can be packed in many different ways (flavors), depending on your needs. To this end, it is important to choose the right options for building your firmware.
@@ -81,6 +90,8 @@ The default way to create or use a community is to use this Git repository https
 Both community and device profile names can be any of your choice (must exist!) , since they are only used for identifying it. When executing a cook order, you can specify the community profile like this:
 
 `./cooker -c ar71xx/generic --profile=tl-wdr4300-v1 --flavor=lime_default --community=CommunityName/ProfileName`
+
+A community profile might include a special file named PACKAGES on the root of the profile directory (_CommunityName/ProfileName/PACKAGES_) to specify a list of extra packages which must be added to the firmware image.
 
 ## Using development branch
 
@@ -158,8 +169,8 @@ Time to time, if you want to update the code with the official one you might add
 ## Advanced help
 
     Usage: ./cooker [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]] 
-                    [--download-all|build-all|update-feeds] [--targets|flavors|communities|profiles=<target>] 
-                    [-b <target> [--no-update|no-link-ib|remote|clean|package=<pkg>]]
+                    [--download-all|build-all|update-feeds] [--targets|flavors|communities|update-communities|profiles=<target>] 
+                    [-b <target> [-j<N>] [--no-update|no-link-ib|remote|clean|force-local|package=<pkg>]]
                     [-c <target> [--profile=<profile>|no-update|remote|flavor=<flavor>|community=<path>|extra-pkg=<list>]] 
                     [--help]
     
@@ -171,6 +182,7 @@ Time to time, if you want to update the code with the official one you might add
         --profiles=<target>        : list available hardware profiles for a specific target
         --flavors                  : list available LibreMesh flavors for cooking
         --communities              : list available community profiles
+        --update-communities       : update or download community profiles
         --update-feeds             : update previously downloaded feeds (only works for Git feeds)
         -f                         : download feeds based on feeds.conf.default file. Feeds will be shared among all targets
            --force                 : force reinstall of feeds (remove old if exist)
@@ -182,10 +194,12 @@ Time to time, if you want to update the code with the official one you might add
            --sdk-file=<file>       : specify SDK file to unpack
            --ib-file=<file>        : specify ImageBuilder file to unpack
         -b <target>                : build SDK for specific target and link it to the ImageBuilder
+           -j<N>                   : number of threads to use when building (recommended N=#cores+1)
            --no-link-ib            : do not download and link ImageBuilder when building the SDK
            --no-update             : do not update feeds when building SDK
            --clean                 : clean sources before compiling
            --package=<pkg_name>    : build only a package (and its dependencies)
+           --force-local           : force installation of all local SDK compiled packages when cooking firmware
         -c <target>                : cook the firmware for specific target. Can be used with next options
            --profile=<profile>     : use <profile> when cooking firmware (default is all available target profiles)
            --flavor=<flavor>       : use <flavor> when cooking firmware (default lime_default)
