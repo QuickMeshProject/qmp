@@ -407,7 +407,7 @@ unpack_ib() {
 }
 
 list_flavors() {
-    cat flavors.conf | egrep -v "^_|^#|^$" | awk -F= '{print $1}'
+    cat qmp.flavors.conf | egrep -v "^_|^#|^$" | awk -F= '{print $1}'
 }
 
 get_profile_names() {
