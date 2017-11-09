@@ -339,21 +339,16 @@ qmp_configure_wifi_device() {
 		 -e s/"#QMP_KEY"/"$key"/ \
 		 -e s/"#QMP_MODE"/"ap"/ >> $TMP/qmp_wifi_iface
 	}
-echo "AAAA 16"
 	qmp_uci_import $TMP/qmp_wifi_iface
-  echo "AAAA 16b"
 	qmp_uci_import $TMP/qmp_wifi_device
-echo "AAAA 17"
 	# List arguments (needed for HT capab)
 	cat $device_template | grep -v ^# | grep "^list " | sed s/"^list "//g | sed \
 	 -e s/"#QMP_RADIO"/"$radio"/ | while read l; do
 		qmp_uci_add_list_raw $l
 	done
-echo "AAAA 18"
 	uci reorder wireless.$radio=0
 	#uci reorder wireless.@wifi-iface[$index]=16
 	uci commit wireless
-  echo "AAAA 18"
 }
 
 #############################
