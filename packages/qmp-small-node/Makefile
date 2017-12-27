@@ -25,15 +25,20 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
+BRANCH_GIT?=$(shell git rev-parse --abbrev-ref HEAD)
+REV_GIT?=$(shell git rev-parse --short HEAD)
+DATE_GIT?=$(shell git log  -1 --format=%cd --date=format:%Y%m%d)
+TIME_GIT?=$(shell git log  -1 --format=%cd --date=format:%H%M)
+
 QMP_RELEASE?=trunk
-QMP_PKGRELEASE=r20170831-2
+QMP_PKGRELEASE=r$(DATE_GIT)_$(TIME_GIT)
 QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-small-node
 PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
 PKG_RELEASE:=$(QMP_CODENAME)
-PKG_LICENSE:=GPL-2.0+
+PKG_LICENSE:=GPL-3.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
