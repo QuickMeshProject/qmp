@@ -25,9 +25,14 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
+BRANCH_GIT?=$(shell git rev-parse --abbrev-ref HEAD)
+REV_GIT?=$(shell git rev-parse --short HEAD)
+DATE_GIT?=$(shell git log  -1 --format=%cd --date=format:%Y%m%d)
+TIME_GIT?=$(shell git log  -1 --format=%cd --date=format:%H%M)
+
 QMP_RELEASE?=testing
-QMP_PKGRELEASE=r20171102-1
-QMP_CODENAME?=testing
+QMP_PKGRELEASE=r$(DATE_GIT)_$(TIME_GIT)
+QMP_CODENAME?=Testing
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-system
