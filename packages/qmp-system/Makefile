@@ -25,19 +25,21 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-BRANCH_GIT?=$(shell git rev-parse --abbrev-ref HEAD)
-REV_GIT?=$(shell git rev-parse --short HEAD)
-DATE_GIT?=$(shell git log  -1 --format=%cd --date=format:%Y%m%d)
-TIME_GIT?=$(shell git log  -1 --format=%cd --date=format:%H%M)
+QMP_FEED_DIR?=$(CURDIR)
+
+QMP_GIT_BRANCH?=$(shell git -C $(QMP_FEED_DIR) rev-parse --abbrev-ref HEAD)
+QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
+QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
+QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
 QMP_RELEASE?=4.0
-QMP_PKGRELEASE=r$(DATE_GIT)_$(TIME_GIT)
+QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
 QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-system
 PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
-PKG_RELEASE:=$(QMP_CODENAME)
+PKG_RELEASE:=$(QMP_CODENAME)-$(QMP_GIT_REV)
 PKG_LICENSE:=GPL-3.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -76,8 +78,8 @@ endef
 
 define Package/qmp-system/install
 	$(CP) ./files/* $(1)/
-	$(SED) 's,$$$$BRANCH,$(BRANCH_GIT),g' $(1)/etc/uci-defaults/qmp_banner
-	$(SED) 's,$$$$REV,$(REV_GIT),g' $(1)/etc/uci-defaults/qmp_banner
+	$(SED) 's,$$$$BRANCH,$(QMP_GIT_BRANCH),g' $(1)/etc/uci-defaults/qmp_banner
+	$(SED) 's,$$$$REV,$(QMP_GIT_REV),g' $(1)/etc/uci-defaults/qmp_banner
 	$(SED) 's,$$$$COD,$(QMP_CODENAME),g' $(1)/etc/uci-defaults/qmp_banner
 	$(SED) 's,$$$$REL,$(QMP_RELEASE),g' $(1)/etc/uci-defaults/qmp_banner
 	$(SED) 's,$$$$DATE,$(QMP_BUILDDATE),g' $(1)/etc/uci-defaults/qmp_banner
@@ -86,10 +88,10 @@ define Package/qmp-system/install
 	echo "QMP_ID=qMp" > $(1)/etc/qmp/qmp.release
 	echo "QMP_CODENAME=$(QMP_CODENAME)" >> $(1)/etc/qmp/qmp.release
 	echo "QMP_RELEASE=$(QMP_RELEASE)" >> $(1)/etc/qmp/qmp.release
-	echo "QMP_BRANCH=$(BRANCH_GIT)" >> $(1)/etc/qmp/qmp.release
-	echo "QMP_REVISION=$(REV_GIT)" >> $(1)/etc/qmp/qmp.release
+	echo "QMP_BRANCH=$(QMP_GIT_BRANCH)" >> $(1)/etc/qmp/qmp.release
+	echo "QMP_REVISION=$(QMP_GIT_REV)" >> $(1)/etc/qmp/qmp.release
 	echo "QMP_BUILDDATE=$(QMP_BUILDDATE)" >> $(1)/etc/qmp/qmp.release
-	echo "QMP_DESCRIPTION=\"qMp $(QMP_CODENAME) $(QMP_RELEASE), $(BRANCH_GIT) rev.$(REV_GIT)-$(QMP_BUILDDATE)\"" >> $(1)/etc/qmp/qmp.release
+	echo "QMP_DESCRIPTION=\"qMp $(QMP_CODENAME) $(QMP_RELEASE), branch $(QMP_GIT_BRANCH) rev.$(QMP_GIT_REV)-$(QMP_BUILDDATE)\"" >> $(1)/etc/qmp/qmp.release
 endef
 
 $(eval $(call BuildPackage,qmp-system))

@@ -25,19 +25,21 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-BRANCH_GIT?=$(shell git rev-parse --abbrev-ref HEAD)
-REV_GIT?=$(shell git rev-parse --short HEAD)
-DATE_GIT?=$(shell git log  -1 --format=%cd --date=format:%Y%m%d)
-TIME_GIT?=$(shell git log  -1 --format=%cd --date=format:%H%M)
+QMP_FEED_DIR?=$(CURDIR)
+
+QMP_GIT_BRANCH?=$(shell git -C $(QMP_FEED_DIR) rev-parse --abbrev-ref HEAD)
+QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
+QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
+QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
 QMP_RELEASE?=4.0
-QMP_PKGRELEASE=r$(DATE_GIT)_$(TIME_GIT)
+QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
 QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-small-node
 PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
-PKG_RELEASE:=$(QMP_CODENAME)
+PKG_RELEASE:=$(QMP_CODENAME)-$(QMP_GIT_REV)
 PKG_LICENSE:=GPL-3.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
