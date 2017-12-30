@@ -11,6 +11,18 @@ RESULT=0
 [ ! -d "$files_dir" ] && mkdir -p "$files_dir"
 J=${J:-$make_j}
 
+IMAGEOPT=true
+VERSIONOPT=true
+VERSION_DIST="${dist_name:-qMp}"
+VERSION_NICK="${release:-Kalimotxo}"
+VERSION_NUMBER="${version:-trunk}"
+VERSION_MANUFACTURER="${manufacturer:-Quick Mesh Project}"
+VERSION_MANUFACTURER_URL="${manufacturer_url:-https://qmp.cat}"
+VERSION_BUG_URL="${bug_url:-https://dev.qmp.cat/projects/qmp/issues}"
+VERSION_SUPPORT_URL="${support_url:-https://qmp.cat/Documentation}"
+QMP_CODENAME=$VERSION_NICK
+QMP_RELEASE=$VERSION_NUMBER
+
 usage() {
     echo "Usage: $0 [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]] 
                 [--download-all|build-all|update-feeds] [--targets|flavors|communities|update-communities|profiles=<target>] 
@@ -250,7 +262,7 @@ build_pkg() {
   local output_dir=$PWD/$bin_output/packages
   [ ! -d $output_dir ] && mkdir -p $output_dir
   echo "-> Building package $pkg on sdk $sdk"
-  make -j$J V=$V -C $sdk package/$pkg/{clean,compile,install} && {
+  make -j$J V=$V -C $sdk IMAGEOPT="$IMAGEOPT" VERSIONOPT="$VERSIONOPT" VERSION_DIST="$VERSION_DIST" VERSION_NICK="$VERSION_NICK" VERSION_NUMBER="$VERSION_NUMBER" VERSION_MANUFACTURER="$VERSION_MANUFACTURER" VERSION_MANUFACTURER_URL="$VERSION_MANUFACTURER_URL" VERSION_BUG_URL="$VERSION_BUG_URL" VERSION_SUPPORT_URL="$VERSION_SUPPORT_URL" BRANCH_GIT="$QMP_GIT_BRANCH" REV_GIT="$REV_GIT" QMP_CODENAME="$VERSION_NICK" QMP_RELEASE="$VERSION_NUMBER" package/$pkg/{clean,compile,install} && {
   echo "-> Build of $pkg successful"
   local pkg_path=$(find $sdk/bin/packages -type f -name "${pkg}*.ipk")
   local pkg_file=$(echo $pkg_path | awk -F/ '{print $NF}')
