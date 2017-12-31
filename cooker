@@ -63,6 +63,7 @@ usage() {
     echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
     echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
     echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
+    echo "     -r                        : make a qMp release"
     echo ""
 }
 
@@ -449,8 +450,58 @@ join_packages() {
   done
 }
 
+make_qmp_release() {
+    DISTCL="openwrt"
+    DISTLEGACY="openwrt"
+    COMBINEDEXT4IMG="combined-ext4.img.gz"
+    COMBINEDEXT4VDI="combined-ext4.vdi"
+    COMBINEDEXT4VMDK="combined-ext4.vmdk"
+    COMBINEDSQUASH="combined-squashfs.bin"
+    COMBINEDSQUASHIMG="combined-squashfs.img.gz"
+    COMBINEDSQUASHVDI="combined-squashfs.vdi"
+    COMBINEDSQUASHVMDK="combined-squashfs.vmdk"
+    EXT4SDCARD="ext4-sdcard.img.gz"
+    SDCARDVFATEXT4="sdcard-vfat-ext4.img"
+    SQUASHFACTORY="squashfs-factory.bin"
+    SQUASHSYSUPGRADE="squashfs-sysupgrade.bin"
+    SQUASHFSSDCARD="squashfs-sdcard.img.gz"
+
+    #build_all_sdk
+
+    [ -f qmp.profiles.conf ] && . qmp.profiles.conf
+
+    for i in $SUPPORTED_PROFILES; do
+      TPROFILE="$i" && . qmp.profiles.conf
+
+      flavor=$FLAVOR
+
+      cook "$ARCH/$SUBARCH" "$PROFILE"
+
+      local output_dir="$PWD/$bin_output/$ARCH/$SUBARCH/$PROFILE/$FLAVOR"
+
+      [ "$FACTORY" ] && {
+        echo "$NAME - FACTORY"
+        ls "$output_dir/$(echo $FACTORY | sed 's/_/-/g')"
+      }
+      [ "$SYSUPGRADE" ] && {
+        echo "$NAME - SYSUPGRADE"
+        ls "$output_dir/$(echo $SYSUPGRADE | sed 's/_/-/g')"
+      }
+      [ "$SQUASHIMAGE" ] && {
+        echo "$NAME - SQUASHIMAGE"
+        ls "$output_dir/$(echo $SQUASHIMAGE | sed 's/_/-/g')"
+      }
+      [ "$EXT4IMAGE" ] && {
+        echo "$NAME - EXT4IMAGE"
+        ls "$output_dir/$(echo $EXT4IMAGE | sed 's/_/-/g')"
+      }
+
+    done
+
+}
+
 [ -z "$1" ] && usage
-OPTS=$(getopt -o hd:fb:c:d:i:j: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
+OPTS=$(getopt -o hd:fb:c:d:i:j:rb: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
 update-feeds,no-update,no-link-ib,only-sdk,only-ib,remote,ib,sdk,sdk-file:,ib-file:,help,force,clean,\
 communities,update-communities,community:,cook-all,package:,extra-pkg:,force-local -n $0 -- "$@")
 eval set -- "$OPTS"
@@ -589,6 +640,10 @@ while true; do
             join_packages $system_pkg
             shift;shift
         ;;
+        -r)
+            qmp_release=1
+            shift
+        ;;
         -h)
             usage
             break
@@ -650,5 +705,6 @@ profile=${profile:-Default}
 
 [ "$build_all" == "1" ] && build_all_sdk
 [ "$cook_all" == "1" ] && cook_all_targets
+[ "$qmp_release" == "1" ] && make_qmp_release
 
 exit $RESULT
