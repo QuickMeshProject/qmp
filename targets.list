@@ -8,10 +8,9 @@ mpc85xx/generic
 ramips/rt305x
 ramips/mt7620
 ramips/mt7621
-ramips/mt76x8
-sunxi/cortexa53
-sunxi/cortexa7
-sunxi/cortexa8
+ramips/mt7628
+ramips/mt7688
+sunxi/generic
 x86/64
 x86/generic
 x86/geode
