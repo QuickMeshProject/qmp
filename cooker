@@ -470,6 +470,9 @@ make_qmp_release() {
 
     [ -f qmp.profiles.conf ] && . qmp.profiles.conf
 
+    mkdir -p $bin_output
+    cp DEVICES $bin_output/
+
     for i in $SUPPORTED_PROFILES; do
       TPROFILE="$i" && . qmp.profiles.conf
 
@@ -481,22 +484,38 @@ make_qmp_release() {
 
       [ "$FACTORY" ] && {
         echo "$NAME - FACTORY"
-        ls "$output_dir/$(echo $FACTORY | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $FACTORY | sed 's/_/-/g')"
+        output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_"$(date +%Y%m%d-%H%M)"_factory.bin"
+        echo cp "$fw_file" "$output_file"
+        cp "$fw_file" "$output_file"
       }
       [ "$SYSUPGRADE" ] && {
         echo "$NAME - SYSUPGRADE"
-        ls "$output_dir/$(echo $SYSUPGRADE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $SYSUPGRADE | sed 's/_/-/g')"
+        output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_"$(date +%Y%m%d-%H%M)"_sysupgrade.bin"
+        echo cp "$fw_file" "$output_file"
+        cp "$fw_file" "$output_file"
       }
       [ "$SQUASHIMAGE" ] && {
         echo "$NAME - SQUASHIMAGE"
-        ls "$output_dir/$(echo $SQUASHIMAGE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $SQUASHIMAGE | sed 's/_/-/g')"
+        output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_"$(date +%Y%m%d-%H%M)"_combined-squashfs."$BINEXT
+        echo cp "$fw_file" "$output_file"
+        cp "$fw_file" "$output_file"
       }
       [ "$EXT4IMAGE" ] && {
         echo "$NAME - EXT4IMAGE"
-        ls "$output_dir/$(echo $EXT4IMAGE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $EXT4IMAGE | sed 's/_/-/g')"
+        output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_"$(date +%Y%m%d-%H%M)"_combined-ext4."$BINEXT
+        echo cp "$fw_file" "$output_file"
+        cp "$fw_file" "$output_file"
       }
 
     done
+
+    cd "$output_dir"
+    md5sum *.* >> IMAGES
+    cd ..
 
 }
 
