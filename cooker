@@ -24,10 +24,10 @@ QMP_CODENAME=$VERSION_NICK
 QMP_RELEASE=$VERSION_NUMBER
 
 usage() {
-    echo "Usage: $0 [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]] 
-                [--download-all|build-all|update-feeds] [--targets|flavors|communities|update-communities|profiles=<target>] 
+    echo "Usage: $0 [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]]
+                [--download-all|build-all|update-feeds] [--targets|flavors|communities|update-communities|profiles=<target>]
                 [-b <target> [-j<N>] [--no-update|no-link-ib|remote|clean|force-local|package=<pkg>]]
-                [-c <target> [--profile=<profile>|no-update|remote|flavor=<flavor>|community=<path>|extra-pkg=<list>]] 
+                [-c <target> [--profile=<profile>|no-update|remote|flavor=<flavor>|community=<path>|extra-pkg=<list>]]
                 [--help]"
     echo ""
     echo "    --help                     : show full help with examples"
@@ -63,6 +63,7 @@ usage() {
     echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
     echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
     echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
+    echo "     -r                        : make a qMp release"
     echo ""
 }
 
@@ -199,10 +200,10 @@ build_sdk() {
         echo "-> SDK for target $target not found"
         download_sdk $target
     }
-    
+
     echo "-> Building $sdk"
-    
-    [ -f "$feeds_file" ] || { 
+
+    [ -f "$feeds_file" ] || {
         echo "-> Local feeds file not found"
         download_feeds
     }
@@ -354,8 +355,8 @@ download_sdk() {
     local url="$base_url/$target"
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
-    
-    local sdk_file="$(wget -q -O- $url | grep lede-sdk | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+
+    local sdk_file="$(wget -q -O- $url | grep openwrt-sdk | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
     echo "-> Downloading $url/$sdk_file"
     wget -c "$url/$sdk_file" -O "$tmp_dir/$sdk_file" || {
         echo "-> Error, cannot download SDK $url/$sdk_file"
@@ -373,7 +374,7 @@ unpack_sdk() {
         echo "-> Unpacking SDK to $output"
         tar xf $file -C $output/ && {
             [ -d $output/sdk ] && rm -rf $output/sdk
-            mv $output/lede-sdk* $output/sdk
+            mv $output/openwrt-sdk* $output/sdk
             rm -rf $output/sdk/dl
             local dl=$downloads_dir
             echo $dl | grep -q / || dl="$PWD/$dl"
@@ -393,7 +394,7 @@ download_ib() {
     local url="$base_url/$target"
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
-    local ib_file="$(wget -q -O- $url | grep lede-imagebuilder | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    local ib_file="$(wget -q -O- $url | grep openwrt-imagebuilder | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
     echo "-> Downloading $url/$ib_file"
     wget -c "$url/$ib_file" -O "$tmp_dir/$ib_file" || {
         echo "-> Error, cannot download ImageBuilder $url/$ib_file"
@@ -411,7 +412,7 @@ unpack_ib() {
         echo "-> Unpacking ImageBuilder to $output"
         tar xf $file -C $output/ && {
            [ -d $output/ib ] && rm -rf $output/ib
-           mv $output/lede-imagebuilder* $output/ib
+           mv $output/openwrt-imagebuilder* $output/ib
            cp -f $output/ib/repositories.conf $output/ib/repositories.original.conf
            sed -i 's%^src/gz .*_routing .*$%# &%' $output/ib/repositories.original.conf
        } || echo "-> Error installing ImageBuilder"
@@ -449,8 +450,58 @@ join_packages() {
   done
 }
 
+make_qmp_release() {
+    DISTCL="openwrt"
+    DISTLEGACY="openwrt"
+    COMBINEDEXT4IMG="combined-ext4.img.gz"
+    COMBINEDEXT4VDI="combined-ext4.vdi"
+    COMBINEDEXT4VMDK="combined-ext4.vmdk"
+    COMBINEDSQUASH="combined-squashfs.bin"
+    COMBINEDSQUASHIMG="combined-squashfs.img.gz"
+    COMBINEDSQUASHVDI="combined-squashfs.vdi"
+    COMBINEDSQUASHVMDK="combined-squashfs.vmdk"
+    EXT4SDCARD="ext4-sdcard.img.gz"
+    SDCARDVFATEXT4="sdcard-vfat-ext4.img"
+    SQUASHFACTORY="squashfs-factory.bin"
+    SQUASHSYSUPGRADE="squashfs-sysupgrade.bin"
+    SQUASHFSSDCARD="squashfs-sdcard.img.gz"
+
+    #build_all_sdk
+
+    [ -f qmp.profiles.conf ] && . qmp.profiles.conf
+
+    for i in $SUPPORTED_PROFILES; do
+      TPROFILE="$i" && . qmp.profiles.conf
+
+      flavor=$FLAVOR
+
+      cook "$ARCH/$SUBARCH" "$PROFILE"
+
+      local output_dir="$PWD/$bin_output/$ARCH/$SUBARCH/$PROFILE/$FLAVOR"
+
+      [ "$FACTORY" ] && {
+        echo "$NAME - FACTORY"
+        ls "$output_dir/$(echo $FACTORY | sed 's/_/-/g')"
+      }
+      [ "$SYSUPGRADE" ] && {
+        echo "$NAME - SYSUPGRADE"
+        ls "$output_dir/$(echo $SYSUPGRADE | sed 's/_/-/g')"
+      }
+      [ "$SQUASHIMAGE" ] && {
+        echo "$NAME - SQUASHIMAGE"
+        ls "$output_dir/$(echo $SQUASHIMAGE | sed 's/_/-/g')"
+      }
+      [ "$EXT4IMAGE" ] && {
+        echo "$NAME - EXT4IMAGE"
+        ls "$output_dir/$(echo $EXT4IMAGE | sed 's/_/-/g')"
+      }
+
+    done
+
+}
+
 [ -z "$1" ] && usage
-OPTS=$(getopt -o hd:fb:c:d:i:j: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
+OPTS=$(getopt -o hd:fb:c:d:i:j:rb: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
 update-feeds,no-update,no-link-ib,only-sdk,only-ib,remote,ib,sdk,sdk-file:,ib-file:,help,force,clean,\
 communities,update-communities,community:,cook-all,package:,extra-pkg:,force-local -n $0 -- "$@")
 eval set -- "$OPTS"
@@ -557,7 +608,7 @@ while true; do
             cook=1
             target="$2"
             shift;shift
-        ;;  
+        ;;
         --profile)
             profile="$2"
             shift;shift
@@ -588,6 +639,10 @@ while true; do
             PKG="$2"
             join_packages $system_pkg
             shift;shift
+        ;;
+        -r)
+            qmp_release=1
+            shift
         ;;
         -h)
             usage
@@ -650,5 +705,6 @@ profile=${profile:-Default}
 
 [ "$build_all" == "1" ] && build_all_sdk
 [ "$cook_all" == "1" ] && cook_all_targets
+[ "$qmp_release" == "1" ] && make_qmp_release
 
 exit $RESULT
