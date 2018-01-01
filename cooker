@@ -451,8 +451,8 @@ join_packages() {
 }
 
 make_qmp_release() {
-    DISTCL="openwrt"
-    DISTLEGACY="openwrt"
+    DISTCL="lede"-$lede_release
+    DISTLEGACY="lede-"$lede_release
     COMBINEDEXT4IMG="combined-ext4.img.gz"
     COMBINEDEXT4VDI="combined-ext4.vdi"
     COMBINEDEXT4VMDK="combined-ext4.vmdk"
