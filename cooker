@@ -513,7 +513,7 @@ make_qmp_release() {
 
     done
 
-    cd "$output_dir"
+    cd "$bin_output"
     md5sum *.* >> IMAGES
     cd ..
 
