@@ -91,7 +91,7 @@ define Package/qmp-system/install
 	echo "QMP_BRANCH=$(QMP_GIT_BRANCH)" >> $(1)/etc/qmp/qmp.release
 	echo "QMP_REVISION=$(QMP_GIT_REV)" >> $(1)/etc/qmp/qmp.release
 	echo "QMP_BUILDDATE=$(QMP_BUILDDATE)" >> $(1)/etc/qmp/qmp.release
-	echo "QMP_DESCRIPTION=\"qMp $(QMP_CODENAME) $(QMP_RELEASE), $(QMP_GIT_BRANCH) rev.$(QMP_GIT_REV)-$(QMP_BUILDDATE)\"" >> $(1)/etc/qmp/qmp.release
+	echo "QMP_DESCRIPTION=\"qMp $(QMP_CODENAME) $(QMP_RELEASE), branch $(QMP_GIT_BRANCH) rev.$(QMP_GIT_REV)-$(QMP_BUILDDATE)\"" >> $(1)/etc/qmp/qmp.release
 endef
 
 $(eval $(call BuildPackage,qmp-system))
