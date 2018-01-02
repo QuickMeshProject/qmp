@@ -1,4 +1,5 @@
 release=Kalimotxo
+version=trunk
 base_url=https://downloads.lede-project.org/snapshots/targets/
 communities_git=https://github.com/libremesh/network-profiles.git
 communities_dir=communities
