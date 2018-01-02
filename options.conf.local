@@ -1,4 +1,6 @@
+<<<<<<< HEAD
 release=Neumann
+version=testing
 lede_release=17.01.4
 base_url=https://downloads.lede-project.org/releases/$lede_release/targets/
 communities_git=https://github.com/libremesh/network-profiles.git
