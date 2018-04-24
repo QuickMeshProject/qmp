@@ -356,7 +356,7 @@ download_sdk() {
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
 
-    local sdk_file="$(wget -q -O- $url | grep openwrt-sdk | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    local sdk_file="$(wget -q -O- $url | grep openwrt-sdk | grep -Eoi '<a [^>]+>' |  grep -Eo 'href="[^\"]+"' | cut -d '=' -f 2 | sed 's/\"//g')"
     echo "-> Downloading $url/$sdk_file"
     wget -c "$url/$sdk_file" -O "$tmp_dir/$sdk_file" || {
         echo "-> Error, cannot download SDK $url/$sdk_file"
@@ -394,7 +394,7 @@ download_ib() {
     local url="$base_url/$target"
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
-    local ib_file="$(wget -q -O- $url | grep openwrt-imagebuilder | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    local ib_file="$(wget -q -O- $url | grep openwrt-imagebuilder | grep -Eoi '<a [^>]+>' |  grep -Eo 'href="[^\"]+"' | cut -d '=' -f 2 | sed 's/\"//g')"
     echo "-> Downloading $url/$ib_file"
     wget -c "$url/$ib_file" -O "$tmp_dir/$ib_file" || {
         echo "-> Error, cannot download ImageBuilder $url/$ib_file"
