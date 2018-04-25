@@ -17,9 +17,9 @@
 #    The full GNU General Public License is included in this distribution in
 #    the file called "COPYING".
 #
-# Contributors:
-#	Pau Escrich <p4u@dabax.net>
-#	Simó Albert i Beltran
+#    Contributors:
+#	       Pau Escrich <p4u@dabax.net>
+#	       Simó Albert i Beltran
 #
 
 include $(TOPDIR)/rules.mk
@@ -72,7 +72,6 @@ define Package/qmp-small-node/description
 
  It is intended to be used on devices with 8 MB of flash or more.
 endef
-
 
 define Build/Configure
 endef
