@@ -178,7 +178,7 @@ function confwifi.write(self, section)
   -- Delete all wireless sections from qmp config
   local delsecs = {}
 
-  local cursor = uci.cursor()
+  local cursor = luci.model.uci.cursor()
   cursor:foreach("qmp", "wireless", function(s)
     table.insert(delsecs, s[".name"])
   end

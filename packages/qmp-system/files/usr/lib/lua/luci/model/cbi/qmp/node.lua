@@ -20,7 +20,7 @@ package.path = package.path .. ";/etc/qmp/?.lua"
 
 require("luci.sys")
 local http = require "luci.http"
-local uciout = uci.cursor()
+local uciout = luci.model.uci.cursor()
 local qmpinfo = require "qmpinfo"
 
 
