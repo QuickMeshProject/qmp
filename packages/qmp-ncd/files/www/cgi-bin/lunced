@@ -1,0 +1,52 @@
+#!/bin/sh
+
+action=$(echo "$QUERY_STRING" | grep -oE "(^|[&])action=[^&]+" | cut -f 2 -d "=" | head -n1)
+address=$(echo "$QUERY_STRING" | grep -oE "(^|[&])address=[^&]+" | cut -f 2 -d "=" | head -n1)
+cmd=$(echo "$QUERY_STRING" | grep -oE "(^|[?&])cmd=[^&]+" | cut -f 2 -d "=" | head -n1)
+parameters=$(echo "$QUERY_STRING" | grep -oE "(^|[&])parameters=[^&]+" | cut -f 2 -d "=" | head -n1 )
+algorithm=$(echo "$QUERY_STRING" | grep -oE "(^|[&])algorithm=[^&]+" | cut -f 2 -d "=" | head -n1)
+rxExpNumerator=$(echo "$QUERY_STRING" | grep -oE "(^|[&])rxExpNumerator=[^&]+" | cut -f 2 -d "=" | head -n1)
+rxExpDivisor=$(echo "$QUERY_STRING" | grep -oE "(^|[&])rxExpDivisor=[^&]+" | cut -f 2 -d "=" | head -n1)
+txExpNumerator=$(echo "$QUERY_STRING" | grep -oE "(^|[&])txExpNumerator=[^&]+" | cut -f 2 -d "=" | head -n1)
+txExpDivisor=$(echo "$QUERY_STRING" | grep -oE "(^|[&])txExpDivisor=[^&]+" | cut -f 2 -d "=" | head -n1)
+#node=$(echo "$QUERY_STRING" | grep -oE "(^|[?&])node=[^&]+" | cut -f 2 -d "=" | head -n1)
+
+head_txt() {
+	echo "Content-type: text/html"
+	echo ""
+}
+
+head_json() {
+	echo "Content-Type: application/json"
+	echo ""
+}
+
+head_error() {
+	local error = $1
+
+	[ -z "$error" ] && error="404"
+
+	echo "Status: $error Not Found"
+	echo "Content-Type: text/html"
+	echo ""
+	echo "<h1>$error File not found!</h1>"
+	exit
+}
+
+[ -z "$cmd" ] && head_error
+
+head_json
+
+if [ "$cmd" == "bmx6SetMetricAlgo" ]; then
+	ubus call lunced-remote bmx6SetMetricAlgo '{"rxExpNumerator":'$rxExpNumerator',"rxExpDivisor":'$rxExpDivisor',"txExpDivisor":'$txExpDivisor',"algorithm":'$algorithm',"txExpNumerator":'$txExpNumerator'}'
+elif [ "$cmd" == "nettestPing" ]; then
+	ubus call lunced-remote nettestPing '{"address": "'$address'", "parameters": "'$parameters'" }'
+elif [ "$cmd" == "nettestBandwidth" ]; then
+	ubus call lunced-remote nettestBandwidth '{"address": "'$address'", "parameters": "'$parameters'" }'
+elif [ "$cmd" == "nettestIperf3" ]; then
+	ubus call lunced-remote nettestIperf3 '{"action": "'$action'"}'
+else
+	ubus call lunced-remote $cmd
+fi
+
+
