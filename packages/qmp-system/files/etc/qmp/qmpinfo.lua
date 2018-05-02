@@ -210,6 +210,8 @@ function qmpinfo.get_channels(dev)
 			ch.adhoc = false
 		end
 
+		ch.s80211 = true
+
 		-- 2.4Ghz band
 		if c < 15 then
 			if c < 4 then

@@ -48,7 +48,8 @@ qmp_check_channel() {
 		# Checking if some thing related with channel is wrong
 		local wrong=0
 		[ -z "$channel" ] || [ -z "$chaninfo" ] && wrong=1
-		[ "$mode" == "adhoc" -o "$mode" == "adhoc_ap" -o "$mode" == "80211s" -o "$mode" == "80211s_aplan" ] && [ -z "$(echo $chaninfo | grep adhoc)" ] && wrong=1
+		[ "$mode" == "80211s" -o "$mode" == "80211s_aplan" ] && [ -z "$(echo $chaninfo | grep 80211s)" ] && wrong=1
+		[ "$mode" == "adhoc" -o "$mode" == "adhoc_ap" ] && [ -z "$(echo $chaninfo | grep adhoc)" ] && wrong=1
 		[ "$ht40" == "+" ] && [ -z "$(echo $chaninfo | grep +)" ] && wrong=1
 		[ "$ht40" == "-" ] && [ -z "$(echo $chaninfo | grep -)" ] && wrong=1
 		[ "$m11b" == "b" ] && [ $channel -gt 14 ] && wrong=1
@@ -385,15 +386,22 @@ qmp_wifi_get_default() {
 	local what="$1"
 	local device="$2"
 
-	# MODE
-	# default mode depends on several things:
-	#  if only 1 device = adhoc_ap
+	# WIRELESS MODE
+	#
+	# The default wireless mode depends on the following criteria:
+	#  - Only 1 device:
+	#		 · If 5 GHz-capable: 802.11s (mesh) on the 5 GHz band
+	#		 · Otherwise: 802.11s (mesh) + AP (LAN) on the 2.4 GHz band
+	#  - Two or more devices:
+	#    · Depending on the device's capabilities and on the other devices'
+
 	#  if only 1 bg device = ap
 	#  else depending on index
 
 	if [ "$what" == "mode" ]; then
 
-		#Count the number of total devices, A/AN 5 GHz devices, B/BG/BGN 2.4 GHz devices and AB/ABG/ABGN dual-band devices
+		# Count the total number of devices, single-band 802.11a/an devices,
+		# single-band 802.11b/bg/bgn and dual-band 802.11ab/abg/abgn devices.
 		local devices=0
 		local a_devices=0
 		local bg_devices=0
@@ -407,48 +415,49 @@ qmp_wifi_get_default() {
 
 		local index=$(echo $device | tr -d [A-z])
 
-		#Only one device: if 5 GHz-capable => adhoc, otherwise AP+ADHOC
+
+		# Only one device: if 5 GHz-capable, then 80211s; otherwise 80211s_aplan
 		if [ $devices -eq 1 ]; then
-			[ $bg_devices -eq 0 ] && echo "adhoc" || echo "adhoc_ap"
+			[ $bg_devices -eq 0 ] && echo "80211s" || echo "80211s_aplan"
 		else
 
-		#Two or more devices
+			# If current device is 5 GHz-capable only, then 80211s
+			a_this_device=$($QMPINFO modes $device | egrep "a" | egrep -v "b|g" -c)
+			if [ $a_this_device -eq 1 ]; then
+				echo "80211s"
+			else
 
-		# If current device is 5 GHz-capable only => adhoc
-		a_this_device=$($QMPINFO modes $device | egrep "a" | egrep -v "b|g" -c)
-		if [ $a_this_device -eq 1 ]; then
-			echo "adhoc"
-		else
+				# If current device is 2.4 GHz-capable only => 80211s_aplan
+				bg_this_device=$($QMPINFO modes $device | egrep -v "a" | egrep "b|g" -c)
+				if [ $bg_this_device -eq 1 ]; then
+					echo "80211s_aplan"
+				else
 
-		# If current device is 2.4 GHz-capable only => adhoc_ap
-		bg_this_device=$($QMPINFO modes $device | egrep -v "a" | egrep "b|g" -c)
-		if [ $bg_this_device -eq 1 ]; then
-			echo "adhoc_ap"
-		else
+					# If current device is dual-band capable only => depends on the other devices
 
-		# If current device is dual-band capable only => depends on the other devices
+					# If there are no other only 5 GHz-capable devices => 80211s
+					if [ $a_devices -eq 0 ] && [ $abg_devices -eq 1 ]; then
+						echo "80211s"
+					else
 
-		# If there are no other only 5 GHz-capable devices => adhoc
-		if [ $a_devices -eq 0 ]; then
-			echo "adhoc"
-		else
+						# If there are no other only 2.4 GHz-capable devices => 80211s_aplan
+						if [ $bg_devices -eq 0 ] && [ $abg_devices -eq 1 ]; then
+							echo "80211s_aplan"
+						else
 
-		# If there are no other only 2.4 GHz-capable devices => adhoc_ap
-		if [ $bg_devices -eq 0 ]; then
-			echo "adhoc_ap"
-		else
+							# If all the devices are dual-band capable => first device 80211s, the rest 80211s_aplan
+							if [ $abg_devices -eq $devices ]; then
+								[ $index == 0 ] && echo "80211s" || echo "80211s_aplan"
+							else
 
-		# If all the devices are dual-band capable => firs device adhoc, the rest adhoc_ap
-		if [ $abg_devices -eq $devices ]; then
-			[ $index == 0 ] && echo "adhoc" || echo "adhoc_ap"
-		else
-
-		# This should never happen
-			echo "adhoc_ap"
+								# This should never happen
+								echo "80211s_aplan"
 		fi;fi;fi;fi;fi;fi
 
-	# CHANNEL
-	# Default channel depends on the card and on configured mode
+	# WIRELESS CHANNEL
+	#
+	# The default wireless channel depends on the card and on the configured mode:
+	#
 	#  Highest channel -> adhoc or not-configured
 	#  Lower channel -> ap
 
@@ -460,7 +469,7 @@ qmp_wifi_get_default() {
 		local index=$(echo $device | tr -d [A-z])
 		index=${index:-0}
 
-		# QMPINFO returns a list of avaiable channels in this format: 130 ht40+ adhoc
+		# QMPINFO returns a list of avaiable channels in this format: 120 ht40+ adhoc 80211s
 		# this is the command line used to get available channels from a device
 		local channels_cmd="$QMPINFO channels $device"
 		local num_channels=$($channels_cmd | wc -l)
@@ -473,7 +482,7 @@ qmp_wifi_get_default() {
 		local ht40="" # ht40+/ht40-
 
 		# channel AdHoc is the last available (qmp_tac = inverse order) plus index*2+1 (1 3 5 ...)
-		[ "$mode" == "adhoc" ] || [ -z "$mode" ] && {
+		[ "$mode" == "adhoc" ] || [ "$mode" == "80211s" ] || [ -z "$mode" ] && {
 
 			#this is global
 			ADHOC_INDEX=${ADHOC_INDEX:-0}
@@ -528,7 +537,7 @@ qmp_wifi_get_default() {
 
 		# if there is some problem, channel 6 is used
 		if [ -z "$channel_info" ]; then
-			qmp_log "Warning, not usable channels found in device $device "
+			qmp_log "Warning, no usable channels found in device $device "
 			[ "$1" == "channel" ] && echo "6"
 			return
 		fi
