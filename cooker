@@ -63,7 +63,7 @@ usage() {
     echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
     echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
     echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
-    echo "     -r                        : make a qMp release"
+    echo "    -r                         : make a qMp release"
     echo ""
 }
 
