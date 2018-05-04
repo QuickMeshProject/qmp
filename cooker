@@ -478,6 +478,8 @@ make_qmp_release() {
 
       flavor=$FLAVOR
 
+      join_packages $EXTRAPKGS
+
       cook "$ARCH/$SUBARCH" "$PROFILE"
 
       local output_dir="$PWD/$bin_output/$ARCH/$SUBARCH/$PROFILE/$FLAVOR"
