@@ -130,13 +130,14 @@ qmp_configure_wifi_device() {
 	# clientwan => Client (WAN)
 	# 80211s ====> 802.11s (mesh)
 	# 80211s_aplan ====> 802.11s (mesh) + access poin (LAN)
+	# 80211s_adhoc ====> 802.11s (mesh) + adhoc (mesh)
 
 	local mode="$(qmp_uci_get @wireless[$id].mode)"
   local dev_disabled="0"
 
 	# Remove $device and also unneeded white spaces
 	local allmeshdevs="$(qmp_uci_get interfaces.mesh_devices)"
-	local meshdevs="$(echo $allmeshdevs | sed -e s/$device//g  -e 's/^[ \t]*//' -e 's/ \+/ /g' -e 's/[ \t]*$//')"
+	local meshdevs="$(echo $allmeshdevs | sed -e s/$device[a-z]*[A-Z]*//g  -e 's/^[ \t]*//' -e 's/ \+/ /g' -e 's/[ \t]*$//')"
 	local allwandevs="$(qmp_uci_get interfaces.wan_devices)"
 	local wandevs="$(echo $allwandevs | sed -e s/$device//g  -e 's/^[ \t]*//' -e 's/ \+/ /g' -e 's/[ \t]*$//')"
 	local alllandevs="$(qmp_uci_get interfaces.lan_devices)"
@@ -161,6 +162,11 @@ qmp_configure_wifi_device() {
 		80211s_aplan)
 			qmp_uci_set interfaces.mesh_devices "$meshdevs $device"
 			qmp_uci_set interfaces.lan_devices  "$landevs $device"
+			qmp_uci_set interfaces.wan_devices  "$wandevs"
+			;;
+		80211s_adhoc)
+			qmp_uci_set interfaces.mesh_devices "$meshdevs $device ${device}a"
+			qmp_uci_set interfaces.lan_devices  "$landevs"
 			qmp_uci_set interfaces.wan_devices  "$wandevs"
 			;;
 		ap)
@@ -276,6 +282,7 @@ qmp_configure_wifi_device() {
 	[ -z $mesh80211s ] && mesh80211s="qMp"
 
 	local vap=0
+	local ahl=0
 	[ $mode == "adhoc_ap" ] && {
 		mode="adhoc"
 		vap=1
@@ -284,6 +291,11 @@ qmp_configure_wifi_device() {
 	[ $mode == "80211s_aplan" ] && {
 		mode="80211s"
 		vap=1
+	}
+
+	[ $mode == "80211s_adhoc" ] && {
+		mode="80211s"
+		ahl=1
 	}
 
 	device_template="$TEMPLATE_BASE/device.$driver-$mode11"
@@ -340,6 +352,22 @@ qmp_configure_wifi_device() {
 		 -e s/"#QMP_KEY"/"$key"/ \
 		 -e s/"#QMP_MODE"/"ap"/ >> $TMP/qmp_wifi_iface
 	}
+
+	# If legacy Ad hoc interface has to be configured
+  ahl_template="$TEMPLATE_BASE/iface.adhoclegacy"
+  [ ! -f "$ahl_template" ] && qmp_error "Legacy Ad hoc mesh template $ahl_template not found"
+	[ "$ahl" == "1" ] && {
+		qmp_prepare_wireless_iface ${device}a
+		cat $ahl_template | grep -v ^# | sed \
+		 -e s/"#QMP_RADIO"/"$radio"/ \
+		 -e s/"#QMP_DEVICE"/"${device}a"/ \
+		 -e s/"#QMP_IFNAME"/"${device}a"/ \
+		 -e s/"#QMP_SSID"/"$(echo "${name:0:32}" | sed -e 's|/|\\/|g')"/ \
+		 -e s/"#QMP_BSSID"/"$bssid"/ \
+		 -e s/"#QMP_NETWORK"/"${network}a"/ \
+		 -e s/"#QMP_MODE"/"adhoc"/ >> $TMP/qmp_wifi_iface
+	}
+
 	qmp_uci_import $TMP/qmp_wifi_iface
 	qmp_uci_import $TMP/qmp_wifi_device
 	# List arguments (needed for HT capab)

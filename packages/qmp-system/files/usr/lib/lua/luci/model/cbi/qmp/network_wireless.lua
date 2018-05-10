@@ -81,8 +81,9 @@ for _,wdev in ipairs(wdevs) do
 
   -- Mode
   mode = s_wireless:option(ListValue,"mode","Mode")
-  mode:value("adhoc","Ad hoc (mesh)")
   mode:value("80211s","802.11s (mesh)")
+  mode:value("80211s_adhoc","802.11s (mesh) + Ad hoc (legacy mesh)")
+  mode:value("adhoc","Ad hoc (legacy mesh)")
   mode:value("ap","Access point (mesh)")
   mode:value("client","Client (mesh)")
   mode:value("aplan","Access point (LAN)")
@@ -90,6 +91,7 @@ for _,wdev in ipairs(wdevs) do
   mode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
   mode:value("80211s_aplan","802.11s (mesh) + access point (LAN)")
   mode:value("none","Disabled")
+  mode.default = "80211s_aplan"
 
   -- Channel
   channel = s_wireless:option(ListValue,"channel","Channel",translate("WiFi channel to be used in this device.") .. " " ..translate ("Selecting channels with + or - enables 40MHz bandwidth."))

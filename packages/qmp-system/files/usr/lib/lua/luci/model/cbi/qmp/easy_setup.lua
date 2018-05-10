@@ -258,8 +258,9 @@ local wireless_interface_mode_help
 wireless_interface_mode_help = m:field(DummyValue,"wireless_interface_mode_help")
 wireless_interface_mode_help.rawhtml = true
 wireless_interface_mode_help.default = translate("Select the working mode of the wireless network interfaces:") .. "<br/> <br/>" ..
-  translate("· <em>Ad hoc (mesh)</em> mode is used to link with other mesh nodes operating in ad hoc mode") .. "<br/>" ..
-  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in ad hoc mode") .."<br/>" ..
+  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> mode") .."<br/>" ..
+  translate("· <em>802.11s (mesh) + Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> or in <strong>legacy ad hoc mesh</strong> mode. Use this one for <strong>backwards compatibility</strong> with old qMp deployments.") .."<br/>" ..
+  translate("· <em>Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>legacy ad hoc mesh</strong> mode") .. "<br/>" ..
   translate("· <em>AP (mesh)</em> mode is used to create an access point for other mesh nodes to connect as clients") .. "<br/>" ..
   translate("· <em>Client (mesh)</em> mode is used to link with a mesh node operating in AP mode") .. "<br/>" ..
   translate("· <em>AP (LAN)</em> mode is used to generate an access point for end users' devices") .. "<br/>" ..
@@ -271,8 +272,9 @@ nodedevs_wifi = {}
 
 for i,v in ipairs(devices.wifi) do
   wmode = m:field(ListValue, "_"..v.."_mode", translatef("Wireless interface <strong>%s</strong>",v))
-  wmode:value("adhoc","Ad hoc (mesh)")
   wmode:value("80211s","802.11s (mesh)")
+  wmode:value("80211s_adhoc","802.11s (mesh) + Ad hoc (legacy mesh)")
+  wmode:value("adhoc","Ad hoc (legacy mesh)")
   wmode:value("ap","Access point (mesh)")
   wmode:value("client","Client (mesh)")
   wmode:value("aplan","Access point (LAN)")
@@ -280,7 +282,7 @@ for i,v in ipairs(devices.wifi) do
   wmode:value("adhoc_ap","Ad hoc (mesh) + access point (LAN)")
   wmode:value("80211s_aplan","802.11s (mesh) + access point (LAN)")
   wmode:value("none","Disabled")
-  wmode.default = "adhoc_ap"
+  wmode.default = "80211s_aplan"
 
   wchan = m:field(ListValue, "_".. v.."_chan", translate("Channel"))
   for _,ch in ipairs(qmpinfo.get_channels(v)) do
