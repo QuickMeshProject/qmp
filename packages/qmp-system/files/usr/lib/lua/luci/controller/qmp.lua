@@ -35,11 +35,11 @@ function index()
 	entry({"qmp","status"}, template("admin_status/index"), "Status", 2).dependent=false
 
   entry({"qmp","configuration"}, cbi("qmp/easy_setup"), "Device configuration", 4).dependent=false
-    entry({"qmp","configuration","easy_setup"}, cbi("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
+    entry({"qmp","configuration","easy_setup"}, form("qmp/easy_setup"), "qMp easy setup", 10).dependent=false
   entry({"qmp","configuration","node"}, cbi("qmp/node"), "Node settings", 20).dependent=false
   entry({"qmp","configuration","network"}, cbi("qmp/network_basic"), "Network settings", 30).dependent=false
     entry({"qmp","configuration","network","basic"}, cbi("qmp/network_basic"), "Basic settings", 31).dependent=false
-    entry({"qmp","configuration","network","wired"}, cbi("qmp/network_wired"), "Wired interfaces", 32).dependent=false
+    entry({"qmp","configuration","network","wired"}, form("qmp/network_wired"), "Wired interfaces", 32).dependent=false
     entry({"qmp","configuration","network","wireless"}, cbi("qmp/network_wireless"), "Wireless interfaces", 33).dependent=false
     entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced settings", 34).dependent=false
   entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 40).dependent=false
