@@ -63,7 +63,8 @@ usage() {
     echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
     echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
     echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
-    echo "    -r                         : make a qMp release"
+    echo "    -r                         : make a full qMp release"
+    echo "       --refresh               : refresh a qMp release in this directory"
     echo ""
 }
 
@@ -451,6 +452,20 @@ join_packages() {
 }
 
 make_qmp_release() {
+
+    # Download the feeds (./cooker -f)
+    download_feeds
+
+    # Update feeds if refresh_release is on
+    [ -n "$refresh_release" ] && update_feeds
+
+    # Run snippets
+    ./snippets/regdbus.sh
+
+    # Build the SDK and the packages locally for each architecture
+    force_local=1
+    build_all_sdk
+
     DISTCL="openwrt"
     DISTLEGACY="openwrt"
     COMBINEDEXT4IMG="combined-ext4.img.gz"
@@ -465,8 +480,6 @@ make_qmp_release() {
     SQUASHFACTORY="squashfs-factory.bin"
     SQUASHSYSUPGRADE="squashfs-sysupgrade.bin"
     SQUASHFSSDCARD="squashfs-sdcard.img.gz"
-
-    #build_all_sdk
 
     [ -f qmp.profiles.conf ] && . qmp.profiles.conf
 
@@ -663,6 +676,10 @@ while true; do
         ;;
         -r)
             qmp_release=1
+            shift
+        ;;
+        --refresh)
+            refresh_release=1
             shift
         ;;
         -h)
