@@ -170,9 +170,26 @@ community_addressing_help.default = "<strong>" .. " " .. "</strong>" .. "<br/> <
 
 local nodeip = m:field(Value, "_nodeip", " ", translate("Main IPv4 address for this device."))
 nodeip:depends("_nodemode","community")
-nodeip.default = "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1"
 nodeip.optional=false
 nodeip.datatype="ip4addr"
+
+local pip = uciout:get("qmp","networks","bmx6_ipv4_address")
+if pip == nil or #pip < 7 then
+  pip = uciout:get("bmx6","general","tun4Address")
+  if pip == nil or #pip < 7 then
+    pip = "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1"
+  end
+end
+
+if string.find(pip, "/") then
+  pip = string.sub(pip, 0, string.find(pip, "/") -1)
+end
+
+nodeip.default=pip
+
+
+
+
 
 -- Mesh IPv4 netmask (public)
 local nodemask = m:field(Value, "_nodemask"," ", translate("Network mask to be used with the IPv4 address above."))
