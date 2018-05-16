@@ -63,7 +63,8 @@ usage() {
     echo "       --remote                : instead of building local SDK packages. Use only remote repositories for cooking"
     echo "       --community=<name/prof> : specify which network community and profile device to use (if any)"
     echo "       --no-update             : do not update package list when cooking (requires patch_ib_no_update.sh snippet)"
-    echo "     -r                        : make a qMp release"
+    echo "    -r                         : make a full qMp release"
+    echo "       --refresh               : refresh a qMp release in this directory"
     echo ""
 }
 
@@ -356,7 +357,7 @@ download_sdk() {
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
 
-    local sdk_file="$(wget -q -O- $url | grep lede-sdk | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    local sdk_file="$(wget -q -O- $url | grep lede-sdk | grep -Eoi '<a [^>]+>' |  grep -Eo 'href="[^\"]+"' | cut -d '=' -f 2 | sed 's/\"//g')"
     echo "-> Downloading $url/$sdk_file"
     wget -c "$url/$sdk_file" -O "$tmp_dir/$sdk_file" || {
         echo "-> Error, cannot download SDK $url/$sdk_file"
@@ -394,7 +395,7 @@ download_ib() {
     local url="$base_url/$target"
     local output="$release/$target"
     [ ! -d "$output" ] && mkdir -p "$output"
-    local ib_file="$(wget -q -O- $url | grep lede-imagebuilder | grep href | awk -F\> '{print $4}' | awk -F\< '{print $1}')"
+    local ib_file="$(wget -q -O- $url | grep lede-imagebuilder | grep -Eoi '<a [^>]+>' |  grep -Eo 'href="[^\"]+"' | cut -d '=' -f 2 | sed 's/\"//g')"
     echo "-> Downloading $url/$ib_file"
     wget -c "$url/$ib_file" -O "$tmp_dir/$ib_file" || {
         echo "-> Error, cannot download ImageBuilder $url/$ib_file"
@@ -451,8 +452,22 @@ join_packages() {
 }
 
 make_qmp_release() {
-    DISTCL="lede"-$lede_release
-    DISTLEGACY="lede-"$lede_release
+
+    # Download the feeds (./cooker -f)
+    download_feeds
+
+    # Update feeds if refresh_release is on
+    [ -n "$refresh_release" ] && update_feeds
+
+    # Run snippets
+    ./snippets/regdbus.sh
+
+    # Build the SDK and the packages locally for each architecture
+    force_local=1
+    build_all_sdk
+
+    DISTCL="lede"
+    DISTLEGACY="lede"
     COMBINEDEXT4IMG="combined-ext4.img.gz"
     COMBINEDEXT4VDI="combined-ext4.vdi"
     COMBINEDEXT4VMDK="combined-ext4.vmdk"
@@ -466,8 +481,6 @@ make_qmp_release() {
     SQUASHSYSUPGRADE="squashfs-sysupgrade.bin"
     SQUASHFSSDCARD="squashfs-sdcard.img.gz"
 
-    #build_all_sdk
-
     [ -f qmp.profiles.conf ] && . qmp.profiles.conf
 
     mkdir -p $bin_output
@@ -477,6 +490,8 @@ make_qmp_release() {
       TPROFILE="$i" && . qmp.profiles.conf
 
       flavor=$FLAVOR
+
+      join_packages $EXTRAPKGS
 
       cook "$ARCH/$SUBARCH" "$PROFILE"
 
@@ -661,6 +676,10 @@ while true; do
         ;;
         -r)
             qmp_release=1
+            shift
+        ;;
+        --refresh)
+            refresh_release=1
             shift
         ;;
         -h)
