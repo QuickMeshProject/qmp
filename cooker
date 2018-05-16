@@ -460,7 +460,7 @@ make_qmp_release() {
     [ -n "$refresh_release" ] && update_feeds
 
     # Remove downloaded IB and SDK files, if using trunk
-    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf tmp/openwrt-imagebuilder-*.tar.xz openwrt-sdk-*.tar.xz
+    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf tmp/openwrt-imagebuilder-*.tar.xz tmp/openwrt-sdk-*.tar.xz
 
     # Remove decompressed IB and SDK directories, if using trunk
     [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/sdk $release/*/ib
