@@ -202,6 +202,11 @@ build_sdk() {
         download_sdk $target
     }
 
+    [ -d "$sdk" && $refresh_release ] && {
+        echo "-> SDK for target $target found, uncompressing on top"
+        download_sdk $target
+    }
+
     echo "-> Building $sdk"
 
     [ -f "$feeds_file" ] || {
@@ -467,6 +472,8 @@ make_qmp_release() {
 
     # Run snippets
     ./snippets/regdbus.sh
+
+    list_profiles "ar71xx/mikrotik"
     ./snippets/mikrotik-ath10k-ct.sh
 
     # Build the SDK and the packages locally for each architecture
