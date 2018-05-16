@@ -41,4 +41,4 @@ EOF
 
 ( cd $base_feed && git apply $patch_file && {
   echo "Patch applied, now you can use the special country US when you deploy a mesh network on International Waters"
-} || echo "Patch does not apply, maybe it is already applied or LEDE source has changed" )
+} || echo "Patch does not apply, maybe it is already applied or OpenWrt source has changed" )
