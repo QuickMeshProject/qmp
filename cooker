@@ -463,7 +463,7 @@ make_qmp_release() {
     [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf tmp/openwrt-imagebuilder-*.tar.xz tmp/openwrt-sdk-*.tar.xz
 
     # Remove decompressed IB and SDK directories, if using trunk
-    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/sdk $release/*/ib
+    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/*/sdk $release/*/*/ib
 
     # Run snippets
     ./snippets/regdbus.sh
