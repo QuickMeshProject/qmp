@@ -1,7 +1,8 @@
 release=Neumann
 version=testing
-lede_release=17.01.4
-base_url=https://downloads.lede-project.org/releases/$lede_release/targets/
+openwrt_release=18.06
+base_url=https://downloads.openwrt.org/releases/$lede_release/targets/
+base_url=https://downloads.openwrt.org/snapshots/targets/
 communities_git=https://github.com/libremesh/network-profiles.git
 communities_dir=communities
 tmp_dir=tmp
