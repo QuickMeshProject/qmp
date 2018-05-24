@@ -202,6 +202,11 @@ build_sdk() {
         download_sdk $target
     }
 
+    [ -d "$sdk" && $refresh_release ] && {
+        echo "-> SDK for target $target found, uncompressing on top"
+        download_sdk $target
+    }
+
     echo "-> Building $sdk"
 
     [ -f "$feeds_file" ] || {
@@ -459,8 +464,17 @@ make_qmp_release() {
     # Update feeds if refresh_release is on
     [ -n "$refresh_release" ] && update_feeds
 
+    # Remove downloaded IB and SDK files, if using trunk
+    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf tmp/openwrt-imagebuilder-*.tar.xz tmp/openwrt-sdk-*.tar.xz
+
+    # Remove decompressed IB and SDK directories, if using trunk
+    [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/*/sdk $release/*/*/ib
+
     # Run snippets
     ./snippets/regdbus.sh
+
+    list_profiles "ar71xx/mikrotik"
+    ./snippets/mikrotik-ath10k-ct.sh
 
     # Build the SDK and the packages locally for each architecture
     force_local=1
@@ -537,7 +551,7 @@ make_qmp_release() {
 [ -z "$1" ] && usage
 OPTS=$(getopt -o hd:fb:c:d:i:j:rb: -l targets,build-all,download-all,profiles:,flavors,profile:,flavor:,\
 update-feeds,no-update,no-link-ib,only-sdk,only-ib,remote,ib,sdk,sdk-file:,ib-file:,help,force,clean,\
-communities,update-communities,community:,cook-all,package:,extra-pkg:,force-local -n $0 -- "$@")
+communities,update-communities,community:,cook-all,package:,extra-pkg:,refresh,force-local -n $0 -- "$@")
 eval set -- "$OPTS"
 
 while true; do
