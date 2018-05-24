@@ -202,7 +202,7 @@ build_sdk() {
         download_sdk $target
     }
 
-    [ -d "$sdk" && $refresh_release ] && {
+    [ -d "$sdk" ] && [ -n $refresh_release ] && {
         echo "-> SDK for target $target found, uncompressing on top"
         download_sdk $target
     }
