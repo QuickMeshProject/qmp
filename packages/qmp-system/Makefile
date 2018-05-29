@@ -51,7 +51,7 @@ define Package/qmp-system
   SECTION:=net
   CATEGORY:=qMp
   URL:=https://qmp.cat
-  DEPENDS:=+libuci-lua +lua +libiwinfo-lua +wpad-mini +kmod-ipt-nat +luci-base\
+  DEPENDS:=+libuci-lua +lua +libiwinfo-lua +wpad-mesh +kmod-ipt-nat +luci-base\
    +bmx6 +bmx6-uci-config +bmx6-json +gwck-qmp +ip +iw +iwinfo +bmx6-sms
 endef
 
