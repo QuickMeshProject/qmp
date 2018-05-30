@@ -505,6 +505,7 @@ make_qmp_release() {
 
       flavor=$FLAVOR
 
+      pre_PKG=$PKG
       join_packages $EXTRAPKGS
 
       cook "$ARCH/$SUBARCH" "$PROFILE"
@@ -539,6 +540,8 @@ make_qmp_release() {
         echo cp "$fw_file" "$output_file"
         cp "$fw_file" "$output_file"
       }
+
+      PKG=$pre_PKG
 
     done
 
