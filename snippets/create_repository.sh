@@ -1,5 +1,6 @@
 #!/bin/bash
 . options.conf
+. options.conf.local
 OUTDIR="${1:-repository}"
 [ ! -d $OUTDIR ] && mkdir -p $OUTDIR
 echo "-> Output directory: $OUTDIR"
