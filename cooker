@@ -559,6 +559,9 @@ make_qmp_release() {
     md5sum *.* >> IMAGES
     cd ..
 
+    # Run repository snippet
+    ./snippets/create_repository.sh
+
 }
 
 [ -z "$1" ] && usage
