@@ -470,12 +470,6 @@ make_qmp_release() {
     # Remove decompressed IB and SDK directories, if using trunk
     [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/*/sdk $release/*/*/ib
 
-    # Run snippets
-    ./snippets/regdbus.sh
-
-    list_profiles "ar71xx/mikrotik"
-    ./snippets/mikrotik-ath10k-ct.sh
-
     # Build the SDK and the packages locally for each architecture
     force_local=1
     build_all_sdk
