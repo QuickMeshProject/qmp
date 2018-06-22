@@ -22,6 +22,7 @@ VERSION_BUG_URL="${bug_url:-https://dev.qmp.cat/projects/qmp/issues}"
 VERSION_SUPPORT_URL="${support_url:-https://qmp.cat/Documentation}"
 QMP_CODENAME=$VERSION_NICK
 QMP_RELEASE=$VERSION_NUMBER
+QMP_DOWNLOADS_URL="${qmp_downloads_url:-http://fw.qmp.cat}"
 
 usage() {
     echo "Usage: $0 [-f [--force]] [-d <target> [--sdk|ib|force]] [-i <target> [--sdk-file=<file>|ib-file=<file>]]
@@ -143,6 +144,8 @@ cook() {
       [ -f ${ib_files}/PACKAGES ] && rm -f ${ib_files}/PACKAGES
     }
     cp -rf ${myfiles}/* ${ib_files}/ 2>/dev/null
+
+    [ "$qmp_release" == "1" ] && generate_qmp_feeds_file $target
 
     # make binary using imagebuilder
     local fw_extra_name="$flavor"
@@ -429,6 +432,19 @@ list_flavors() {
     cat qmp.flavors.conf | egrep -v "^_|^#|^$" | awk -F= '{print $1}'
 }
 
+generate_qmp_feeds_file() {
+  local target=$1
+  local qmp_feeds_dir="${PWD}/files/etc/opkg"
+
+  [ ! -d "$qmp_feeds_dir" ] && mkdir -p "$qmp_feeds_dir"
+  [ -f $qmp_feeds_dir/qmpfeeds.conf ] && rm -f $qmp_feeds_dir/qmpfeeds.conf
+
+  for r in $sdk_install_repos; do
+    this_qmp_feed_url="$QMP_DOWNLOADS_URL/Releases/$VERSION_NUMBER/packages/$(get_arch_from_ib $target)/$r"
+    echo "src/gz qmp_$r $this_qmp_feed_url" >> $qmp_feeds_dir/qmpfeeds.conf
+  done
+}
+
 get_profile_names() {
     local profiles="$(cat $release/$target/ib/.profiles.mk 2>/dev/null | grep ^PROFILE_NAMES | \
       sed -e s/"PROFILE_NAMES = Default"//g -e s/DEVICE_//g)"
@@ -470,12 +486,6 @@ make_qmp_release() {
     # Remove decompressed IB and SDK directories, if using trunk
     [ -n "$refresh_release" ] && [ "$version" == "trunk" ] && rm -rf $release/*/*/sdk $release/*/*/ib
 
-    # Run snippets
-    ./snippets/regdbus.sh
-
-    list_profiles "ar71xx/mikrotik"
-    ./snippets/mikrotik-ath10k-ct.sh
-
     # Build the SDK and the packages locally for each architecture
     force_local=1
     build_all_sdk
@@ -505,6 +515,7 @@ make_qmp_release() {
 
       flavor=$FLAVOR
 
+      pre_PKG=$PKG
       join_packages $EXTRAPKGS
 
       cook "$ARCH/$SUBARCH" "$PROFILE"
@@ -540,11 +551,16 @@ make_qmp_release() {
         cp "$fw_file" "$output_file"
       }
 
+      PKG=$pre_PKG
+
     done
 
     cd "$bin_output"
     md5sum *.* >> IMAGES
     cd ..
+
+    # Run repository snippet
+    ./snippets/create_repository.sh
 
 }
 
