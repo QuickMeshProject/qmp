@@ -21,7 +21,7 @@ local http = require "luci.http"
 local ip = require "luci.ip"
 local util = require "luci.util"
 local uci  = require "luci.model.uci"
-local uciout = uci.cursor()
+local uciout = luci.model.uci.cursor()
 
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"

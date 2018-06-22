@@ -1,1 +1,0 @@
-../scripts/xiaomi-miwifi-mini.sh

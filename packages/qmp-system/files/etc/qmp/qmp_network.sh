@@ -246,7 +246,7 @@ qmp_configure_lan_v6() {
 	echo "Publishing $ulan_net over the mesh network"
 	qmp_publish_hna_bmx6 $ulan_net ulan
 
-	
+
 	### Deprecated
 	# echo "Configuring radvd"
 	# qmp_radvd_enable_dev lan
@@ -388,7 +388,12 @@ qmp_configure_mesh() {
     # bring them up; otherwise the VLAN interface on top of the radio interface
     # can't be brought up
     if [ -e "/sys/class/net/$dev/phy80211" ]; then
-      qmp_configure_rescue_ip_device "$dev" "$viface"
+      local wireless_network="$(uci get wireless.${dev}.network)"
+        if [ -z "$wireless_network" ]; then
+          qmp_configure_rescue_ip_device "$dev" "$viface"
+        else
+          qmp_configure_rescue_ip_device "$dev" "$wireless_network"
+        fi
     fi
 		counter=$(( $counter + 1 ))
 	done
@@ -461,8 +466,18 @@ qmp_get_rescue_ip() {
 
 	mac=${mac:-FF:FF:FF:FF:FF:FF}
 
-	#local xoctet=$(printf "%d\n" 0x$(echo $mac | cut -d: -f5))
 	local yoctet=$(printf "%d\n" 0x$(echo $mac | cut -d: -f6))
+
+  # A trick to avoid wlan0 and wlan0a getting the same rescue IP:
+  local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
+  local subdevice=$(echo $device | sed -e "s/$id_extra\$//g")
+
+  if [ $device != $subdevice ]; then
+    if qmp_uci_test wireless.$subdevice.device; then
+		    yoctet=$((yoctet+1))
+    fi
+	fi
+
 	local rip="$rprefix.$yoctet.1"
 
 	echo "$rip"

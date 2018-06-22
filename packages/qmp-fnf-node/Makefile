@@ -40,7 +40,6 @@ define Package/qmp-fnf-node
   +qmp-system \
   +uhttpd +luci-mod-admin-full +luci-app-bmx6 +libiwinfo-lua \
   +iwinfo \
-  +radvd \
   +wpad-mini \
   +iw +netperf +mtr \
   +bmx6 +bmx6-uci-config +bmx6-json +bmx6-sms \

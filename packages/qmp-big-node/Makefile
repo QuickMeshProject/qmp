@@ -34,7 +34,7 @@ QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%
 
 QMP_RELEASE?=testing
 QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
-QMP_CODENAME?=Testing
+QMP_CODENAME?=Neumann
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-big-node

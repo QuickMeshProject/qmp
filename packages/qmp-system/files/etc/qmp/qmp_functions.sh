@@ -59,15 +59,17 @@ qmp_set_vlan() {
   [ -z "$iface" ] || [ -z "$vid" ] && return
 
   # Replace dots by underscores to use the interface name as part of another one
-  local uiface="$(echo $iface | sed -r 's/\./_/g')" 
+  local uiface="$(echo $iface | sed -r 's/\./_/g')"
 
   uci set network.${uiface}_${vid}=device
   if [ -e "/sys/class/net/$dev/phy80211" ]; then
     # 802.1q VLANs for wireless interfaces
     uci set network.${uiface}_${vid}.type=8021q
+		echo "VLAN $vid for interface $iface is of type 802.1q"
   else
     # 802.1ad VLANs for wired interfaces
     uci set network.${uiface}_${vid}.type=8021ad
+		echo "VLAN $vid for interface $iface is of type 802.1ad (QinQ)"
   fi
 
   uci set network.${uiface}_${vid}.name=${uiface}_${vid}
@@ -126,9 +128,12 @@ qmp_get_virtual_iface() {
 
 	[ ! -e "/sys/class/net/$device/phy80211" ] && [ -n "$viface" ] && { echo $viface; return; }
 
-	# id is the first char and the numbers of the device [e]th[0] [w]lan[1]
-	local id_num=$(echo $device | tr -d "[A-z]" | tr - _ | tr . _)
+	# id_char is the first char of the device: [e]th0 [w]lan1a
 	local id_char=$(echo $device | cut -c 1)
+	# id_num is the number of the device: eth[0], wlan[1]a
+	local id_num=$(echo $device | tr -d "[A-z]" | tr - _ | tr . _)
+	# id_extra are the extra characters after the number: eth0[], wlan1[a]
+	local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
 
 	# is wan?
 	for w in $(qmp_get_devices wan); do
@@ -142,10 +147,11 @@ qmp_get_virtual_iface() {
 	qmp_log "LOG: 5"
 		qmp_log "Viface: $viface"
 
+qmp_log $device $viface
 	# is mesh?
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
-			viface="mesh_${id_char}${id_num}"
+			viface="mesh_${id_char}${id_num}${id_extra}"
 			break
 		fi
 	done
@@ -162,7 +168,7 @@ qmp_get_devices() {
 	fi
   #   local brlan_enabled=0
   #   for dev in $(uci get qmp.interfaces.mesh_devices 2>/dev/null); do
-	# 
+	#
   #       # Looking if device is defined as LAN, in such case dev=br-lan, but only once
   #       # except eth1 for RouterStation Pro
   #       if ! ( [[ "$dev" == "eth1" ]] && qmp_is_routerstationpro ) ; then
@@ -178,7 +184,7 @@ qmp_get_devices() {
   #               fi
   #           done
   #       fi
-	# 
+	#
   #     [ -n "$dev" ] && devices="$devices $dev"
   #   done
   # fi
