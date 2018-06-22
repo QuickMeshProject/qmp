@@ -1,7 +1,7 @@
 release=Neumann
 version=testing
 openwrt_release=18.06.0-rc1
-base_url=https://downloads.openwrt.org/releases/18.06-SNAPSHOT/targets/
+base_url=https://downloads.openwrt.org/releases/$openwrt_release/targets/
 communities_git=https://github.com/libremesh/network-profiles.git
 communities_dir=communities
 tmp_dir=tmp
