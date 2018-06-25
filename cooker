@@ -490,8 +490,8 @@ make_qmp_release() {
     force_local=1
     build_all_sdk
 
-    DISTCL="openwrt"
-    DISTLEGACY="openwrt"
+    DISTCL="openwrt-"$openwrt_release
+    DISTLEGACY="openwrt-"$openwrt_release
     COMBINEDEXT4IMG="combined-ext4.img.gz"
     COMBINEDEXT4VDI="combined-ext4.vdi"
     COMBINEDEXT4VMDK="combined-ext4.vmdk"
