@@ -49,7 +49,7 @@ function sidebarSystemBoard(nodeId, autorefresh) {
         Sidebar.append("p").append("b").text("Operating system")
                .append("p").text(nodes[indexNode(nodeId)].system.board.release.distribution + ' ' +
                             nodes[indexNode(nodeId)].system.board.release.version.toLowerCase()  + ' "' +
-                            titleCase(nodes[indexNode(nodeId)].system.board.release.codename.replace("_", " ")) + '" (' +
+                            titleCase(nodes[indexNode(nodeId)].system.board.release.description.replace("_", " ")) + '" (' +
                             nodes[indexNode(nodeId)].system.board.release.revision + ')')
                .append("p").text("Kernel " + nodes[indexNode(nodeId)].system.board.kernel + ' (' +
                             nodes[indexNode(nodeId)].system.board.release.target.replace("\\", "") + ')');
