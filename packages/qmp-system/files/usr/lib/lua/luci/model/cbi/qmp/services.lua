@@ -19,9 +19,10 @@
     the file called "COPYING".
 --]]
 
-require("luci.sys")
+local sys = require "luci.sys"
 local http = require "luci.http"
-local nixio = require "nixio"
+local uci = luci.model.uci.cursor()
+
 
 local m = Map("qmp", "qMp node services")
 
@@ -78,8 +79,9 @@ translate("Munin agent (listening on port 4949) for monitorization and statistic
 munin.default=0
 
 function m.on_commit(self,map)
+  http.redirect("/luci-static/resources/qmp/wait_short.html")
+  uci:commit("qmp")
 	luci.sys.call('/etc/qmp/qmp_control.sh apply_services > /tmp/qmp_apply_services.log &')
-	http.redirect("/luci-static/resources/qmp/wait_short.html")
 end
 
 return m

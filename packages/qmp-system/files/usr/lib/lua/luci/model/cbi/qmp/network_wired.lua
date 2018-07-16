@@ -26,15 +26,16 @@ local uciout = luci.model.uci.cursor()
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"
 
+
 ------------
 -- Header --
 ------------
 m = SimpleForm("qmp", translate("qMp wired network interfaces"), translate("This page allows to configure the operation mode of the wired network interfaces (i.e. Ethernet interfaces).") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
+
 ------------------------
 -- Network interfaces --
 ------------------------
-
 -- Ethernet devices' mode
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
