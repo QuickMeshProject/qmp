@@ -16,14 +16,16 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-require("luci.sys")
+local sys = require "luci.sys"
 local http = require "luci.http"
+
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"
-local uci = require "uci"
 
 
-
+------------
+-- Header --
+------------
 m = Map("qmp", translate("qMp wireless network interfaces"), translate("This page allows to configure the operation mode of the wireless network interfaces (i.e. WiFi interfaces).") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 local uci = luci.model.uci.cursor()
@@ -36,9 +38,9 @@ end
 local iw = luci.sys.wifi.getiwinfo(mydev)
 
 
----------------------------
--- Section Wireless Main --
----------------------------
+------------------------------
+-- General wireless options --
+------------------------------
 s_wireless_main = m:section(NamedSection, "wireless", "qmp", translate("General wireless options"), "")
 s_wireless_main.addremove = False
 
@@ -62,6 +64,7 @@ bssid = s_wireless_main:option(Value,"bssid","BSSID")
 
 -- MRATE
 mrate = s_wireless_main:option(Value,"mrate",translate("Multicast rate"))
+
 
 -----------------------------
 -- Section Wireless Device --
@@ -163,9 +166,10 @@ function m.on_commit(self,map)
   luci.sys.call('(/etc/qmp/qmp_control.sh configure_wifi ; /etc/init.d/network reload; /etc/init.d/gwck enabled && /etc/init.d/gwck restart)&')
 end
 
----------------------------
--- Section Wireless Main --
----------------------------
+
+-----------------------------
+-- Reconfiguration section --
+-----------------------------
 s_wireless_reconfigure = m:section(NamedSection, "wireless", "qmp", translate("Reconfigure wireless"),
   translate("Use this button to rescan and reconfigure all wireless interfaces.") .. " " ..
   translate("This is useful in case new interfaces are added.") .. "<br/> <br/>" ..
