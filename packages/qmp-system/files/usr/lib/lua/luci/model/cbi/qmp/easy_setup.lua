@@ -145,7 +145,7 @@ roaming_ipaddress_help.default = translate("In <em>natted</em> mode, all qMp dev
 
 local nodeip_roaming =  m:field(Value, "_nodeip_roaming", " ", translate("Write the mesh-wide public IPv4 address for this device with a /32 netmask, or leave it blank to get a random one."))
 nodeip_roaming:depends("_nodemode","roaming")
-nodeip_roaming.datatype="ip4prefix"
+nodeip_roaming.datatype="cidr4"
 
 local rip = uciout:get("qmp","networks","bmx6_ipv4_address")
 if rip == nil or #rip < 7 then

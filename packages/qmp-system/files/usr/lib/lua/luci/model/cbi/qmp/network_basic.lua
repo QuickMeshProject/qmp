@@ -105,7 +105,7 @@ if uciout:get("qmp","roaming","ignore") == "0" then
   if uciout:get("qmp","networks","bmx6_ipv4_prefix24") ~= nil then
     meshaddress.default = uciout:get("qmp","networks","bmx6_ipv4_prefix24") .. '.' .. util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))")) .. '/32'
   end
-  meshaddress.datatype = "ip4prefix"
+  meshaddress.datatype = "cidr4"
   meshaddress.optional = false
   meshaddress.rmempty = false
 
