@@ -51,7 +51,7 @@ define Package/qmp-ncd
 		SECTION:=net
     CATEGORY:=qMp
     URL:=http://dev.qmp.cat/projects/nc
-    DEPENDS:=+lua +liblua +libubox-lua +libubus-lua +ubus +iperf3
+    DEPENDS:=+lua +liblua +libubox-lua +libubus-lua +ubus +iperf3 +wget
 endef
 
 define Package/qmp-ncd/description
