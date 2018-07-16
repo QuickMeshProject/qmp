@@ -22,6 +22,10 @@ local util = require "luci.util"
 local ip = require "luci.ip"
 local uciout = luci.model.uci.cursor()
 
+
+------------
+-- Header --
+------------
 m = Map("qmp", "qMp basic network settings", translate("This page allows to configure the basic network settings of a qMp device, like the node mode or the mesh-wide public IPv4 address.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 -- Network mode change was requested, rebuild and reload page
@@ -59,10 +63,10 @@ if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
   end
 end
 
+
 ---------------
 -- Node mode --
 ---------------
-
 node_mode = m:section(NamedSection, "roaming", "qmp", translate("Node mode"),
   translate("The <em>node mode</em> option defines whether qMp makes the devices connected to the LAN interfaces of the node visible to the rest of the mesh network or hidden behind a NAT.") .. " " ..
   translate("Static, long-term deployments such as <em>community networks</em> usually choose <em>public</em> mode, whereas quick, temporal or ephemeral deployments usually choose <em>natted</em> mode.") .. "<br/> <br/>" ..

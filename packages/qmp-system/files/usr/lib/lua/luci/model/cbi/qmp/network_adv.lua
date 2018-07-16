@@ -18,6 +18,10 @@
 
 require("luci.sys")
 local http = require "luci.http"
+
+------------
+-- Header --
+------------
 m = Map("qmp", "qMp advanced network settings", translate("This page allows to configure the advanced network settings of a qMp device, like IPv4 and IPv6 addresses, prefixes, DHCP behaviour, etc.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
 ethernet_interfaces = { 'eth', 'ath', 'wlan' }
@@ -66,10 +70,10 @@ fint:value("","disabled")
 fint:value("1","yes")
 fint:value("0","no")
 
+
 ----------------------------
 -- Non overlapping
 ---------------------------
-
 overlapping_section = m:section(NamedSection, "roaming", "qmp", translate("Roaming mode"))
 overlapping_section.addremove = False
 
@@ -94,10 +98,10 @@ special_section.addremove = False
 no_vlan = special_section:option(Value, "no_vlan_devices", translate("VLAN-untagged devices"),translate("Devices that will not be used with VLAN tagging (it is recommended to leave it blank)"))
 ignore_devs = special_section:option(Value, "ignore_devices", translate("Excluded devices"),translate("Devices that will not be used by qMp"))
 
+
 --------------------------
 -- Commit
 -------------------------
-
 function m.on_commit(self,map)
 	http.redirect("/luci-static/resources/qmp/wait_long.html")
 	luci.sys.call('/etc/qmp/qmp_control.sh configure_all > /tmp/qmp_control_network.log &')
