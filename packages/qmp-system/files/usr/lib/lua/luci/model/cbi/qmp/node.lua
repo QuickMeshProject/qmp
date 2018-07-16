@@ -36,7 +36,7 @@ device_name.rmempty = false
 device_name.default = "qMp"
 
 
-community_name = device_section:option(Value, "community_name", translate ("Community Network name"), translate("Select a predefined Community Network or type your own name (optional)."))
+community_name = device_section:option(Value, "community_name", translate ("Community Network name"), translate("Select a predefined community network from the list, type your own name or leave it blank."))
 community_name.datatype="string"
 community_name:value("Bogotá Mesh","Bogotá Mesh")
 community_name:value("DigitalMerthyr","Digital Merthyr")
@@ -57,6 +57,7 @@ guifimesh_name:value("SantAndreu", "Sant Andreu (SAND)")
 guifimesh_name:value("Vallcarca", "Vallcarca (VKK)")
 
 device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use alphanumeric characters only, without spaces or symbols."))
+device_id:depends("community_name","Guifi.net")
 device_id.datatype = "string"
 device_id.optional = true
 device_id.rmempty = false

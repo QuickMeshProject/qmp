@@ -57,7 +57,7 @@ communityname_help = m:field(DummyValue,"_communityname_help")
 communityname_help.rawhtml = true
 communityname_help.default = translate("Select the name of the community network this device belongs to.") .. "<br/> <br/>"
 
-local communityname = m:field(Value, "_communityname", " ", translate("Select a predefined community network, type your own name or leave it blank."))
+local communityname = m:field(Value, "_communityname", " ", translate("Select a predefined community network from the list, type your own name or leave it blank."))
 communityname.datatype="string"
 communityname:value("Bogotá Mesh","Bogotá Mesh")
 communityname:value("DigitalMerthyr","Digital Merthyr")
@@ -337,6 +337,8 @@ function nodemode.write(self, section, value)
     local device_id = guifideviceid:formvalue(section)
     uciout:set("qmp","node","mesh_name",mesh_name)
     uciout:set("qmp","node","device_id",device_id)
+  else
+    uciout:set("qmp","node","community_name",community_name)
   end
 
   if mode == "community" then
