@@ -16,8 +16,10 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-require("luci.sys")
+local sys = require "luci.sys"
 local http = require "luci.http"
+local uci = luci.model.uci.cursor()
+
 
 ------------
 -- Header --
@@ -103,7 +105,8 @@ ignore_devs = special_section:option(Value, "ignore_devices", translate("Exclude
 -- Commit
 -------------------------
 function m.on_commit(self,map)
-	http.redirect("/luci-static/resources/qmp/wait_long.html")
+  http.redirect("/luci-static/resources/qmp/wait_long.html")
+  uci:commit("qmp")
 	luci.sys.call('/etc/qmp/qmp_control.sh configure_all > /tmp/qmp_control_network.log &')
 end
 

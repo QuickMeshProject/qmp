@@ -16,10 +16,11 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+package.path = package.path .. ";/etc/qmp/?.lua"
+
 local sys = require "luci.sys"
 local http = require "luci.http"
-
-package.path = package.path .. ";/etc/qmp/?.lua"
+local uci = luci.model.uci.cursor()
 qmpinfo = require "qmpinfo"
 
 
@@ -163,6 +164,7 @@ end
 
 function m.on_commit(self,map)
   http.redirect("/luci-static/resources/qmp/wait_short.html")
+  uci:commit("qmp")
   luci.sys.call('(/etc/qmp/qmp_control.sh configure_wifi ; /etc/init.d/network reload; /etc/init.d/gwck enabled && /etc/init.d/gwck restart)&')
 end
 

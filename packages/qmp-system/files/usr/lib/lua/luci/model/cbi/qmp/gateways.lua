@@ -19,10 +19,10 @@
     the file called "COPYING".
 --]]
 
-require("luci.sys")
+local sys = require "luci.sys"
 local http = require "luci.http"
 local uci = luci.model.uci.cursor()
-local sys = require("luci.sys")
+
 
 m = Map("gateways", "qMp gateway announcements")
 
@@ -84,10 +84,10 @@ end
 
 
 function m.on_commit(self,map)
-	http.redirect("/luci-static/resources/qmp/wait_short.html")
+  http.redirect("/luci-static/resources/qmp/wait_short.html")
+  uci:commit("qmp")
 	luci.sys.call('/etc/qmp/qmp_control.sh configure_gw > /tmp/qmp_control_system.log &')
 end
 
 
 return m
-

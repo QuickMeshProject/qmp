@@ -18,10 +18,11 @@
 
 package.path = package.path .. ";/etc/qmp/?.lua"
 
-require("luci.sys")
+local sys = require "luci.sys"
 local http = require "luci.http"
-local uciout = luci.model.uci.cursor()
+local uci = luci.model.uci.cursor()
 local qmpinfo = require "qmpinfo"
+local util = require "luci.util"
 
 
 m = Map("qmp", "qMp node settings", translate("This page allows to configure the basic node settings, like the device identification, location and contact details.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
@@ -106,11 +107,13 @@ contact.optional = true
 contact.rmempty = false
 contact.default = "admin@qmp.cat"
 
-
+------------
+-- Commit --
+------------
 function m.on_commit(self,map)
 	http.redirect("/luci-static/resources/qmp/wait_short.html")
-        luci.sys.exec('/etc/qmp/qmp_control.sh configure_system > /tmp/qmp_control_system.log &')
+	uci:commit("qmp")
+	luci.sys.call('/etc/qmp/qmp_control.sh configure_system > /tmp/qmp_control_system.log &')
 end
-
 
 return m

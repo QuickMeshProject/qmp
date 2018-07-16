@@ -20,7 +20,7 @@ local sys = require("luci.sys")
 local http = require "luci.http"
 local util = require "luci.util"
 local ip = require "luci.ip"
-local uciout = luci.model.uci.cursor()
+local uci = luci.model.uci.cursor()
 
 
 ------------
@@ -30,7 +30,7 @@ m = Map("qmp", "qMp basic network settings", translate("This page allows to conf
 
 -- Network mode change was requested, rebuild and reload page
 if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
-  if m:formvalue("cbid.qmp.roaming.ignore") ~= uciout:get("qmp","roaming","ignore") then
+  if m:formvalue("cbid.qmp.roaming.ignore") ~= uci:get("qmp","roaming","ignore") then
 
     m:set("roaming", "ignore", m:formvalue("cbid.qmp.roaming.ignore"))
 
@@ -39,8 +39,8 @@ if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
     if m:formvalue("cbid.qmp.roaming.ignore") == "0" then
       m:set("networks", "lan_netmask", "255.255.0.0")
       m:set("networks", "lan_address", "172.30.22.1")
-      if uciout:get("qmp","networks","bmx6_ipv4_address") ~= nil then
-        bmx6ipv4address = uciout:get("qmp","networks","bmx6_ipv4_address")
+      if uci:get("qmp","networks","bmx6_ipv4_address") ~= nil then
+        bmx6ipv4address = uci:get("qmp","networks","bmx6_ipv4_address")
         bmx6ipv4 = string.sub( bmx6ipv4address, 1, string.find(bmx6ipv4address, "/" , 1 , true)-1 )
         m:set("networks", "bmx6_ipv4_address", bmx6ipv4 .. '/32')
       end
@@ -50,8 +50,8 @@ if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
     elseif m:formvalue("cbid.qmp.roaming.ignore") == "1" then
       m:set("networks", "lan_netmask", "255.255.255.224")
       m:set("networks", "lan_address", "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1")
-      if uciout:get("qmp","networks","bmx6_ipv4_address") ~= nil then
-        bmx6ipv4address = uciout:get("qmp","networks","bmx6_ipv4_address")
+      if uci:get("qmp","networks","bmx6_ipv4_address") ~= nil then
+        bmx6ipv4address = uci:get("qmp","networks","bmx6_ipv4_address")
         bmx6ipv4 = string.sub( bmx6ipv4address, 1, string.find(bmx6ipv4address, "/" , 1 , true)-1 )
         m:set("networks", "lan_address", bmx6ipv4)
       end
@@ -89,7 +89,7 @@ rv["1"] = translate("public")
 local i, nm
 for i, nm in pairs(rv) do
   roaming:value(i, nm)
-  if i ~= uciout:get("qmp","roaming","ignore") then
+  if i ~= uci:get("qmp","roaming","ignore") then
     nm_switch:depends("ignore", i)
   end
 end
@@ -98,7 +98,7 @@ end
 --------------------------------
 -- Natted mode IPv4 addresses --
 --------------------------------
-if uciout:get("qmp","roaming","ignore") == "0" then
+if uci:get("qmp","roaming","ignore") == "0" then
 
   natted_mode = m:section(NamedSection, "networks", "qmp", translate("Mesh-wide public and private LAN IPv4 addresses (<em>natted</em> mode)"),
     translate("In <em>natted</em> mode, all qMp devices in the mesh network need a unique IPv4 address with a /32 netmask.") .. " " ..
@@ -106,8 +106,8 @@ if uciout:get("qmp","roaming","ignore") == "0" then
   natted_mode.addremove = false
 
   meshaddress = natted_mode:option(Value, "bmx6_ipv4_address", "Mesh-wide public IPv4 address", translate("Write the mesh-wide public IPv4 address for this device with a /32 netmask (recommended)."))
-  if uciout:get("qmp","networks","bmx6_ipv4_prefix24") ~= nil then
-    meshaddress.default = uciout:get("qmp","networks","bmx6_ipv4_prefix24") .. '.' .. util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))")) .. '/32'
+  if uci:get("qmp","networks","bmx6_ipv4_prefix24") ~= nil then
+    meshaddress.default = uci:get("qmp","networks","bmx6_ipv4_prefix24") .. '.' .. util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))")) .. '/32'
   end
   meshaddress.datatype = "cidr4"
   meshaddress.optional = false
@@ -128,7 +128,7 @@ if uciout:get("qmp","roaming","ignore") == "0" then
   -------------------------------------
   -- Public mode public IPv4 address --
   -------------------------------------
-elseif uciout:get("qmp","roaming","ignore") == "1" then
+elseif uci:get("qmp","roaming","ignore") == "1" then
 
   public_mode = m:section(NamedSection, "networks", "qmp", translate("Mesh-wide public IPv4 address and network mask (<em>public</em> mode)"),
     translate("In <em>public</em> mode, all qMp devices in the mesh network need a unique IPv4 address and a subnetwork mask.") .. " " ..
@@ -164,20 +164,19 @@ function m.on_commit(self,map)
 
   -- Public mode:
   -- generate public mesh address and publish the whole LAN to the mesh
-  if uciout:get("qmp","roaming","ignore") == "1" then
+  if uci:get("qmp","roaming","ignore") == "1" then
     local lanip = m:formvalue("cbid.qmp.networks.lan_address")
     local lanmask = m:formvalue("cbid.qmp.networks.lan_netmask")
-    uciout:set("qmp","networks","bmx6_ipv4_address",ip.IPv4(lanip,lanmask):string())
-    uciout:set("qmp","networks","publish_lan","1")
-    uciout:commit("qmp")
+    uci:set("qmp","networks","bmx6_ipv4_address",ip.IPv4(lanip,lanmask):string())
+    uci:set("qmp","networks","publish_lan","1")
 
     -- Natted mode:
     -- unpublish the whole LAN from the mesh
-  elseif uciout:get("qmp","roaming","ignore") == "0" then
-    uciout:set("qmp","networks","publish_lan","0")
-    uciout:commit("qmp")
+  elseif uci:get("qmp","roaming","ignore") == "0" then
+    uci:set("qmp","networks","publish_lan","0")
   end
 
+  uci:commit("qmp")
   luci.sys.call('/etc/qmp/qmp_control.sh configure_all > /tmp/qmp_control_network.log &')
 end
 
