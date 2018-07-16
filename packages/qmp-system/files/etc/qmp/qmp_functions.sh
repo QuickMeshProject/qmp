@@ -851,6 +851,11 @@ fi
 			local ifname="$dev"
 		fi
 
+		# If the interface is in the LAN bridge (br-lan) and does not use VLANed mesh, add the bridge instead
+		if [ $(qmp_get_virtual_iface $dev) == "lan" ] && [ $use_vlan == "0" ]; then
+			ifname="br-lan"
+		fi
+
 		uci set $conf.mesh_$counter="dev"
 		uci set $conf.mesh_$counter.dev="$ifname"
 		if [ -e "/sys/class/net/$dev/phy80211" ]; then
