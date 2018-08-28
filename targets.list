@@ -1,6 +1,7 @@
 ar71xx/generic
 ar71xx/mikrotik
 ar71xx/tiny
+ath25/generic
 brcm2708/bcm2708
 brcm2708/bcm2709
 brcm2708/bcm2710
