@@ -205,7 +205,7 @@ function initializeLocalNode()
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url:  'local_id/',
+		url:  '../nc/local_id/',
 		timeout: localTimeout,
 
 		success: function(data) {
@@ -264,7 +264,7 @@ function nodeCapabilities(nodeId, asyncrhonous) {
 	if (inNodesList(nodeId)) {
 
 		//Check NCD capability
-		var scriptUrl = "./ncd_version/?nodeid=" + nodeId;
+		var scriptUrl = "../nc/ncd_version/?nodeid=" + nodeId;
 
 		$.ajax({
 			url: scriptUrl,
@@ -353,7 +353,7 @@ function updateNeighboursList(nodeId, asynchronous)
 
 			console.debug("In function " + debug.callee.name + ". Calling Ubus neighbours for node " + nodeId + ".");
 
-			var scriptUrl = "./neighbours/?nodeid=" + nodeId;
+			var scriptUrl = "../nc/neighbours/?nodeid=" + nodeId;
 			$.ajax({
 				url: scriptUrl,
 				type: 'get',

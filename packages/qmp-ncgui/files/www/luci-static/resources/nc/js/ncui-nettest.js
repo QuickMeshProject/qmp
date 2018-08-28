@@ -20,7 +20,7 @@ function ping6test(nodeId, address, parameters, asynchronous) {
 			console.debug("In function " + debug.callee.name + ". Node " + nodeId + " is in the nodes list (index = " + n + " ).");
 
 			$.ajax({
-				url: "./nettest_ping/?nodeid=" + nodeId + "&address=" + address + "&parameters=" + parameters,
+				url: "../nc/nettest_ping/?nodeid=" + nodeId + "&address=" + address + "&parameters=" + parameters,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
@@ -74,7 +74,7 @@ function iperf3test(nodeId, address, asynchronous, parameters) {
 			console.debug("In function " + debug.callee.name + ". Node " + nodeId + " is in the nodes list (index = " + n + " ).");
 
 			$.ajax({
-				url: "./nettest_bandwidth/?nodeid=" + nodeId + "&address=" + address + "&parameters=" + parameters,
+				url: "../nc/nettest_bandwidth/?nodeid=" + nodeId + "&address=" + address + "&parameters=" + parameters,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
