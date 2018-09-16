@@ -96,17 +96,6 @@ qmp_get_virtual_iface() {
   local device="$1"
   local viface=""
 
-  if qmp_is_routerstationpro; then
-    if [ "$device" == "eth1" ]; then
-      echo "rsp_e1"
-      return
-    fi
-    if [ "$device" == "eth1.1" ]; then
-      echo "rsp_e1_1"
-      return
-    fi
-  fi
-
 	# is lan?
 	if [ "$device" == "br-lan" ]; then
 		viface="lan"
@@ -166,28 +155,6 @@ qmp_get_devices() {
   if [ "$1" == "mesh" ]; then
 		devices="$(uci get qmp.interfaces.mesh_devices 2>/dev/null)"
 	fi
-  #   local brlan_enabled=0
-  #   for dev in $(uci get qmp.interfaces.mesh_devices 2>/dev/null); do
-	#
-  #       # Looking if device is defined as LAN, in such case dev=br-lan, but only once
-  #       # except eth1 for RouterStation Pro
-  #       if ! ( [[ "$dev" == "eth1" ]] && qmp_is_routerstationpro ) ; then
-  #           for landev in $(uci get qmp.interfaces.lan_devices 2>/dev/null); do
-  #               if [ "$landev" == "$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ; then
-  #                   if [ $brlan_enabled -eq 0 ]; then
-  #                       dev="br-lan"
-  #                       brlan_enabled=1
-  #                   else
-  #                       dev=""
-  #                   fi
-  #                   break
-  #               fi
-  #           done
-  #       fi
-	#
-  #     [ -n "$dev" ] && devices="$devices $dev"
-  #   done
-  # fi
 
   if [ "$1" == "lan" ]; then
      devices="$(uci get qmp.interfaces.lan_devices 2>/dev/null)"
@@ -195,10 +162,6 @@ qmp_get_devices() {
 
   if [ "$1" == "wan" ]; then
      devices="$(uci get qmp.interfaces.wan_devices 2>/dev/null)"
-  fi
-
-  if qmp_is_routerstationpro && [ "$1" == "wan" -o "$1" == "lan" ]; then
-     devices="$(echo $devices | sed -e "s/\beth1\b/eth1.1/g")"
   fi
 
   echo "$devices"
@@ -343,40 +306,6 @@ qmp_attach_device_to_interface() {
 				echo " -> $device attached to $interface"
 			fi
 	fi
-}
-
-qmp_is_routerstationpro() {
-	cat /proc/cpuinfo | grep -q "^machine[[:space:]]*: No Ubiquiti RouterStation Pro at all$"
-}
-
-qmp_configure_routerstationpro_switch() {
-	local vids="$@"
-
-	uci set network.eth1="switch"
-	uci set network.eth1.enable="1"
-	uci set network.eth1.enable_vlan="1"
-	uci set network.eth1.reset="1"
-
-	uci set network.mesh_ports_vid1="switch_vlan"
-	uci set network.mesh_ports_vid1.vlan="1"
-	uci set network.mesh_ports_vid1.vid="1"
-	uci set network.mesh_ports_vid1.device="eth1"
-	uci set network.mesh_ports_vid1.ports="0t 4"
-
-	for vid in $vids
-	do
-		uci set network.mesh_ports_vid$vid="switch_vlan"
-		uci set network.mesh_ports_vid$vid.vlan="$vid"
-		uci set network.mesh_ports_vid$vid.vid="$vid"
-		uci set network.mesh_ports_vid$vid.device="eth1"
-		uci set network.mesh_ports_vid$vid.ports="0t 2t 3t"
-	done
-
-	local viface="$(qmp_get_virtual_iface eth1)"
-	uci set network.$viface="interface"
-	uci set network.$viface.proto="static"
-	uci set network.$viface.ifname="eth1"
-	uci commit network
 }
 
 qmp_get_ip6_slow() {

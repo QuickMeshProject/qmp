@@ -14,7 +14,7 @@ $Id$
 ]]--
 
 local fs = require "nixio.fs"
-local globalfile = "/etc/mdns/public" 
+local globalfile = "/etc/mdns/public"
 local dom4file = "/etc/mdns/domain4"
 local dom6file = "/etc/mdns/domain6"
 local hostfile = "/etc/mdns/hosts"
@@ -33,7 +33,7 @@ function d6.cfgvalue()
 	return fs.readfile(dom6file) or ""
 end
 
-t = f:field(TextValue, "mdns", translate("Domains to publish"), translate("Syntax: IP@domain<br/>Examples:\
+t = f:field(TextValue, "mdns", translate("Domains to publish"), translate("Syntax: domain@IP<br/>Examples:\
 <pre>proxy1.qmp@10.1.2.3<br/>proxy1.qm6@fd00:1714:1714:1677:120b::23c1</pre><br/>\
 A line with a single domain name is published as own domain with the node's IP."))
 t.rmempty = false
