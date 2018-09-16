@@ -25,7 +25,7 @@ function bmx6All(nodeId, asynchronous) {
 
         //Get BMX6 interfaces from NCD via ubus
         $.ajax({
-                url: "./bmx6_all/?nodeid=" + nodeId,
+                url: "../nc/bmx6_all/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -123,7 +123,7 @@ function bmx6Descriptors(nodeId, asynchronous) {
 
         //Get BMX6 descriptors from NCD via ubus
         $.ajax({
-                url: "./bmx6_descriptors/?nodeid=" + nodeId,
+                url: "../nc/bmx6_descriptors/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -175,7 +175,7 @@ function bmx6Interfaces(nodeId, asynchronous) {
 
         //Get BMX6 interfaces from NCD via ubus
         $.ajax({
-                url: "./bmx6_interfaces/?nodeid=" + nodeId,
+                url: "../nc/bmx6_interfaces/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -226,7 +226,7 @@ function bmx6Interfaces(nodeId, asynchronous) {
 
         //Get BMX6 interfaces from NCD via ubus
         $.ajax({
-                url: "./bmx6_links/?nodeid=" + nodeId,
+                url: "../nc/bmx6_links/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -277,7 +277,7 @@ function bmx6Originators(nodeId, asynchronous) {
 
         //Get BMX6 originators from NCD via ubus
         $.ajax({
-        	url: "./bmx6_originators/?nodeid=" + nodeId,
+        	url: "../nc/bmx6_originators/?nodeid=" + nodeId,
         	type: 'get',
         	dataType: 'json',
         	async: asynchronous,
@@ -325,7 +325,7 @@ function bmx6Parameters(nodeId, asynchronous) {
 
         //Get BMX6 parameters from NCD via ubus
         $.ajax({
-                url: "./bmx6_parameters/?nodeid=" + nodeId,
+                url: "../nc/bmx6_parameters/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -455,7 +455,7 @@ function bmx6RemoteMetricsStatus(nodeId, asynchronous) {
         });
         //Get BMX6 interfaces from NCD via ubus
         $.ajax({
-                url: "./bmx6_status/?nodeid=" + nodeId,
+                url: "../nc/bmx6_status/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -499,7 +499,7 @@ function bmx6SetBmx6Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpN
 
 		//Set BMX6 metric algorithm via ubus
 		$.ajax({
-			url: "./set_bmx6_metricalgo/?nodeid=" + nodeId + "&algorithm=" + algorithm + "&rxExpNumerator=" + rxExpNumerator + "&rxExpDivisor=" + rxExpDivisor + "&txExpNumerator=" + txExpNumerator + "&txExpDivisor=" + txExpDivisor,
+			url: "../nc/set_bmx6_metricalgo/?nodeid=" + nodeId + "&algorithm=" + algorithm + "&rxExpNumerator=" + rxExpNumerator + "&rxExpDivisor=" + rxExpDivisor + "&txExpNumerator=" + txExpNumerator + "&txExpDivisor=" + txExpDivisor,
 
 			type: 'get',
 			dataType: 'json',
@@ -604,7 +604,7 @@ function bmx6infoDescriptions(nodeId, asynchronous) {
 
 		//Get BMX6 interfaces from lunced via ubus
 		$.ajax({
-			url: "./bmx6info_descriptions/?nodeid=" + nodeId,
+			url: "../nc/bmx6info_descriptions/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
@@ -654,7 +654,7 @@ function bmx6infoLinks(nodeId, asynchronous) {
 
 		//Get BMX6 interfaces from lunced via ubus
 		$.ajax({
-			url: "./bmx6info_links/?nodeid=" + nodeId,
+			url: "../nc/bmx6info_links/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
@@ -705,7 +705,7 @@ function bmx6infoOptions(nodeId, asynchronous) {
 
 		//Get BMX6 interfaces from lunced via ubus
 		$.ajax({
-			url: "./bmx6info_options/?nodeid=" + nodeId,
+			url: "../nc/bmx6info_options/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
@@ -756,7 +756,7 @@ function bmx6infoOriginators(nodeId, asynchronous) {
 
 		//Get BMX6 interfaces from lunced via ubus
 		$.ajax({
-			url: "./bmx6info_originators/?nodeid=" + nodeId,
+			url: "../nc/bmx6info_originators/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
@@ -806,7 +806,7 @@ function bmx6infoStatus(nodeId, asynchronous) {
 
 		//Get BMX6 interfaces from lunced via ubus
 		$.ajax({
-			url: "./bmx6info_status/?nodeid=" + nodeId,
+			url: "../nc/bmx6info_status/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
@@ -858,7 +858,7 @@ function bmx6luncedLinks(nodeId, asynchronous) {
 
 			//Get BMX6 links from lunced via ubus
 			$.ajax({
-				url: "./bmx6_links/?nodeid=" + nodeId,
+				url: "../nc/bmx6_links/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
@@ -912,7 +912,7 @@ function bmx6luncedOptions(nodeId, asynchronous) {
 
 			//Get BMX6 options from lunced via ubus
 			$.ajax({
-				url: "./bmx6_options/?nodeid=" + nodeId,
+				url: "../nc/bmx6_options/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
@@ -966,7 +966,7 @@ function bmx6luncedStatus(nodeId, asynchronous) {
 				nodes[n].bmx6 = {};
 			//Get BMX6 status from lunced via ubus
 			$.ajax({
-				url: "./bmx6_status/?nodeid=" + nodeId,
+				url: "../nc/bmx6_status/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,

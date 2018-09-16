@@ -22,32 +22,66 @@
 module("luci.controller.nc", package.seeall)
 
 function index()
-	entry({"qmp","nc"}, template("nc/graph"), "Network characterization", 7).dependent=false
-	entry({"qmp","nc","graph"}, template("nc/graph"), "Network graph", 2).dependent=false
-	entry({"qmp","nc","local_id"}, call("local_id"), "Get local id", 10).dependent=false
-	entry({"qmp","nc","ncd_version"}, call("ncd_version"), "Get NCD daemon version", 11).dependent=false
-	entry({"qmp","nc","neighbours"}, call("neighbours"), "List local neighbours", 20).dependent=false
-	entry({"qmp","nc","system_board"}, call("system_board"), "System: board", 21).dependent=false
-	entry({"qmp","nc","system_info"}, call("system_info"), "System: info", 22).dependent=false
-	-- entry({"qmp","nc","bmx6_flushAll"}, call("bmx6_flushAll"), "BMX6 -> Flush all", 30).dependent=false
-	entry({"qmp","nc","bmx6_interfaces"}, call("bmx6_interfaces"), "BMX6: interfaces", 31).dependent=false
-	entry({"qmp","nc","bmx6_links"}, call("bmx6_links"), "BMX6: links", 32).dependent=false
-	entry({"qmp","nc","bmx6_originators"}, call("bmx6_originators"), "BMX6: originators", 33).dependent=false
-	entry({"qmp","nc","bmx6_status"}, call("bmx6_status"), "BMX6: status", 34).dependent=false
-	entry({"qmp","nc","bmx6_options"}, call("bmx6_options"), "BMX6: options", 35).dependent=false
-	entry({"qmp","nc","bmx6_parameters"}, call("bmx6_parameters"), "BMX6: parameters", 36).dependent=false
-	entry({"qmp","nc","bmx6_descriptors"}, call("bmx6_descriptors"), 'BMX6: descriptors', 37).dependent=false
-	entry({"qmp","nc","set_bmx6_metricalgo"}, call("bmx6_setmetricalgo"), 'BMX6: set metric algorithm', 38).dependent=false
-	entry({"qmp","nc","bmx6info_status"}, call("bmx6info_status"), "BMX6info: status", 40).dependent=false
-	entry({"qmp","nc","bmx6info_links"}, call("bmx6info_links"), "BMX6info: links", 41).dependent=false
-	entry({"qmp","nc","bmx6info_descriptions"}, call("bmx6info_descriptions"), "BMX6info: descriptions", 42).dependent=false
-	entry({"qmp","nc","bmx6info_options"}, call("bmx6info_options"), "BMX6info: options", 43).dependent=false
-	entry({"qmp","nc","bmx6info_originators"}, call("bmx6info_originators"), "BMX6info: originators", 44).dependent=false
-	entry({"qmp","nc","nettest_bandwidth"}, call("nettest_bandwidth"), 'NetTest: bandwidth', 65).dependent=false
-	entry({"qmp","nc","nettest_iperf3"}, call("nettest_iperf3"), 'NetTest: iperf3', 65).dependent=false
-	entry({"qmp","nc","nettest_ping"}, call("nettest_ping"), 'NetTest: ping', 68).dependent=false
-    entry({"qmp","nc","bmx6_all"}, call("bmx6_all"), "BMX6: get all", 98).dependent=false
-	entry({"qmp","nc","test"}, template("nc/test"), "Test stuff", 99).dependent=false
+
+	local DEBUGMODE = false
+
+	entry({"qmp","tools","graph"}, template("nc/graph"), "Network graph (alpha)", 20).dependent=false
+
+	if DEBUGMODE == true then
+		entry({"qmp","nc"}, template("nc/graph"), "Network characterization", 7).dependent=false
+		entry({"qmp","nc","graph"}, template("nc/graph"), "Network graph (debug)", 2).dependent=false
+		entry({"qmp","nc","local_id"}, call("local_id"), "Get local id", 10).dependent=false
+		entry({"qmp","nc","ncd_version"}, call("ncd_version"), "Get NCD daemon version", 11).dependent=false
+		entry({"qmp","nc","neighbours"}, call("neighbours"), "List local neighbours", 20).dependent=false
+		entry({"qmp","nc","system_board"}, call("system_board"), "System: board", 21).dependent=false
+		entry({"qmp","nc","system_info"}, call("system_info"), "System: info", 22).dependent=false
+		entry({"qmp","nc","bmx6_flushAll"}, call("bmx6_flushAll"), "BMX6 -> Flush all", 30).dependent=false
+		entry({"qmp","nc","bmx6_interfaces"}, call("bmx6_interfaces"), "BMX6: interfaces", 31).dependent=false
+		entry({"qmp","nc","bmx6_links"}, call("bmx6_links"), "BMX6: links", 32).dependent=false
+		entry({"qmp","nc","bmx6_originators"}, call("bmx6_originators"), "BMX6: originators", 33).dependent=false
+		entry({"qmp","nc","bmx6_status"}, call("bmx6_status"), "BMX6: status", 34).dependent=false
+		entry({"qmp","nc","bmx6_options"}, call("bmx6_options"), "BMX6: options", 35).dependent=false
+		entry({"qmp","nc","bmx6_parameters"}, call("bmx6_parameters"), "BMX6: parameters", 36).dependent=false
+		entry({"qmp","nc","bmx6_descriptors"}, call("bmx6_descriptors"), 'BMX6: descriptors', 37).dependent=false
+		entry({"qmp","nc","set_bmx6_metricalgo"}, call("bmx6_setmetricalgo"), 'BMX6: set metric algorithm', 38).dependent=false
+		entry({"qmp","nc","bmx6info_status"}, call("bmx6info_status"), "BMX6info: status", 40).dependent=false
+		entry({"qmp","nc","bmx6info_links"}, call("bmx6info_links"), "BMX6info: links", 41).dependent=false
+		entry({"qmp","nc","bmx6info_descriptions"}, call("bmx6info_descriptions"), "BMX6info: descriptions", 42).dependent=false
+		entry({"qmp","nc","bmx6info_options"}, call("bmx6info_options"), "BMX6info: options", 43).dependent=false
+		entry({"qmp","nc","bmx6info_originators"}, call("bmx6info_originators"), "BMX6info: originators", 44).dependent=false
+		entry({"qmp","nc","nettest_bandwidth"}, call("nettest_bandwidth"), 'NetTest: bandwidth', 65).dependent=false
+		entry({"qmp","nc","nettest_iperf3"}, call("nettest_iperf3"), 'NetTest: iperf3', 65).dependent=false
+		entry({"qmp","nc","nettest_ping"}, call("nettest_ping"), 'NetTest: ping', 68).dependent=false
+		entry({"qmp","nc","bmx6_all"}, call("bmx6_all"), "BMX6: get all", 98).dependent=false
+		entry({"qmp","nc","test"}, template("nc/test"), "Test stuff", 99).dependent=false
+	else
+		entry({"qmp","nc"}, template("nc/graph"), nil, 7).dependent=false
+		entry({"qmp","nc","local_id"}, call("local_id"), nil, 10).dependent=false
+		entry({"qmp","nc","ncd_version"}, call("ncd_version"), nil, 11).dependent=false
+		entry({"qmp","nc","neighbours"}, call("neighbours"), nil, 20).dependent=false
+		entry({"qmp","nc","system_board"}, call("system_board"), nil, 21).dependent=false
+		entry({"qmp","nc","system_info"}, call("system_info"), nil, 22).dependent=false
+		entry({"qmp","nc","bmx6_flushAll"}, call("bmx6_flushAll"), nil, 30).dependent=false
+		entry({"qmp","nc","bmx6_interfaces"}, call("bmx6_interfaces"), nil, 31).dependent=false
+		entry({"qmp","nc","bmx6_links"}, call("bmx6_links"), nil, 32).dependent=false
+		entry({"qmp","nc","bmx6_originators"}, call("bmx6_originators"), nil, 33).dependent=false
+		entry({"qmp","nc","bmx6_status"}, call("bmx6_status"), nil, 34).dependent=false
+		entry({"qmp","nc","bmx6_options"}, call("bmx6_options"), nil, 35).dependent=false
+		entry({"qmp","nc","bmx6_parameters"}, call("bmx6_parameters"), nil, 36).dependent=false
+		entry({"qmp","nc","bmx6_descriptors"}, call("bmx6_descriptors"), nil, 37).dependent=false
+		entry({"qmp","nc","set_bmx6_metricalgo"}, call("bmx6_setmetricalgo"), nil, 38).dependent=false
+		entry({"qmp","nc","bmx6info_status"}, call("bmx6info_status"), nil, 40).dependent=false
+		entry({"qmp","nc","bmx6info_links"}, call("bmx6info_links"), nil, 41).dependent=false
+		entry({"qmp","nc","bmx6info_descriptions"}, call("bmx6info_descriptions"), nil, 42).dependent=false
+		entry({"qmp","nc","bmx6info_options"}, call("bmx6info_options"), nil, 43).dependent=false
+		entry({"qmp","nc","bmx6info_originators"}, call("bmx6info_originators"), nil, 44).dependent=false
+		entry({"qmp","nc","nettest_bandwidth"}, call("nettest_bandwidth"), nil, 65).dependent=false
+		entry({"qmp","nc","nettest_iperf3"}, call("nettest_iperf3"), nil, 65).dependent=false
+		entry({"qmp","nc","nettest_ping"}, call("nettest_ping"), nil, 68).dependent=false
+		entry({"qmp","nc","bmx6_all"}, call("bmx6_all"), nil, 98).dependent=false
+		entry({"qmp","nc","test"}, template("nc/test"), nil, 99).dependent=false
+	end
+
 end
 
 

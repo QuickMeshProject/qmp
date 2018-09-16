@@ -27,7 +27,7 @@ function getNCDVersion(nodeId, refresh, asynchronous, thenSystemBoard)
 
 
 
-			var scriptUrl = "./ncd_version/?nodeid=" + nodeId;
+			var scriptUrl = "../nc/ncd_version/?nodeid=" + nodeId;
 
 			$.ajax({
 				url: scriptUrl,
@@ -180,7 +180,7 @@ function updateSystemInfo(nodeId, asynchronous)
         if (nodes[nodeIndex].local)
             nodeId = "local"
 
-        var scriptUrl = "./system_info/?nodeid=" + nodeId;
+        var scriptUrl = "../nc/system_info/?nodeid=" + nodeId;
 
         $.ajax({
             url: scriptUrl,
@@ -249,7 +249,7 @@ function updateSystemBoard(nodeId, asynchronous, thenBMX6Status)
 			//This is the only function that calls Ubus without checking for NCD to be active on the node
 			console.debug("In function " + debug.callee.name + ". Calling Ubus system_board for node " + nodeId + ".");
 
-	        var scriptUrl = "system_board/?nodeid=" + nodeId;
+	        var scriptUrl = "../nc/system_board/?nodeid=" + nodeId;
 
 	        $.ajax({
 	            url: scriptUrl,
@@ -312,5 +312,3 @@ function updateSystemBoard(nodeId, asynchronous, thenBMX6Status)
         }
     }
 }
-
-

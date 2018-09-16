@@ -239,7 +239,7 @@ function iperf3_installed(nodeId, refresh, asynchronous) {
 				if ( nodes[n].iperf3.installed == undefined || refresh ) {
 
 					$.ajax({
-						url: "./nettest_iperf3/?nodeid=" + nodeId + "&action=installed",
+						url: "../nc/nettest_iperf3/?nodeid=" + nodeId + "&action=installed",
 						type: 'get',
 						dataType: 'json',
 						async: asynchronous,
@@ -298,7 +298,7 @@ function iperf3_action(nodeId, action, refresh, asynchronous) {
 				if ( nodes[n].iperf3.installed ) {
 
 					$.ajax({
-						url: "./nettest_iperf3/?nodeid=" + nodeId + "&action=" + action,
+						url: "../nc/nettest_iperf3/?nodeid=" + nodeId + "&action=" + action,
 						type: 'get',
 						dataType: 'json',
 						async: asynchronous,
