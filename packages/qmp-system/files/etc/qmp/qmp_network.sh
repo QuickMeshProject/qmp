@@ -306,8 +306,12 @@ qmp_configure_lan() {
   # Attaching LAN devices to br-lan
   local device
   for device in $(qmp_get_devices lan) ; do
-    qmp_attach_device_to_interface $device lan
-    qmp_set_mss_clamping_and_masq $device remove
+      # Do not attach to br-lan wireless devices, they do it themselves
+      # somewhere else via /etc/config/wireless
+      if ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
+        qmp_attach_device_to_interface $device lan
+        qmp_set_mss_clamping_and_masq $device remove
+      fi
   done
 }
 
