@@ -3,19 +3,19 @@ function savePath(nodeIdA, nodeIdB, timestamp, saveButton) {
 	if (saveButton != undefined)
 		d3.select("#"+saveButton).attr("disabled", true).text("Saving...");
 
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
 
 	var pathTest = {};
 	pathTest.timestamp = timestamp;
 
 	pathTest.algorithm = {};
-	pathTest.algorithm.value = bmx6Algo.value;
-	pathTest.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   	pathTest.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-	pathTest.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   	pathTest.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+	pathTest.algorithm.value = bmx7Algo.value;
+	pathTest.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   	pathTest.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+	pathTest.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   	pathTest.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
-	pathTest.path = nodes[indexNode(nodeIdA)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdA)].bmx6.paths, nodeIdB)].path;
+	pathTest.path = nodes[indexNode(nodeIdA)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdA)].bmx7.paths, nodeIdB)].path;
 
 	if ( tests.paths == undefined)
 		tests.paths = [];
@@ -39,11 +39,11 @@ function savePath(nodeIdA, nodeIdB, timestamp, saveButton) {
 		var newCase = {};
 		newCase.timestamp = timestamp;
 		newCase.algorithm = {};
-		newCase.algorithm.value = bmx6Algo.value;
-		newCase.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   		newCase.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-		newCase.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   		newCase.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+		newCase.algorithm.value = bmx7Algo.value;
+		newCase.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   		newCase.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+		newCase.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   		newCase.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
 		console.log("SAVE PATHS...........PUSHING FIRST PATH", pathTest);
 		newPath.cases.push(newCase);
@@ -73,11 +73,11 @@ function savePath(nodeIdA, nodeIdB, timestamp, saveButton) {
 				var newCase = {};
 				newCase.timestamp = timestamp;
 				newCase.algorithm = {};
-				newCase.algorithm.value = bmx6Algo.value;
-				newCase.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   				newCase.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-				newCase.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   				newCase.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+				newCase.algorithm.value = bmx7Algo.value;
+				newCase.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   				newCase.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+				newCase.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   				newCase.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
 				console.log("SAVING PATH ", i, "ON CASE ", tests.paths[i].cases.length + "+1");
 
@@ -97,11 +97,11 @@ function savePath(nodeIdA, nodeIdB, timestamp, saveButton) {
 			var newCase = {};
 			newCase.timestamp = timestamp;
 			newCase.algorithm = {};
-			newCase.algorithm.value = bmx6Algo.value;
-			newCase.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   			newCase.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-			newCase.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   			newCase.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+			newCase.algorithm.value = bmx7Algo.value;
+			newCase.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   			newCase.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+			newCase.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   			newCase.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
 			newPath.path = pathTest.path;
 			newPath.cases = [];
@@ -121,14 +121,14 @@ function savePing(nodeIdA, nodeIdB, pingObject, saveButton) {
 	if (saveButton != undefined)
 		d3.select("#"+saveButton).attr("disabled", true).text("Saving...");
 
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
 
 	pingObject.id.algorithm = {};
-	pingObject.id.algorithm.value = bmx6Algo.value;
-	pingObject.id.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   	pingObject.id.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-	pingObject.id.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   	pingObject.id.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+	pingObject.id.algorithm.value = bmx7Algo.value;
+	pingObject.id.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   	pingObject.id.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+	pingObject.id.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   	pingObject.id.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
 	if ( tests.pingtests == undefined)
 		tests.pingtests = [];
@@ -144,14 +144,14 @@ function saveBandwidth(nodeIdA, nodeIdB, bandwidthObject, saveButton) {
 	if (saveButton != undefined)
 		d3.select("#"+saveButton).attr("disabled", true).text("Saving...");
 
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
 
 	bandwidthObject.id.algorithm = {};
-	bandwidthObject.id.algorithm.value = bmx6Algo.value;
-	bandwidthObject.id.algorithm.rxExpNumerator = bmx6Algo.exponents[0].value;
-   	bandwidthObject.id.algorithm.rxExpDivisor = bmx6Algo.exponents[1].value;
-	bandwidthObject.id.algorithm.txExpNumerator = bmx6Algo.exponents[2].value;
-   	bandwidthObject.id.algorithm.txExpDivisor = bmx6Algo.exponents[3].value;
+	bandwidthObject.id.algorithm.value = bmx7Algo.value;
+	bandwidthObject.id.algorithm.rxExpNumerator = bmx7Algo.exponents[0].value;
+   	bandwidthObject.id.algorithm.rxExpDivisor = bmx7Algo.exponents[1].value;
+	bandwidthObject.id.algorithm.txExpNumerator = bmx7Algo.exponents[2].value;
+   	bandwidthObject.id.algorithm.txExpDivisor = bmx7Algo.exponents[3].value;
 
 	if ( tests.bandwidthtests == undefined)
 		tests.bandwidthtests = [];

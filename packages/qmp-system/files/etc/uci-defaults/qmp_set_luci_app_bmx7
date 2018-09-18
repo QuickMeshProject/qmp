@@ -1,0 +1,17 @@
+#!/bin/sh
+# Move the BMX7 LuCI menu entry from Administration to qMp's page
+uci set luci-bmx7.luci=bmx7
+uci set luci-bmx7.luci.place="qmp Mesh"
+uci set luci-bmx7.luci.position=3
+uci set luci-bmx7.luci.json="exec:/www/cgi-bin/bmx7-info -s"
+uci set luci-bmx7.luci.ignore=0
+uci commit luci-bmx7
+
+
+# # Update BMX7's JSON graph to match the new location of the BMX6 menu
+# FILENAME="/www/luci-static/resources/bmx6/js/bmx6-graph.js"
+# if [ -f $FILENAME ]; then
+# 	sed -i 's|/cgi-bin/luci/admin/network/BMX6/topology|/cgi-bin/luci/qmp/Mesh/topology|g' $FILENAME
+# fi
+
+exit 0

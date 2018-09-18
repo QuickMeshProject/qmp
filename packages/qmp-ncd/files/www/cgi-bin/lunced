@@ -37,8 +37,8 @@ head_error() {
 
 head_json
 
-if [ "$cmd" == "bmx6SetMetricAlgo" ]; then
-	ubus call lunced-remote bmx6SetMetricAlgo '{"rxExpNumerator":'$rxExpNumerator',"rxExpDivisor":'$rxExpDivisor',"txExpDivisor":'$txExpDivisor',"algorithm":'$algorithm',"txExpNumerator":'$txExpNumerator'}'
+if [ "$cmd" == "bmx7SetMetricAlgo" ]; then
+	ubus call lunced-remote bmx7SetMetricAlgo '{"rxExpNumerator":'$rxExpNumerator',"rxExpDivisor":'$rxExpDivisor',"txExpDivisor":'$txExpDivisor',"algorithm":'$algorithm',"txExpNumerator":'$txExpNumerator'}'
 elif [ "$cmd" == "nettestPing" ]; then
 	ubus call lunced-remote nettestPing '{"address": "'$address'", "parameters": "'$parameters'" }'
 elif [ "$cmd" == "nettestBandwidth" ]; then

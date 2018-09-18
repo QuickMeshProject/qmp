@@ -35,24 +35,24 @@ function index()
 		entry({"qmp","nc","neighbours"}, call("neighbours"), "List local neighbours", 20).dependent=false
 		entry({"qmp","nc","system_board"}, call("system_board"), "System: board", 21).dependent=false
 		entry({"qmp","nc","system_info"}, call("system_info"), "System: info", 22).dependent=false
-		entry({"qmp","nc","bmx6_flushAll"}, call("bmx6_flushAll"), "BMX6 -> Flush all", 30).dependent=false
-		entry({"qmp","nc","bmx6_interfaces"}, call("bmx6_interfaces"), "BMX6: interfaces", 31).dependent=false
-		entry({"qmp","nc","bmx6_links"}, call("bmx6_links"), "BMX6: links", 32).dependent=false
-		entry({"qmp","nc","bmx6_originators"}, call("bmx6_originators"), "BMX6: originators", 33).dependent=false
-		entry({"qmp","nc","bmx6_status"}, call("bmx6_status"), "BMX6: status", 34).dependent=false
-		entry({"qmp","nc","bmx6_options"}, call("bmx6_options"), "BMX6: options", 35).dependent=false
-		entry({"qmp","nc","bmx6_parameters"}, call("bmx6_parameters"), "BMX6: parameters", 36).dependent=false
-		entry({"qmp","nc","bmx6_descriptors"}, call("bmx6_descriptors"), 'BMX6: descriptors', 37).dependent=false
-		entry({"qmp","nc","set_bmx6_metricalgo"}, call("bmx6_setmetricalgo"), 'BMX6: set metric algorithm', 38).dependent=false
-		entry({"qmp","nc","bmx6info_status"}, call("bmx6info_status"), "BMX6info: status", 40).dependent=false
-		entry({"qmp","nc","bmx6info_links"}, call("bmx6info_links"), "BMX6info: links", 41).dependent=false
-		entry({"qmp","nc","bmx6info_descriptions"}, call("bmx6info_descriptions"), "BMX6info: descriptions", 42).dependent=false
-		entry({"qmp","nc","bmx6info_options"}, call("bmx6info_options"), "BMX6info: options", 43).dependent=false
-		entry({"qmp","nc","bmx6info_originators"}, call("bmx6info_originators"), "BMX6info: originators", 44).dependent=false
+		entry({"qmp","nc","bmx7_flushAll"}, call("bmx7_flushAll"), "BMX7 -> Flush all", 30).dependent=false
+		entry({"qmp","nc","bmx7_interfaces"}, call("bmx7_interfaces"), "BMX7: interfaces", 31).dependent=false
+		entry({"qmp","nc","bmx7_links"}, call("bmx7_links"), "BMX7: links", 32).dependent=false
+		entry({"qmp","nc","bmx7_originators"}, call("bmx7_originators"), "BMX7: originators", 33).dependent=false
+		entry({"qmp","nc","bmx7_status"}, call("bmx7_status"), "BMX7: status", 34).dependent=false
+		entry({"qmp","nc","bmx7_options"}, call("bmx7_options"), "BMX7: options", 35).dependent=false
+		entry({"qmp","nc","bmx7_parameters"}, call("bmx7_parameters"), "BMX7: parameters", 36).dependent=false
+		entry({"qmp","nc","bmx7_descriptors"}, call("bmx7_descriptors"), 'BMX7: descriptors', 37).dependent=false
+		entry({"qmp","nc","set_bmx7_metricalgo"}, call("bmx7_setmetricalgo"), 'BMX7: set metric algorithm', 38).dependent=false
+		entry({"qmp","nc","bmx7info_status"}, call("bmx7info_status"), "BMX7info: status", 40).dependent=false
+		entry({"qmp","nc","bmx7info_links"}, call("bmx7info_links"), "BMX7info: links", 41).dependent=false
+		entry({"qmp","nc","bmx7info_descriptions"}, call("bmx7info_descriptions"), "BMX7info: descriptions", 42).dependent=false
+		entry({"qmp","nc","bmx7info_options"}, call("bmx7info_options"), "BMX7info: options", 43).dependent=false
+		entry({"qmp","nc","bmx7info_originators"}, call("bmx7info_originators"), "BMX7info: originators", 44).dependent=false
 		entry({"qmp","nc","nettest_bandwidth"}, call("nettest_bandwidth"), 'NetTest: bandwidth', 65).dependent=false
 		entry({"qmp","nc","nettest_iperf3"}, call("nettest_iperf3"), 'NetTest: iperf3', 65).dependent=false
 		entry({"qmp","nc","nettest_ping"}, call("nettest_ping"), 'NetTest: ping', 68).dependent=false
-		entry({"qmp","nc","bmx6_all"}, call("bmx6_all"), "BMX6: get all", 98).dependent=false
+		entry({"qmp","nc","bmx7_all"}, call("bmx7_all"), "BMX7: get all", 98).dependent=false
 		entry({"qmp","nc","test"}, template("nc/test"), "Test stuff", 99).dependent=false
 	else
 		entry({"qmp","nc"}, template("nc/graph"), nil, 7).dependent=false
@@ -61,24 +61,24 @@ function index()
 		entry({"qmp","nc","neighbours"}, call("neighbours"), nil, 20).dependent=false
 		entry({"qmp","nc","system_board"}, call("system_board"), nil, 21).dependent=false
 		entry({"qmp","nc","system_info"}, call("system_info"), nil, 22).dependent=false
-		entry({"qmp","nc","bmx6_flushAll"}, call("bmx6_flushAll"), nil, 30).dependent=false
-		entry({"qmp","nc","bmx6_interfaces"}, call("bmx6_interfaces"), nil, 31).dependent=false
-		entry({"qmp","nc","bmx6_links"}, call("bmx6_links"), nil, 32).dependent=false
-		entry({"qmp","nc","bmx6_originators"}, call("bmx6_originators"), nil, 33).dependent=false
-		entry({"qmp","nc","bmx6_status"}, call("bmx6_status"), nil, 34).dependent=false
-		entry({"qmp","nc","bmx6_options"}, call("bmx6_options"), nil, 35).dependent=false
-		entry({"qmp","nc","bmx6_parameters"}, call("bmx6_parameters"), nil, 36).dependent=false
-		entry({"qmp","nc","bmx6_descriptors"}, call("bmx6_descriptors"), nil, 37).dependent=false
-		entry({"qmp","nc","set_bmx6_metricalgo"}, call("bmx6_setmetricalgo"), nil, 38).dependent=false
-		entry({"qmp","nc","bmx6info_status"}, call("bmx6info_status"), nil, 40).dependent=false
-		entry({"qmp","nc","bmx6info_links"}, call("bmx6info_links"), nil, 41).dependent=false
-		entry({"qmp","nc","bmx6info_descriptions"}, call("bmx6info_descriptions"), nil, 42).dependent=false
-		entry({"qmp","nc","bmx6info_options"}, call("bmx6info_options"), nil, 43).dependent=false
-		entry({"qmp","nc","bmx6info_originators"}, call("bmx6info_originators"), nil, 44).dependent=false
+		entry({"qmp","nc","bmx7_flushAll"}, call("bmx7_flushAll"), nil, 30).dependent=false
+		entry({"qmp","nc","bmx7_interfaces"}, call("bmx7_interfaces"), nil, 31).dependent=false
+		entry({"qmp","nc","bmx7_links"}, call("bmx7_links"), nil, 32).dependent=false
+		entry({"qmp","nc","bmx7_originators"}, call("bmx7_originators"), nil, 33).dependent=false
+		entry({"qmp","nc","bmx7_status"}, call("bmx7_status"), nil, 34).dependent=false
+		entry({"qmp","nc","bmx7_options"}, call("bmx7_options"), nil, 35).dependent=false
+		entry({"qmp","nc","bmx7_parameters"}, call("bmx7_parameters"), nil, 36).dependent=false
+		entry({"qmp","nc","bmx7_descriptors"}, call("bmx7_descriptors"), nil, 37).dependent=false
+		entry({"qmp","nc","set_bmx7_metricalgo"}, call("bmx7_setmetricalgo"), nil, 38).dependent=false
+		entry({"qmp","nc","bmx7info_status"}, call("bmx7info_status"), nil, 40).dependent=false
+		entry({"qmp","nc","bmx7info_links"}, call("bmx7info_links"), nil, 41).dependent=false
+		entry({"qmp","nc","bmx7info_descriptions"}, call("bmx7info_descriptions"), nil, 42).dependent=false
+		entry({"qmp","nc","bmx7info_options"}, call("bmx7info_options"), nil, 43).dependent=false
+		entry({"qmp","nc","bmx7info_originators"}, call("bmx7info_originators"), nil, 44).dependent=false
 		entry({"qmp","nc","nettest_bandwidth"}, call("nettest_bandwidth"), nil, 65).dependent=false
 		entry({"qmp","nc","nettest_iperf3"}, call("nettest_iperf3"), nil, 65).dependent=false
 		entry({"qmp","nc","nettest_ping"}, call("nettest_ping"), nil, 68).dependent=false
-		entry({"qmp","nc","bmx6_all"}, call("bmx6_all"), nil, 98).dependent=false
+		entry({"qmp","nc","bmx7_all"}, call("bmx7_all"), nil, 98).dependent=false
 		entry({"qmp","nc","test"}, template("nc/test"), nil, 99).dependent=false
 	end
 
@@ -138,7 +138,7 @@ function neighbours()
 end
 
 
-function bmx6_flushAll()
+function bmx7_flushAll()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
@@ -149,9 +149,9 @@ function bmx6_flushAll()
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6FlushAll", {})
+			result = conn:call("lunced", "bmx7FlushAll", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6FlushAll", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7FlushAll", id = nodeid })
 		end
  	end
 
@@ -160,20 +160,20 @@ function bmx6_flushAll()
 end
 
 
-function bmx6_descriptors()
+function bmx7_descriptors()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6_descriptors/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7_descriptors/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Descriptors", {})
+			result = conn:call("lunced", "bmx7Descriptors", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Descriptors", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7Descriptors", id = nodeid })
 		end
  	end
 
@@ -182,29 +182,7 @@ function bmx6_descriptors()
 end
 
 
-function bmx6_interfaces()
-	nodeid = luci.http.formvalue("nodeid")
-	local result
-
-	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/remote_neighbours/?nodeid=node12345" }'
- 	else
- 		local ubus = require "ubus"
- 		local conn = ubus.connect()
-
-		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Interfaces", {})
-		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Interfaces", id = nodeid })
-		end
- 	end
-
-	luci.http.prepare_content("application/json")
-	luci.http.write_json(result)
-end
-
-
-function bmx6_links()
+function bmx7_interfaces()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
@@ -215,9 +193,9 @@ function bmx6_links()
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Links", {})
+			result = conn:call("lunced", "bmx7Interfaces", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Links", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7Interfaces", id = nodeid })
 		end
  	end
 
@@ -226,29 +204,7 @@ function bmx6_links()
 end
 
 
-function bmx6_options()
-	nodeid = luci.http.formvalue("nodeid")
-	local result
-
-	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6_options/?nodeid=node12345" }'
- 	else
- 		local ubus = require "ubus"
- 		local conn = ubus.connect()
-
-		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Options", {})
-		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Options", id = nodeid })
-		end
- 	end
-
-	luci.http.prepare_content("application/json")
-	luci.http.write_json(result)
-end
-
-
-function bmx6_originators()
+function bmx7_links()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
@@ -259,9 +215,9 @@ function bmx6_originators()
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Originators", {})
+			result = conn:call("lunced", "bmx7Links", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Originators", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7Links", id = nodeid })
 		end
  	end
 
@@ -270,20 +226,20 @@ function bmx6_originators()
 end
 
 
-function bmx6_parameters()
+function bmx7_options()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6_parameters/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7_options/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Parameters", {})
+			result = conn:call("lunced", "bmx7Options", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Parameters", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7Options", id = nodeid })
 		end
  	end
 
@@ -292,7 +248,51 @@ function bmx6_parameters()
 end
 
 
-function bmx6_setmetricalgo()
+function bmx7_originators()
+	nodeid = luci.http.formvalue("nodeid")
+	local result
+
+	if nodeid == nil then
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/remote_neighbours/?nodeid=node12345" }'
+ 	else
+ 		local ubus = require "ubus"
+ 		local conn = ubus.connect()
+
+		if nodeid == "local" then
+			result = conn:call("lunced", "bmx7Originators", {})
+		else
+			result = conn:call("lunced", "reply", { cmd = "bmx7Originators", id = nodeid })
+		end
+ 	end
+
+	luci.http.prepare_content("application/json")
+	luci.http.write_json(result)
+end
+
+
+function bmx7_parameters()
+	nodeid = luci.http.formvalue("nodeid")
+	local result
+
+	if nodeid == nil then
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7_parameters/?nodeid=node12345" }'
+ 	else
+ 		local ubus = require "ubus"
+ 		local conn = ubus.connect()
+
+		if nodeid == "local" then
+			result = conn:call("lunced", "bmx7Parameters", {})
+		else
+			result = conn:call("lunced", "reply", { cmd = "bmx7Parameters", id = nodeid })
+		end
+ 	end
+
+	luci.http.prepare_content("application/json")
+	luci.http.write_json(result)
+end
+
+
+function bmx7_setmetricalgo()
 	nodeid = luci.http.formvalue("nodeid")
 	algorithm = luci.http.formvalue("algorithm")
 	rxExpNumerator = luci.http.formvalue("rxExpNumerator")
@@ -302,15 +302,15 @@ function bmx6_setmetricalgo()
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node, the metric algorithm value and the exponents in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6SetMetricAlgo/?nodeid=node12345&algorithm=16&rxExpNumerator=1&rxExpDivisor=2&txExpNumerator=1&txExpDivisor=1" }'
+		result = '{ "error" : "You must specify a node, the metric algorithm value and the exponents in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7SetMetricAlgo/?nodeid=node12345&algorithm=16&rxExpNumerator=1&rxExpDivisor=2&txExpNumerator=1&txExpDivisor=1" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6SetMetricAlgo", {algorithm = algorithm, rxExpNumerator = rxExpNumerator, rxExpDivisor = rxExpDivisor, txExpNumerator = txExpNumerator, txExpDivisor = txExpDivisor })
+			result = conn:call("lunced", "bmx7SetMetricAlgo", {algorithm = algorithm, rxExpNumerator = rxExpNumerator, rxExpDivisor = rxExpDivisor, txExpNumerator = txExpNumerator, txExpDivisor = txExpDivisor })
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6SetMetricAlgo", id = nodeid, algorithm = algorithm, rxExpNumerator = rxExpNumerator, rxExpDivisor = rxExpDivisor, txExpNumerator = txExpNumerator, txExpDivisor = txExpDivisor })
+			result = conn:call("lunced", "reply", { cmd = "bmx7SetMetricAlgo", id = nodeid, algorithm = algorithm, rxExpNumerator = rxExpNumerator, rxExpDivisor = rxExpDivisor, txExpNumerator = txExpNumerator, txExpDivisor = txExpDivisor })
 		end
  	end
 
@@ -319,7 +319,7 @@ function bmx6_setmetricalgo()
 end
 
 
-function bmx6_status()
+function bmx7_status()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
@@ -330,9 +330,9 @@ function bmx6_status()
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6Status", {})
+			result = conn:call("lunced", "bmx7Status", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6Status", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7Status", id = nodeid })
 		end
  	end
 
@@ -343,17 +343,17 @@ end
 
 
 
-function bmx6info_descriptions()
+function bmx7info_descriptions()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6info_descriptions/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7info_descriptions/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
-		result = conn:call("lunced", "reply", { cmd = "bmx6infoDescriptions", id = nodeid })
+		result = conn:call("lunced", "reply", { cmd = "bmx7infoDescriptions", id = nodeid })
  	end
 
 	luci.http.prepare_content("application/json")
@@ -361,17 +361,17 @@ function bmx6info_descriptions()
 end
 
 
-function bmx6info_links()
+function bmx7info_links()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6info_links/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7info_links/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
-		result = conn:call("lunced", "reply", { cmd = "bmx6infoLinks", id = nodeid })
+		result = conn:call("lunced", "reply", { cmd = "bmx7infoLinks", id = nodeid })
  	end
 
 	luci.http.prepare_content("application/json")
@@ -379,17 +379,17 @@ function bmx6info_links()
 end
 
 
-function bmx6info_options()
+function bmx7info_options()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6info_options/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7info_options/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
-		result = conn:call("lunced", "reply", { cmd = "bmx6infoOptions", id = nodeid })
+		result = conn:call("lunced", "reply", { cmd = "bmx7infoOptions", id = nodeid })
  	end
 
 	luci.http.prepare_content("application/json")
@@ -397,17 +397,17 @@ function bmx6info_options()
 end
 
 
-function bmx6info_originators()
+function bmx7info_originators()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6info_originators/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7info_originators/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
-		result = conn:call("lunced", "reply", { cmd = "bmx6infoOriginators", id = nodeid })
+		result = conn:call("lunced", "reply", { cmd = "bmx7infoOriginators", id = nodeid })
  	end
 
 	luci.http.prepare_content("application/json")
@@ -415,17 +415,17 @@ function bmx6info_originators()
 end
 
 
-function bmx6info_status()
+function bmx7info_status()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
 	if nodeid == nil then
-		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx6info_status/?nodeid=node12345" }'
+		result = '{ "error" : "You must specify a node in the URL. Ex.: http://ip_address/cgi-bin/luci/;stok=deafbeef8coffebabe/qmp/nc/bmx7info_status/?nodeid=node12345" }'
  	else
  		local ubus = require "ubus"
  		local conn = ubus.connect()
 
-		result = conn:call("lunced", "reply", { cmd = "bmx6infoStatus", id = nodeid })
+		result = conn:call("lunced", "reply", { cmd = "bmx7infoStatus", id = nodeid })
  	end
 
 	luci.http.prepare_content("application/json")
@@ -433,7 +433,7 @@ function bmx6info_status()
 end
 
 
-function bmx6_all()
+function bmx7_all()
 	nodeid = luci.http.formvalue("nodeid")
 	local result
 
@@ -444,9 +444,9 @@ function bmx6_all()
  		local conn = ubus.connect()
 
 		if nodeid == "local" then
-			result = conn:call("lunced", "bmx6All", {})
+			result = conn:call("lunced", "bmx7All", {})
 		else
-			result = conn:call("lunced", "reply", { cmd = "bmx6All", id = nodeid })
+			result = conn:call("lunced", "reply", { cmd = "bmx7All", id = nodeid })
 		end
  	end
 

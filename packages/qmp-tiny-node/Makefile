@@ -52,7 +52,7 @@ define Package/qmp-tiny-node
   CATEGORY:=qMp
   URL:=https://qmp.cat
   DEPENDS:= +qmp-system \
-	+luci-app-bmx6 +luci-mod-status +uhttpd \
+	+luci-app-bmx7 +luci-mod-status +uhttpd \
 	+uhttpd-mod-ubus
 endef
 
@@ -60,7 +60,7 @@ define Package/qmp-tiny-node/description
  This metapackage provides a minimalistic qMp node with just the bare minimum
  features:
   - qMp system configuration files and scripts
-  - BMX6 routing protocol
+  - BMX7 routing protocol
   - Minimalistic LuCI web interface (only for qMp settings)
 
  It is intended to be used on storage-constrained devices with 4 MB flash.

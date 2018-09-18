@@ -34,7 +34,7 @@ function visualizeResults(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 		var sPingTable = sPing.append("table").attr("id", "sPingTable");
 		var sPingTableRowHeader = sPingTable.append("tr").attr("id","sPingTableRowHeader");
 		sPingTableRowHeader.append("td").append("b").text("Test block");
-		sPingTableRowHeader.append("td").append("b").text("BMX6 algorithm");
+		sPingTableRowHeader.append("td").append("b").text("BMX7 algorithm");
 		sPingTableRowHeader.append("td").append("b").text("Iterations");
 		sPingTableRowHeader.append("td").append("b").text("Pings/iteration");
 		sPingTableRowHeader.append("td").append("b").text("Select");
@@ -88,7 +88,7 @@ function visualizeResults(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 		var sBwTable = sBw.append("table").attr("id", "sBwTable");
 		var sBwTableRowHeader = sBwTable.append("tr").attr("id","sBwTableRowHeader");
 		sBwTableRowHeader.append("td").append("b").text("Test block");
-		sBwTableRowHeader.append("td").append("b").text("BMX6 algorithm");
+		sBwTableRowHeader.append("td").append("b").text("BMX7 algorithm");
 		sBwTableRowHeader.append("td").append("b").text("Iterations");
 		sBwTableRowHeader.append("td").append("b").text("Duration");
 		sBwTableRowHeader.append("td").append("b").text("Select");

@@ -1,5 +1,3 @@
-#!/bin/sh
-#
 #    Copyright (C) 2011 Fundacio Privada per a la Xarxa Oberta, Lliure i Neutral guifi.net
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -20,9 +18,46 @@
 #    the file called "COPYING".
 #
 
-# Check if IP prefix is set to /16 (e.g. 10.202) and change it to /24
-local ipv4_prefix24="$(uci get qmp.networks.bmx6_ipv4_prefix24)"
-if [ ! $(echo $ipv4_prefix24 | cut -f3 -d .) ] ; then
-    uci set qmp.networks.bmx6_ipv4_prefix24="$ipv4_prefix24.0"
-    uci commit
-fi
+include $(TOPDIR)/rules.mk
+include $(INCLUDE_DIR)/kernel.mk
+
+PKG_NAME:=qmp-bmx7testing-node
+PKG_RELEASE:=2
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/qmp-bmx7testing-node
+  SECTION:=net
+  CATEGORY:=qMp
+  TITLE:=Basic addons for bmx7 testing and developing
+  URL:=http://qmp.cat
+  DEPENDS:= \
+  +qmp-system \
+  +iwinfo \
+  +wpad-mini \
+  +iw +mtr \
+  +firewall \
+  +tcpdump-mini \
+  +ip +iputils-ping6 
+endef
+
+define Package/qmp-bmx7testing-node/description
+ Basic addons for bmx7 testing and developing
+endef
+
+define Build/Prepare
+ mkdir -p $(PKG_BUILD_DIR)
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+endef
+
+define Package/qmp-bmx7testing-node/install
+    $(INSTALL_DIR) $(1)/etc/qmp
+endef
+
+$(eval $(call BuildPackage,qmp-bmx7testing-node))

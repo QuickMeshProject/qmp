@@ -119,7 +119,7 @@ nodemode:value("roaming","natted")
 
 local networkmode
 if uciout:get("qmp","roaming","ignore") == "1" then
-  local ipv4 = uciout:get("qmp","networks","bmx6_ipv4_address")
+  local ipv4 = uciout:get("qmp","networks","bmx7_ipv4_address")
   if ipv4 ~= nil then
    local ipv4mask = string.find(ipv4,"/")
   end
@@ -148,9 +148,9 @@ local nodeip_roaming =  m:field(Value, "_nodeip_roaming", " ", translate("Write 
 nodeip_roaming:depends("_nodemode","roaming")
 nodeip_roaming.datatype="cidr4"
 
-local rip = uciout:get("qmp","networks","bmx6_ipv4_address")
+local rip = uciout:get("qmp","networks","bmx7_ipv4_address")
 if rip == nil or #rip < 7 then
-  rip = uciout:get("bmx6","general","tun4Address")
+  rip = uciout:get("bmx7","general","tun4Address")
   if rip == nil or #rip < 7 then
     rip = ""
   end
@@ -174,9 +174,9 @@ nodeip:depends("_nodemode","community")
 nodeip.optional=false
 nodeip.datatype="ip4addr"
 
-local pip = uciout:get("qmp","networks","bmx6_ipv4_address")
+local pip = uciout:get("qmp","networks","bmx7_ipv4_address")
 if pip == nil or #pip < 7 then
-  pip = uciout:get("bmx6","general","tun4Address")
+  pip = uciout:get("bmx7","general","tun4Address")
   if pip == nil or #pip < 7 then
     pip = "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1"
   end
@@ -346,7 +346,7 @@ function nodemode.write(self, section, value)
     uciout:set("qmp","roaming","ignore","1")
     uciout:set("qmp","networks","publish_lan","1")
     uciout:set("qmp","networks","lan_address",nodeip)
-    uciout:set("qmp","networks","bmx6_ipv4_address",ip.IPv4(nodeip,nodemask):string())
+    uciout:set("qmp","networks","bmx7_ipv4_address",ip.IPv4(nodeip,nodemask):string())
     uciout:set("qmp","networks","lan_netmask",nodemask)
     uciout:set("qmp","node","device_name",device_name)
     uciout:set("qmp","node","community_name",community_name)
@@ -359,9 +359,9 @@ function nodemode.write(self, section, value)
     uciout:set("qmp","networks","bmx6_ipv4_prefix24","10.202.0")
     uciout:set("qmp","node","device_name",device_name)
     if nodeip_roaming == nil then
-      uciout:set("qmp","networks","bmx6_ipv4_address","")
+      uciout:set("qmp","networks","bmx7_ipv4_address","")
     else
-      uciout:set("qmp","networks","bmx6_ipv4_address",nodeip_roaming)
+      uciout:set("qmp","networks","bmx7_ipv4_address",nodeip_roaming)
     end
 
   end

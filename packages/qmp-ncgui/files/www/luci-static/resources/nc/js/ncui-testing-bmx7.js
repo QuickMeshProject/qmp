@@ -1,4 +1,4 @@
-function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
+function testingBMX7(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 
 	nodeIdA = typeof nodeIdA !== 'undefined' ? nodeIdA : nodeId;
 	nodeIdB = typeof nodeIdB !== 'undefined' ? nodeIdB : nodeId;
@@ -21,10 +21,10 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	var sHeader = sSpace.append("div").attr("id", "sHeader");
 
 	var sTitle = sHeader.append("div").attr("id", "sTitle");
-	sTitle.append("h2").text("BMX6 tests");
+	sTitle.append("h2").text("BMX7 tests");
 
 	var sText1 = sSpace.append("div").attr("id", "sText1").append("p");
-	sText1.html("This tool lets you evaluate network performance when different BMX6 routing <br>metrics calculation algorithms. Select the origin and destination nodes, the <br>algorithms and exponents to evaluate, the tests to perform, the number of <br>iterations, and click on \"Perform tests\".");
+	sText1.html("This tool lets you evaluate network performance when different BMX7 routing <br>metrics calculation algorithms. Select the origin and destination nodes, the <br>algorithms and exponents to evaluate, the tests to perform, the number of <br>iterations, and click on \"Perform tests\".");
 
 
 	//Nodes
@@ -46,7 +46,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	NodeASelect.selectAll("option[value="+nodeIdA+"]").attr("selected",true);
 	if (showAll)
 		NodeASelect.append("option").attr("value", "allnodes").text("Show all nodes...");
-	NodeASelect.attr("onchange",'testingBMX6SelectNode("'+nodeId+'", document.getElementById("nodeA").value, document.getElementById("nodeB").value, "'+d3selection+'")');
+	NodeASelect.attr("onchange",'testingBMX7SelectNode("'+nodeId+'", document.getElementById("nodeA").value, document.getElementById("nodeB").value, "'+d3selection+'")');
 
 	//Node B
 	var ssNodesB = ssNodes.append("div").attr("id", "ssNodesB").attr("class", "dropdown-right");
@@ -59,7 +59,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	NodeBSelect.selectAll("option[value="+nodeIdB+"]").attr("selected",true);
 	if (showAll)
 		NodeBSelect.append("option").attr("value", "allnodes").text("Show all nodes...");
-	NodeBSelect.attr("onchange",'testingBMX6SelectNode("'+nodeId+'", document.getElementById("nodeA").value, document.getElementById("nodeB").value, "'+d3selection+'")');
+	NodeBSelect.attr("onchange",'testingBMX7SelectNode("'+nodeId+'", document.getElementById("nodeA").value, document.getElementById("nodeB").value, "'+d3selection+'")');
 
 	//Nodes warning
 	var ssNodesPD = ssNodes.append("div").attr("id", "ssNodesP").attr("style", "clear:left; color:red").text("");
@@ -70,19 +70,19 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 
 	//Routing algorithm
 	var sAlgo = sSpace.append("div").attr("id","sAlgo");
-	var sAlgoTitle = sAlgo.append("h3").text("BMX6 routing algorithm");
+	var sAlgoTitle = sAlgo.append("h3").text("BMX7 routing algorithm");
 	var sAlgoText1 = sAlgo.append("div").append("p").text("Use this section to select the different routing algorithms to test.");
 
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
 
 	/*algoList = [
 			{
-				"value" : parseInt(bmx6Algo.value),
+				"value" : parseInt(bmx7Algo.value),
 				"exponents" : [
-					parseInt(bmx6Algo.exponents[0].value),
-					parseInt(bmx6Algo.exponents[1].value),
-					parseInt(bmx6Algo.exponents[2].value),
-					parseInt(bmx6Algo.exponents[3].value)
+					parseInt(bmx7Algo.exponents[0].value),
+					parseInt(bmx7Algo.exponents[1].value),
+					parseInt(bmx7Algo.exponents[2].value),
+					parseInt(bmx7Algo.exponents[3].value)
 				]}];*/
 	if(typeof algoList === 'undefined')
 		algoList = [{"value":"16","exponents":["3","1","3","1"]},{"value":"16","exponents":["2","1","2","1"]},{"value":"16","exponents":["1","1","1","1"]},{"value":"16","exponents":["0","1","0","1"]}];
@@ -98,20 +98,20 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 
 	var sAlgoAddValue = sAlgoAdd.append("div").attr("id", "sAlgoAddValue").attr("class", "dropdown-left").attr("style", "clear:both");
 	var sAlgoAddValueLabel = sAlgoAddValue.append("div").attr("id", "sAlgoAddValueLabel").attr("class", "dropdown-desc").text("Algorithm:");
-	createSelectAlgorithm(sAlgoAddValue, "sAlgoAddValueSelect", bmx6Algo.texts);
-	d3.select("#sAlgoAddValueSelect").selectAll('option[value="'+bmx6Algo.value+'"]').attr("selected",true);
+	createSelectAlgorithm(sAlgoAddValue, "sAlgoAddValueSelect", bmx7Algo.texts);
+	d3.select("#sAlgoAddValueSelect").selectAll('option[value="'+bmx7Algo.value+'"]').attr("selected",true);
 
-	for (var i=0; i < bmx6Algo.exponents.length; i++) {
+	for (var i=0; i < bmx7Algo.exponents.length; i++) {
 		if (i%2==0) {
 		var ExpLab = sAlgoAdd.append("div").attr("id", "sAlgoAddExponentLabel"+i).attr("class", "dropdown-left").attr("style", "clear:both");
-			ExpLab.append("div").attr("class", "dropdown-desc").text(bmx6Algo.exponents[i].name+":");
+			ExpLab.append("div").attr("class", "dropdown-desc").text(bmx7Algo.exponents[i].name+":");
 		} else {
 		var ExpLab = sAlgoAdd.append("div").attr("id", "sAlgoAddExponentLabel"+i).attr("class", "dropdown-right");
-			ExpLab.append("div").attr("class", "dropdown-desc").text(bmx6Algo.exponents[i].name+":");
+			ExpLab.append("div").attr("class", "dropdown-desc").text(bmx7Algo.exponents[i].name+":");
 		}
 
-		createSelectNumber(ExpLab, bmx6Algo.exponents[i].name, createDropdownVector(bmx6Algo.exponents[i].min, bmx6Algo.exponents[i].max), bmx6Algo.exponents[i].def, "dropdown-small");
-		d3.select("#"+bmx6Algo.exponents[i].name).selectAll('option[value="'+bmx6Algo.exponents[i].value+'"]').attr("selected",true);
+		createSelectNumber(ExpLab, bmx7Algo.exponents[i].name, createDropdownVector(bmx7Algo.exponents[i].min, bmx7Algo.exponents[i].max), bmx7Algo.exponents[i].def, "dropdown-small");
+		d3.select("#"+bmx7Algo.exponents[i].name).selectAll('option[value="'+bmx7Algo.exponents[i].value+'"]').attr("selected",true);
 	}
 
 	var sAlgoAddButtons = sAlgoAdd.append("div").attr("id", "sAlgoAddButtons").attr("style", "clear:both");
@@ -120,7 +120,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 		.attr("style", "clear:both")
 		.attr("id", "sAlgoAddButton")
 		.attr("class", "btn")
-		.attr("onclick",'testingBMX6AddAlgo ( \
+		.attr("onclick",'testingBMX7AddAlgo ( \
 			{value:document.getElementById("sAlgoAddValueSelect").value,\
 			 exponents:[document.getElementById("rxExpNumerator").value, document.getElementById("rxExpDivisor").value,\
 			  document.getElementById("txExpNumerator").value, document.getElementById("txExpDivisor").value]},\
@@ -133,7 +133,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	var sAlgoTestTitle = sAlgoTest.append("h4").text("Algorithms to test");
 
 	var sAlgoShow = sAlgo.append("div").attr("id","sAlgoShow");
-	testingBMX6AlgoTable("sAlgoShow");
+	testingBMX7AlgoTable("sAlgoShow");
 
 
 	sAlgoAdd.append("p").text(" ");
@@ -151,7 +151,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	sPathButtons.append("button")
 		.attr("id", "sPathAdd")
 		.attr("class", "btn btn-group")
-		.attr("onclick",'testingBMX6AddTest ( \
+		.attr("onclick",'testingBMX7AddTest ( \
 			{"type":"path",\
 			"parameters":""},\
 			"sTestShow")')
@@ -186,7 +186,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	sPing.append("button")
 		.attr("id", "sPingAdd")
 		.attr("class", "btn btn-group")
-		.attr("onclick",'testingBMX6AddTest ( \
+		.attr("onclick",'testingBMX7AddTest ( \
 			{"type":"ping",\
 			"parameters":" -c " + document.getElementById("sPingCountValue").value + " -s " + document.getElementById("sPingSizeValue").value},\
 			"sTestShow")')
@@ -244,7 +244,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	sBandwidth.append("button")
 		.attr("id", "sBandwidthAdd")
 		.attr("class", "btn btn-group")
-		.attr("onclick",'testingBMX6AddTest ( \
+		.attr("onclick",'testingBMX7AddTest ( \
 			{"type":"bandwidth",\
 			"parameters": document.getElementById("sBandwidthProtocolValue").value + " -b " + document.getElementById("sBandwidthBandwidthValue").value + "M" + " -t " + document.getElementById("sBandwidthDurationValue").value + document.getElementById("sBandwidthMSSValue").value},\
 			"sTestShow")')
@@ -256,7 +256,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	var sTestShow = sSpace.append("div").attr("id","sTestShow");
 	var sTestShowTitle = sTestShow.append("h4").text("Tests to perform");
 	var sTestShowTable = sTestShow.append("div").attr("id","sTestShowTable");
-	testingBMX6TestTable("sTestShowTable");
+	testingBMX7TestTable("sTestShowTable");
 	sTestShow.append("p").text(" ");
 
 
@@ -308,7 +308,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	sButtons.append("button")
 		.attr("id", "sButtonsRun")
 		.attr("class", "btn btn-group")
-		.attr("onclick",'testingBMX6RunAll ( \
+		.attr("onclick",'testingBMX7RunAll ( \
 			"'+nodeId+'",\
 			document.getElementById("nodeA").value,\
 			document.getElementById("nodeB").value,\
@@ -325,7 +325,7 @@ function testingBMX6(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 }
 
 
-function testingBMX6RunAll(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest) {
+function testingBMX7RunAll(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest) {
 
 	currentAlgo = typeof currentAlgo !== 'undefined' ? currentAlgo : 0;
 	currentTest = typeof currentTest !== 'undefined' ? currentTest : 0;
@@ -335,10 +335,10 @@ function testingBMX6RunAll(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d
 	if (clear && currentAlgo == 0 && currentIteration == 0 && currentTest == 0)
 		tests = {"blocks":0};
 
-	testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest);
+	testingBMX7Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest);
 }
 
-function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest) {
+function testingBMX7Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest) {
 
 	var debug = arguments;
     console.log("Function " + debug.callee.name + " called.", nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, currentAlgo, currentIteration, currentTest);
@@ -349,7 +349,7 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 
 	//Header and subtile
 	var sHeader = sSpace.append("div").attr("id", "sHeader");
-	var sTitle = sHeader.append("h2").text("BMX6 tests");
+	var sTitle = sHeader.append("h2").text("BMX7 tests");
 
 	//Test progress
 	var sProgress = sSpace.append("div").attr("id", "sProgress");
@@ -361,7 +361,7 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 		var sAlgorithm = sSpace.append("div").attr("id", "sAlgorithm");
 		sAlgorithm.append("h3").text("Routing algorithm");
 		sAlgorithm.append("p").text("Setting routing algorithm metric calculation parameters on destination node...");
-		bmx6SetBmx6Algo(nodeIdB, algoList[currentAlgo].value, algoList[currentAlgo].exponents[0], algoList[currentAlgo].exponents[1], algoList[currentAlgo].exponents[2], algoList[currentAlgo].exponents[3], false);
+		bmx7SetBmx7Algo(nodeIdB, algoList[currentAlgo].value, algoList[currentAlgo].exponents[0], algoList[currentAlgo].exponents[1], algoList[currentAlgo].exponents[2], algoList[currentAlgo].exponents[3], false);
 		sAlgorithm.append("p").text("Done.");
 	}
 
@@ -429,7 +429,7 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 
 			sBandwidth.append("p").text("Performing bandwidth test from " + nodes[indexNode(nodeIdA)].name + " to " + nodes[indexNode(nodeIdB)].name + "...");
 
-			var bandwidthresult = iperf3test(nodeIdA, tun4Address2ipAddress(nodes[indexNode(nodeIdB)].bmx6.status.tun4Address), false, testList[currentTest].parameters);
+			var bandwidthresult = iperf3test(nodeIdA, tun4Address2ipAddress(nodes[indexNode(nodeIdB)].bmx7.status.tun4Address), false, testList[currentTest].parameters);
 
 			if (bandwidthresult.end != undefined &&
 				bandwidthresult.end.sum_received != undefined &&
@@ -506,7 +506,7 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 
 	if ( nextAlgorithm < algoList.length ) {
 		setTimeout( function (){
-			testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, nextAlgorithm, nextIteration, nextTest)
+			testingBMX7Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3selection, nextAlgorithm, nextIteration, nextTest)
 		}, nextPause);
 	}
 	else {
@@ -515,7 +515,7 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 		sButtons.append("button")
 		.attr("id", "sButtonsBack")
 		.attr("class", "btn btn-group")
-		.attr("onclick",'testingBMX6("'+nodeId+'", "fcMainSpace")' )
+		.attr("onclick",'testingBMX7("'+nodeId+'", "fcMainSpace")' )
 		.append("text").text("Back");
 
 		//View results
@@ -527,10 +527,10 @@ function testingBMX6Run(nodeId, nodeIdA, nodeIdB, iterations, pause, clear, d3se
 	}
 }
 
-function testingBMX6SelectNode(nodeId, nodeIdA, nodeIdB, d3selection) {
+function testingBMX7SelectNode(nodeId, nodeIdA, nodeIdB, d3selection) {
 	if (nodeIdA == "allnodes" || nodeIdB == "allnodes") {
 		showAllNodes();
-		testingBMX6(nodeId, d3selection, nodeIdA, nodeId, false);
+		testingBMX7(nodeId, d3selection, nodeIdA, nodeId, false);
 	}
 	else if (nodeIdA == nodeIdB) {
 		d3.select("#sButtonsRun").attr("disabled", true);
@@ -543,7 +543,7 @@ function testingBMX6SelectNode(nodeId, nodeIdA, nodeIdB, d3selection) {
 }
 
 
-function testingBMX6AlgoTable(d3selectionName) {
+function testingBMX7AlgoTable(d3selectionName) {
 
 	var d3selection = d3.select("#"+d3selectionName);
 	d3selection.html("");
@@ -572,7 +572,7 @@ function testingBMX6AlgoTable(d3selectionName) {
 			d3.select("#sAlgoTableRow"+i).append("td").append("button")
 				.attr("id", "sAlgoTableRow"+i+"Delete")
 				.attr("class", "btn")
-				.attr("onclick",'testingBMX6RemoveAlgo("'+i+'","'+d3selectionName+'")' )
+				.attr("onclick",'testingBMX7RemoveAlgo("'+i+'","'+d3selectionName+'")' )
 				.append("text").text("Remove");
 		}
 
@@ -584,7 +584,7 @@ function testingBMX6AlgoTable(d3selectionName) {
 
 }
 
-function testingBMX6TestTable(d3selectionName) {
+function testingBMX7TestTable(d3selectionName) {
 
 	var d3selection = d3.select("#"+d3selectionName);
 	d3selection.html("");
@@ -606,7 +606,7 @@ function testingBMX6TestTable(d3selectionName) {
 			d3.select("#sTestTableRow"+i).append("td").append("button")
 				.attr("id", "sTestTableRow"+i+"Delete")
 				.attr("class", "btn")
-				.attr("onclick",'testingBMX6RemoveTest("'+i+'","'+d3selectionName+'")' )
+				.attr("onclick",'testingBMX7RemoveTest("'+i+'","'+d3selectionName+'")' )
 				.append("text").text("Remove");
 		}
 
@@ -618,22 +618,22 @@ function testingBMX6TestTable(d3selectionName) {
 
 }
 
-function testingBMX6AddAlgo(addAlgorithm, d3selectionName) {
+function testingBMX7AddAlgo(addAlgorithm, d3selectionName) {
 	algoList.push(addAlgorithm);
-	testingBMX6AlgoTable(d3selectionName);
+	testingBMX7AlgoTable(d3selectionName);
 }
 
-function testingBMX6RemoveAlgo(n, d3selectionName) {
+function testingBMX7RemoveAlgo(n, d3selectionName) {
 	algoList.splice(n,1);
-	testingBMX6AlgoTable(d3selectionName);
+	testingBMX7AlgoTable(d3selectionName);
 }
 
-function testingBMX6AddTest(addTest, d3selectionName) {
+function testingBMX7AddTest(addTest, d3selectionName) {
 	testList.push(addTest);
-	testingBMX6TestTable(d3selectionName);
+	testingBMX7TestTable(d3selectionName);
 }
 
-function testingBMX6RemoveTest(n, d3selectionName) {
+function testingBMX7RemoveTest(n, d3selectionName) {
 	testList.splice(n,1);
-	testingBMX6TestTable(d3selectionName);
+	testingBMX7TestTable(d3selectionName);
 }

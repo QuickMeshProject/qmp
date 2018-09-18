@@ -61,7 +61,7 @@ define Package/qmp-big-node/description
  This metapackage provides a full-blown qMp node with all the features and extra
  addons:
   - qMp system configuration files and scripts
-  - BMX6 routing protocol
+  - BMX7 routing protocol
   - Full LuCI web interface (via HTTPS with SSL)
   - IP/TCP utils
   - LibreMap and b6m tools

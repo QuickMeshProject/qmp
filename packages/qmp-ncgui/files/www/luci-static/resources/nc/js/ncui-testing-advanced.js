@@ -68,15 +68,15 @@ function testingAdvanced(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 	var sAlgoCurrentTitle = sAlgoCurrent.append("h3").text("Current routing algorithm");
 	var sAlgoCurrentText1 = sAlgoCurrent.append("div").attr("id", "sAlgoCurrentText1").append("p").text("Current algorithm text.");
 
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
-	console.log("AAAAAAAAAA", bmx6Algo, JSON.stringify(bmx6Algo));
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
+	console.log("AAAAAAAAAA", bmx7Algo, JSON.stringify(bmx7Algo));
 
-	sAlgoCurrent.append("div").attr("id", "sAlgoCurrentValueLabel").attr("class", "dropdown-desc").append("p").text("Algorithm: " + bmx6Algo.value + " (" + bmx6Algo.texts[bmx6Algo.texts.map(function(d){return d.value; }).indexOf(parseInt(bmx6Algo.value))].name + ")" );
+	sAlgoCurrent.append("div").attr("id", "sAlgoCurrentValueLabel").attr("class", "dropdown-desc").append("p").text("Algorithm: " + bmx7Algo.value + " (" + bmx7Algo.texts[bmx7Algo.texts.map(function(d){return d.value; }).indexOf(parseInt(bmx7Algo.value))].name + ")" );
 	sAlgoCurrent.append("div").attr("id", "sAlgoCurrentExpoLabel").attr("class", "dropdown-desc").append("p");
 
-	for (var i=0; i<bmx6Algo.exponents.length; i++) {
-		d3.select("#sAlgoCurrentExpoLabel").text(d3.select("#sAlgoCurrentExpoLabel").text() + bmx6Algo.exponents[i].name + ": " + bmx6Algo.exponents[i].value);
-		if (i<bmx6Algo.exponents.length-1)
+	for (var i=0; i<bmx7Algo.exponents.length; i++) {
+		d3.select("#sAlgoCurrentExpoLabel").text(d3.select("#sAlgoCurrentExpoLabel").text() + bmx7Algo.exponents[i].name + ": " + bmx7Algo.exponents[i].value);
+		if (i<bmx7Algo.exponents.length-1)
 			d3.select("#sAlgoCurrentExpoLabel").text(d3.select("#sAlgoCurrentExpoLabel").text() + " // ");
 	}
 
@@ -90,13 +90,13 @@ function testingAdvanced(nodeId, d3selection, nodeIdA, nodeIdB, showAll) {
 
 	var sAlgoNewValue = sAlgoNew.append("div").attr("id", "sAlgoNewValue");
 	sAlgoNewValue.append("div").attr("id", "sAlgoNewValueLabel").attr("class", "dropdown-desc").text("Algorithm:");
-	createSelectAlgorithm(sAlgoNewValue, "sAlgoNewValueSelect", bmx6Algo.texts);
-	d3.select("#sAlgoNewValueSelect").selectAll('option[value="'+bmx6Algo.value+'"]').attr("selected",true);
+	createSelectAlgorithm(sAlgoNewValue, "sAlgoNewValueSelect", bmx7Algo.texts);
+	d3.select("#sAlgoNewValueSelect").selectAll('option[value="'+bmx7Algo.value+'"]').attr("selected",true);
 
-	for (var i=0; i < bmx6Algo.exponents.length; i++) {
-		sAlgoNewValue.append("div").attr("id", "sAlgoNewExponentLabel"+i).attr("class", "dropdown-desc").text(bmx6Algo.exponents[i].name+":");
-		createSelectNumber(sAlgoNewValue, bmx6Algo.exponents[i].name, createDropdownVector(bmx6Algo.exponents[i].min, bmx6Algo.exponents[i].max), bmx6Algo.exponents[i].def);
-		d3.select("#"+bmx6Algo.exponents[i].name).selectAll('option[value="'+bmx6Algo.exponents[i].value+'"]').attr("selected",true);
+	for (var i=0; i < bmx7Algo.exponents.length; i++) {
+		sAlgoNewValue.append("div").attr("id", "sAlgoNewExponentLabel"+i).attr("class", "dropdown-desc").text(bmx7Algo.exponents[i].name+":");
+		createSelectNumber(sAlgoNewValue, bmx7Algo.exponents[i].name, createDropdownVector(bmx7Algo.exponents[i].min, bmx7Algo.exponents[i].max), bmx7Algo.exponents[i].def);
+		d3.select("#"+bmx7Algo.exponents[i].name).selectAll('option[value="'+bmx7Algo.exponents[i].value+'"]').attr("selected",true);
 	}
 
 
@@ -277,7 +277,7 @@ function testingAdvancedRun(nodeId, nodeIdA, nodeIdB, algorithm, pingParameters,
 
 		sAlgorithm.append("p").text("Setting routing algorithm metric calculation parameters on destination node...");
 
-		bmx6SetBmx6Algo(nodeIdB, algorithm.value, algorithm.exponents[0], algorithm.exponents[1], algorithm.exponents[2], algorithm.exponents[3], false);
+		bmx7SetBmx7Algo(nodeIdB, algorithm.value, algorithm.exponents[0], algorithm.exponents[1], algorithm.exponents[2], algorithm.exponents[3], false);
 
 		sAlgorithm.append("p").text("Done.");
 

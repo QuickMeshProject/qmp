@@ -4,7 +4,7 @@ require "ubus"
 require "uloop"
 require "lunced.tools"
 require "lunced.local"
-require "lunced.bmx6"
+require "lunced.bmx7"
 require "lunced.nettest"
 
 JSON = (loadfile "/usr/share/lunced/JSON.lua")()
@@ -43,37 +43,37 @@ end
 
 local lunced_method = {
 	lunced = {
-		--[[bmx6FlushAll = {
+		--[[bmx7FlushAll = {
 			function(req)
-				conn:reply(req, lunced_bmx6_flushAll());
-				debugMsg("Call to function 'bmx6FlushAll'")
+				conn:reply(req, lunced_bmx7_flushAll());
+				debugMsg("Call to function 'bmx7FlushAll'")
 			end, { }
 		},--]]
-		bmx6All = {
+		bmx7All = {
 			function(req)
-				conn:reply(req, lunced_bmx6_all());
-				debugMsg("Call to function 'bmx6All'")
+				conn:reply(req, lunced_bmx7_all());
+				debugMsg("Call to function 'bmx7All'")
 			end, { }
 		},
-		bmx6Descriptors = {
+		bmx7Descriptors = {
 			function(req)
-				conn:reply(req, lunced_bmx6_descriptors());
-				debugMsg("Call to function 'bmx6Descriptors'")
+				conn:reply(req, lunced_bmx7_descriptors());
+				debugMsg("Call to function 'bmx7Descriptors'")
 			end, { }
 		},
-		bmx6Interfaces = {
+		bmx7Interfaces = {
 			function(req)
-				conn:reply(req, lunced_bmx6_interfaces());
-				debugMsg("Call to function 'bmx6Interfaces'")
+				conn:reply(req, lunced_bmx7_interfaces());
+				debugMsg("Call to function 'bmx7Interfaces'")
 			end, { }
 		},
-		bmx6Links = {
+		bmx7Links = {
 			function(req)
-				conn:reply(req, lunced_bmx6_links());
-				debugMsg("Call to function 'bmx6Links'")
+				conn:reply(req, lunced_bmx7_links());
+				debugMsg("Call to function 'bmx7Links'")
 			end, { }
 		},
-		bmx6SetMetricAlgo = {
+		bmx7SetMetricAlgo = {
 			function(req, msg)
 				for k,v in pairs(msg) do
 					if tostring(k) == "algorithm" and v ~= "" then
@@ -85,7 +85,7 @@ local lunced_method = {
 											if tostring(n) == "txExpNumerator" and y ~= "" then
 												for o,z in pairs(msg) do
 													if tostring(o) == "txExpDivisor" and z ~= "" then
-				         								conn:reply(req, lunced_bmx6_set_metricAlgo(tostring(v), tostring(w), tostring(x), tostring(y), tostring(z) ));
+				         								conn:reply(req, lunced_bmx7_set_metricAlgo(tostring(v), tostring(w), tostring(x), tostring(y), tostring(z) ));
 				         							end
 				         						end
 				         					end
@@ -96,49 +96,49 @@ local lunced_method = {
 						end
 					end
 				end
-				debugMsg("Call to function 'bmx6SetMetricAlgo'")
+				debugMsg("Call to function 'bmx7SetMetricAlgo'")
 			end, {algorithm = ubus.STRING, rxExpNumerator = ubus.STRING, rxExpDivisor = ubus.STRING, txExpNumerator = ubus.STRING, txExpDivisor = ubus.STRING}
 		},
-		bmx6Options = {
+		bmx7Options = {
 			function(req)
-				conn:reply(req, lunced_bmx6_options());
-				debugMsg("Call to function 'bmx6Options'")
+				conn:reply(req, lunced_bmx7_options());
+				debugMsg("Call to function 'bmx7Options'")
 			end, { }
 		},
-		bmx6Originators = {
+		bmx7Originators = {
 			function(req)
-				conn:reply(req, lunced_bmx6_originators());
-				debugMsg("Call to function 'bmx6Originators'")
+				conn:reply(req, lunced_bmx7_originators());
+				debugMsg("Call to function 'bmx7Originators'")
 			end, { }
 		},
-		bmx6Parameters = {
+		bmx7Parameters = {
 			function(req)
-				conn:reply(req, lunced_bmx6_parameters());
-				debugMsg("Call to function 'bmx6Parameters'")
+				conn:reply(req, lunced_bmx7_parameters());
+				debugMsg("Call to function 'bmx7Parameters'")
 			end, { }
 		},
-		--[[bmx6Version = {
+		--[[bmx7Version = {
 			function(req)
-				conn:reply(req, lunced_bmx6_version());
-				debugMsg("Call to function 'bmx6Version'")
+				conn:reply(req, lunced_bmx7_version());
+				debugMsg("Call to function 'bmx7Version'")
 			end, { }
 		},--]]
-		bmx6Status = {
+		bmx7Status = {
 			function(req)
-				conn:reply(req, lunced_bmx6_status());
-				debugMsg("Call to function 'bmx6Status'")
+				conn:reply(req, lunced_bmx7_status());
+				debugMsg("Call to function 'bmx7Status'")
 			end, { }
 		},
 		listnodes = {
 			function(req, msg)
 				-- get nodes
-				conn:reply(req, lunced_bmx6_nodes(selfInfo));
+				conn:reply(req, lunced_bmx7_nodes(selfInfo));
 				debugMsg("Call to function 'nodes'")
 			end, { nodes = ubus.STRING }
 		},
 		neighbours = {
 			function(req)
-				conn:reply(req, lunced_bmx6_neighbours(selfInfo));
+				conn:reply(req, lunced_bmx7_neighbours(selfInfo));
 				debugMsg("Call to function 'neighbours'")
 			end, { nodes = ubus.STRING }
 		},
@@ -188,7 +188,7 @@ local lunced_method = {
 		},
 		self = {
 			function(req)
-				conn:reply(req, lunced_bmx6_local(selfInfo));
+				conn:reply(req, lunced_bmx7_local(selfInfo));
 				debugMsg("Call to function 'self'")
 			end, {id = ubus.STRING, name = ubus.STRING }
 		},
@@ -260,34 +260,34 @@ local lunced_method = {
 				end
 
 				if selfInfo.id == nil then
-					 lunced_bmx6_getSelfInfo(selfInfo)
+					 lunced_bmx7_getSelfInfo(selfInfo)
 				end
 
 				if toIP == uuid2ipv6(selfInfo.id) then
-					if cmd =="bmx6FlushAll" then
-						data = lunced_bmx6_flushAll(selfInfo)
-					elseif cmd =="bmx6All" then
-						data = lunced_bmx6_all(selfInfo)
-					elseif cmd =="bmx6Descriptors" then
-						data = lunced_bmx6_descriptors(selfInfo)
-					elseif cmd =="bmx6Interfaces" then
-						data = lunced_bmx6_interfaces(selfInfo)
-					elseif cmd =="bmx6Links" then
-						data = lunced_bmx6_links(selfInfo)
-					elseif cmd =="bmx6SetMetricAlgo" then
-						data = lunced_bmx6_set_metricAlgo(algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor)
-					elseif cmd =="bmx6Options" then
-						data = lunced_bmx6_options(selfInfo)
-					elseif cmd =="bmx6Originators" then
-						data = lunced_bmx6_originators(selfInfo)
-					elseif cmd =="bmx6Parameters" then
-						data = lunced_bmx6_parameters(selfInfo)
-					elseif cmd =="bmx6Version" then
-						data = lunced_bmx6_version(selfInfo)
-					elseif cmd =="bmx6Status" then
-						data = lunced_bmx6_status(selfInfo)
+					if cmd =="bmx7FlushAll" then
+						data = lunced_bmx7_flushAll(selfInfo)
+					elseif cmd =="bmx7All" then
+						data = lunced_bmx7_all(selfInfo)
+					elseif cmd =="bmx7Descriptors" then
+						data = lunced_bmx7_descriptors(selfInfo)
+					elseif cmd =="bmx7Interfaces" then
+						data = lunced_bmx7_interfaces(selfInfo)
+					elseif cmd =="bmx7Links" then
+						data = lunced_bmx7_links(selfInfo)
+					elseif cmd =="bmx7SetMetricAlgo" then
+						data = lunced_bmx7_set_metricAlgo(algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor)
+					elseif cmd =="bmx7Options" then
+						data = lunced_bmx7_options(selfInfo)
+					elseif cmd =="bmx7Originators" then
+						data = lunced_bmx7_originators(selfInfo)
+					elseif cmd =="bmx7Parameters" then
+						data = lunced_bmx7_parameters(selfInfo)
+					elseif cmd =="bmx7Version" then
+						data = lunced_bmx7_version(selfInfo)
+					elseif cmd =="bmx7Status" then
+						data = lunced_bmx7_status(selfInfo)
 					elseif cmd == "listnodes" then
-						data = lunced_bmx6_nodes(selfInfo)
+						data = lunced_bmx7_nodes(selfInfo)
 					elseif cmd == "nettestBandwidth" then
 						data = lunced_nettest_bandwidth(address, parameters)
 					elseif cmd == "nettestIperf3" then
@@ -295,17 +295,17 @@ local lunced_method = {
 					elseif cmd == "nettestPing" then
 						data = lunced_nettest_ping(address, parameters)
 					elseif cmd == "neighbours" then
-						data = lunced_bmx6_neighbours(selfInfo)
+						data = lunced_bmx7_neighbours(selfInfo)
 					elseif cmd == "self" then
-						data = lunced_bmx6_local(selfInfo)
+						data = lunced_bmx7_local(selfInfo)
 					elseif cmd == "version" then
 						data = lunced_local_version(selfInfo)
 					end
 
-				elseif node_in_nodes(ipv62uuid(toIP), lunced_bmx6_nodes(selfInfo).nodes) then
+				elseif node_in_nodes(ipv62uuid(toIP), lunced_bmx7_nodes(selfInfo).nodes) then
 					command = ""
 
-					if cmd == "bmx6SetMetricAlgo" then
+					if cmd == "bmx7SetMetricAlgo" then
 						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/lunced?cmd=" .. tostring(cmd) .. "'&'algorithm=" .. tostring(algorithm) .. "'&'rxExpNumerator=" .. tostring(rxExpNumerator) .. "'&'rxExpDivisor=" .. tostring(rxExpDivisor) .. "'&'txExpNumerator=" .. tostring(txExpNumerator) .. "'&'txExpDivisor=" .. tostring(txExpDivisor)
 						print(command)
 
@@ -321,32 +321,32 @@ local lunced_method = {
 						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/lunced?cmd=" .. tostring(cmd) .. "'&'action=" .. tostring(action)
 						print(command)
 
-					elseif cmd == "bmx6infoDescriptions" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?descriptions/all"
+					elseif cmd == "bmx7infoDescriptions" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?descriptions/all"
 						print (command)
 
-					elseif cmd == "bmx6infoInterfaces" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?interfaces"
+					elseif cmd == "bmx7infoInterfaces" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?interfaces"
 						print(command)
 
-					elseif cmd == "bmx6infoLinks" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?links"
+					elseif cmd == "bmx7infoLinks" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?links"
 						print(command)
 
-					elseif cmd == "bmx6infoOptions" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?options"
+					elseif cmd == "bmx7infoOptions" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?options"
 						print(command)
 
-					elseif cmd == "bmx6infoParameters" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?parameters"
+					elseif cmd == "bmx7infoParameters" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?parameters"
 						print(command)
 
-					elseif cmd == "bmx6infoOriginators" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?originators/all"
+					elseif cmd == "bmx7infoOriginators" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?originators/all"
 						print(command)
 
-					elseif cmd == "bmx6infoStatus" then
-						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx6-info?status"
+					elseif cmd == "bmx7infoStatus" then
+						command = "/usr/bin/wget --no-check-certificate -T ".. timeout .." -t " .. tries .. " -qO - http://[" .. tostring(toIP) .. "]/cgi-bin/bmx7-info?status"
 						print(command)
 
 					else

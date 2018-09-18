@@ -39,7 +39,7 @@ QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
 QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
-PKG_NAME:=bmx6-mdns
+PKG_NAME:=bmx7-mdns
 PKG_VERSION:=0.1.2-$(QMP_RELEASE)-$(QMP_PKGRELEASE)
 PKG_RELEASE:=$(QMP_CODENAME)-$(QMP_GIT_REV)
 PKG_LICENSE:=GPL-2.0+
@@ -48,16 +48,16 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/bmx6-mdns
-  TITLE:=Distributed DNS server based on BMX6 using bmx6-sms plugin
+define Package/bmx7-mdns
+  TITLE:=Distributed DNS server based on BMX7 using bmx7-sms plugin
   SECTION:=net
   CATEGORY:=qMp
   URL:=https://qmp.cat
-  DEPENDS:=+bmx6-sms
+  DEPENDS:=+bmx7-sms
 endef
 
-define Package/bmx6-mdns/description
- Distributed DNS system using bmx6 sms plugin
+define Package/bmx7-mdns/description
+ Distributed DNS system using bmx7 sms plugin
 endef
 
 define Build/Prepare
@@ -70,7 +70,7 @@ endef
 define Build/Compile
 endef
 
-define Package/bmx6-mdns/install
+define Package/bmx7-mdns/install
 	$(INSTALL_DIR) $(1)/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DIR) $(1)/etc/mdns
@@ -80,7 +80,7 @@ define Package/bmx6-mdns/install
 	chmod 755 $(1)/etc/init.d/mdns
 	$(CP) ./files/etc/mdns/* $(1)/etc/mdns
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/qmp
-	$(CP) ./files/luci/bmx6-mdns.lua $(1)/usr/lib/lua/luci/model/cbi/qmp/mdns.lua
+	$(CP) ./files/luci/bmx7-mdns.lua $(1)/usr/lib/lua/luci/model/cbi/qmp/mdns.lua
 endef
 
-$(eval $(call BuildPackage,bmx6-mdns))
+$(eval $(call BuildPackage,bmx7-mdns))

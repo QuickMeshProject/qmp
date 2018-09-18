@@ -39,10 +39,10 @@ if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
     if m:formvalue("cbid.qmp.roaming.ignore") == "0" then
       m:set("networks", "lan_netmask", "255.255.0.0")
       m:set("networks", "lan_address", "172.30.22.1")
-      if uci:get("qmp","networks","bmx6_ipv4_address") ~= nil then
-        bmx6ipv4address = uci:get("qmp","networks","bmx6_ipv4_address")
-        bmx6ipv4 = string.sub( bmx6ipv4address, 1, string.find(bmx6ipv4address, "/" , 1 , true)-1 )
-        m:set("networks", "bmx6_ipv4_address", bmx6ipv4 .. '/32')
+      if uci:get("qmp","networks","bmx7_ipv4_address") ~= nil then
+        bmx7ipv4address = uci:get("qmp","networks","bmx7_ipv4_address")
+        bmx7ipv4 = string.sub( bmx7ipv4address, 1, string.find(bmx7ipv4address, "/" , 1 , true)-1 )
+        m:set("networks", "bmx7_ipv4_address", bmx7ipv4 .. '/32')
       end
 
       -- if switching to public, set LAN address to the public mesh address with
@@ -50,10 +50,10 @@ if m:formvalue("cbid.qmp.roaming.ignore") ~= nil then
     elseif m:formvalue("cbid.qmp.roaming.ignore") == "1" then
       m:set("networks", "lan_netmask", "255.255.255.224")
       m:set("networks", "lan_address", "10.30."..util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))"))..".1")
-      if uci:get("qmp","networks","bmx6_ipv4_address") ~= nil then
-        bmx6ipv4address = uci:get("qmp","networks","bmx6_ipv4_address")
-        bmx6ipv4 = string.sub( bmx6ipv4address, 1, string.find(bmx6ipv4address, "/" , 1 , true)-1 )
-        m:set("networks", "lan_address", bmx6ipv4)
+      if uci:get("qmp","networks","bmx7_ipv4_address") ~= nil then
+        bmx7ipv4address = uci:get("qmp","networks","bmx7_ipv4_address")
+        bmx7ipv4 = string.sub( bmx7ipv4address, 1, string.find(bmx7ipv4address, "/" , 1 , true)-1 )
+        m:set("networks", "lan_address", bmx7ipv4)
       end
     end
 
@@ -105,9 +105,9 @@ if uci:get("qmp","roaming","ignore") == "0" then
     translate("Additionally, the LAN interfaces are put in the br-lan bridge interface, which is configured with a private IPv4 subnetwork behind a NAT."))
   natted_mode.addremove = false
 
-  meshaddress = natted_mode:option(Value, "bmx6_ipv4_address", "Mesh-wide public IPv4 address", translate("Write the mesh-wide public IPv4 address for this device with a /32 netmask (recommended)."))
-  if uci:get("qmp","networks","bmx6_ipv4_prefix24") ~= nil then
-    meshaddress.default = uci:get("qmp","networks","bmx6_ipv4_prefix24") .. '.' .. util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))")) .. '/32'
+  meshaddress = natted_mode:option(Value, "bmx7_ipv4_address", "Mesh-wide public IPv4 address", translate("Write the mesh-wide public IPv4 address for this device with a /32 netmask (recommended)."))
+  if uci:get("qmp","networks","bmx7_ipv4_prefix24") ~= nil then
+    meshaddress.default = uci:get("qmp","networks","bmx7_ipv4_prefix24") .. '.' .. util.trim(util.exec("echo $((($(date +%M)*$(date +%S)%254)+1))")) .. '/32'
   end
   meshaddress.datatype = "cidr4"
   meshaddress.optional = false
@@ -167,7 +167,7 @@ function m.on_commit(self,map)
   if uci:get("qmp","roaming","ignore") == "1" then
     local lanip = m:formvalue("cbid.qmp.networks.lan_address")
     local lanmask = m:formvalue("cbid.qmp.networks.lan_netmask")
-    uci:set("qmp","networks","bmx6_ipv4_address",ip.IPv4(lanip,lanmask):string())
+    uci:set("qmp","networks","bmx7_ipv4_address",ip.IPv4(lanip,lanmask):string())
     uci:set("qmp","networks","publish_lan","1")
 
     -- Natted mode:

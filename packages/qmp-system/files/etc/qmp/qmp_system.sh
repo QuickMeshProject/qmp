@@ -53,7 +53,7 @@ qmp_configure_system() {
 qmp_set_hosts() {
 	qmp_log "Configuring /etc/hosts file with qmpadmin entry"
 
-	local ip=$(uci get bmx6.general.tun4Address | cut -d'/' -f1)
+	local ip=$(uci get bmx7.general.tun4Address | cut -d'/' -f1)
 	local hn=$(uci get system.@system[0].hostname)
 
 	if [ -z "$ip" -o -z "$hn" ]; then
@@ -81,7 +81,7 @@ qmp_set_maps() {
 				qmp_uci_set_raw libremap.location.elev="$elev"
 				
 				uci set libremap.qmp.enabled=1
-				uci set libremap.bmx6.enabled=1
+				uci set libremap.bmx7.enabled=1
 				uci set libremap.wireless.enabled=1
 				uci commit
 			}

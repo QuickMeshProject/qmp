@@ -57,13 +57,13 @@ define Package/qmp-small-node
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
 	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
 	+luci +luci-lib-libremap-system +luci-lib-libremap-location \
-	+luci-lib-libremap-bmx6 +luci-lib-libremap-qmp +bmx6-mdns
+	+luci-lib-libremap-bmx7 +luci-lib-libremap-qmp +bmx7-mdns
 endef
 
 define Package/qmp-small-node/description
  This metapackage provides a standard qMp node with the following features:
   - qMp system configuration files and scripts
-  - BMX6 routing protocol
+  - BMX7 routing protocol
   - Full LuCI web interface
   - IP/TCP utils
   - LibreMap and b6m tools

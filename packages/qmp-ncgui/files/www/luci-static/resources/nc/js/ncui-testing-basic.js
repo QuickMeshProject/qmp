@@ -340,17 +340,17 @@ function testingBasicPathSelect(nodeId, d3selection, nodeIdA, nodeIdB, showAll) 
 	var ssAlgorithm = ssSpace.append("div").attr("id", "ssAlgorithm");
 
 	var ssAlgorithmValue = ssAlgorithm.append("div").attr("id", "ssAlgorithmValue");
-	var bmx6Algo = generateBmx6Algo (nodeIdB, true);
+	var bmx7Algo = generateBmx7Algo (nodeIdB, true);
 
     ssAlgorithmValue.append("div").attr("id", "ssAlgorithmValueLabel").attr("class", "dropdown-desc").append("p").text("Algorithm:");
 
-    createSelectAlgorithm(ssAlgorithm, "Algorithm", bmx6Algo.texts);
-    d3.select("#Algorithm").selectAll('option[value="'+bmx6Algo.value+'"]').attr("selected",true);
+    createSelectAlgorithm(ssAlgorithm, "Algorithm", bmx7Algo.texts);
+    d3.select("#Algorithm").selectAll('option[value="'+bmx7Algo.value+'"]').attr("selected",true);
 
-	for (var i=0; i < bmx6Algo.exponents.length; i++) {
+	for (var i=0; i < bmx7Algo.exponents.length; i++) {
 
-		ssAlgorithm.append("p").text(bmx6Algo.exponents[i].name + ":");
-  		createSelectNumber(ssAlgorithm, bmx6Algo.exponents[i].name, createDropdownVector(bmx6Algo.exponents[i].min, bmx6Algo.exponents[i].max), bmx6Algo.exponents[i].def);							    		d3.select("#"+bmx6Algo.exponents[i].name).selectAll('option[value="'+bmx6Algo.exponents[i].value+'"]').attr("selected",true);
+		ssAlgorithm.append("p").text(bmx7Algo.exponents[i].name + ":");
+  		createSelectNumber(ssAlgorithm, bmx7Algo.exponents[i].name, createDropdownVector(bmx7Algo.exponents[i].min, bmx7Algo.exponents[i].max), bmx7Algo.exponents[i].def);							    		d3.select("#"+bmx7Algo.exponents[i].name).selectAll('option[value="'+bmx7Algo.exponents[i].value+'"]').attr("selected",true);
 	}
 
 	//Test parameters
@@ -392,7 +392,7 @@ function testingBasicPathSelect(nodeId, d3selection, nodeIdA, nodeIdB, showAll) 
 	ssSpace.append("button")
 			 .attr("id", "sRunPathButton")
 			 .attr("class", "btn btn-group")
-			 .attr("onclick",'testingBasicPathRun("'+nodeId+'", 		 	document.getElementById("nodeA").value, 			 	document.getElementById("nodeB").value, 			 	document.getElementById("ssIterations").value, 			 	document.getElementById("ssPause").value, 			 	document.getElementById("ssClear").checked, 			 	document.getElementById("Algorithm").value, 			 	document.getElementById("'+bmx6Algo.exponents[0].name+'").value, 			 	document.getElementById("'+bmx6Algo.exponents[1].name+'").value, 			 	document.getElementById("'+bmx6Algo.exponents[2].name+'").value, 			 	document.getElementById("'+bmx6Algo.exponents[3].name+'").value, 			 	"sSpace")')
+			 .attr("onclick",'testingBasicPathRun("'+nodeId+'", 		 	document.getElementById("nodeA").value, 			 	document.getElementById("nodeB").value, 			 	document.getElementById("ssIterations").value, 			 	document.getElementById("ssPause").value, 			 	document.getElementById("ssClear").checked, 			 	document.getElementById("Algorithm").value, 			 	document.getElementById("'+bmx7Algo.exponents[0].name+'").value, 			 	document.getElementById("'+bmx7Algo.exponents[1].name+'").value, 			 	document.getElementById("'+bmx7Algo.exponents[2].name+'").value, 			 	document.getElementById("'+bmx7Algo.exponents[3].name+'").value, 			 	"sSpace")')
 			 	.append("text").text("Calculate path");
 
 	if (document.getElementById("nodeA").value == document.getElementById("nodeB").value) {
@@ -429,7 +429,7 @@ function testingBasicPathRun(nodeId, nodeIdA, nodeIdB, iterations, pause, clear,
 	var ssPathSpace = ssSpace.append("div").attr("id", "ssPathSpace");
 
 	if (currenti == 1)
-		bmx6SetBmx6Algo(nodeIdB, algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor, false);
+		bmx7SetBmx7Algo(nodeIdB, algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor, false);
 
 	if (currenti <= iterations) {
 
@@ -489,12 +489,12 @@ function testingPathCalc(nodeId, nodeIdA, nodeIdB, d3selection, showButtons) {
 	var timestamp = Date.now();
 	testStatus.append("p").text("Calculating forward path (" + nodes[indexNode(nodeIdA)].name + " to " + nodes[indexNode(nodeIdB)].name+")...")
 
-	bmx6Path(nodeIdA, nodeIdB);
+	bmx7Path(nodeIdA, nodeIdB);
 
 	testStatus.html("");
 	testStatus.append("p").text("Calculating reverse path (" + nodes[indexNode(nodeIdB)].name + " to " + nodes[indexNode(nodeIdA)].name+")...")
 
-	bmx6Path(nodeIdB, nodeIdA);
+	bmx7Path(nodeIdB, nodeIdA);
 
 	testStatus.html("");
 	var PathTable = createPathTable (nodeIdA, nodeIdB, testStatus, "pathTable");

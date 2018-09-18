@@ -1,14 +1,14 @@
-// A file with some BMX6-specific functions for the NCui
+// A file with some BMX7-specific functions for the NCui
 
-//Get all the BMX6 information for all nodes
-function allBmx6All() {
-	nodes.forEach(function(d){bmx6All(d.id,true);});
-	nodes.forEach(function(d){bmx6Options(d.id,true);});
-	nodes.forEach(function(d){bmx6Parameters(d.id,true);});
+//Get all the BMX7 information for all nodes
+function allBmx7All() {
+	nodes.forEach(function(d){bmx7All(d.id,true);});
+	nodes.forEach(function(d){bmx7Options(d.id,true);});
+	nodes.forEach(function(d){bmx7Parameters(d.id,true);});
 }
 
-//Get all the BMX6 information (interfaces, links, originators, originators) from nodeId
-function bmx6All(nodeId, asynchronous) {
+//Get all the BMX7 information (interfaces, links, originators, originators) from nodeId
+function bmx7All(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
     var debug = arguments;
@@ -19,13 +19,13 @@ function bmx6All(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //Get BMX6 interfaces from NCD via ubus
+        //Get BMX7 interfaces from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_all/?nodeid=" + nodeId,
+                url: "../nc/bmx7_all/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -35,14 +35,14 @@ function bmx6All(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
 					console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                    	nodes[nodeIndex].bmx6.interfaces = data.interfaces.interfaces;
-						nodes[nodeIndex].bmx6.links = data.links.links;
-						nodes[nodeIndex].bmx6.originators = data.originators.originators;
-						nodes[nodeIndex].bmx6.status = data.status.status;
+                    	nodes[nodeIndex].bmx7.interfaces = data.interfaces.interfaces;
+						nodes[nodeIndex].bmx7.links = data.links.links;
+						nodes[nodeIndex].bmx7.originators = data.originators.originators;
+						nodes[nodeIndex].bmx7.status = data.status.status;
                      }
                 },
 				error: function(data) {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_all request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_all request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -57,11 +57,11 @@ function bmx6All(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 paths from node1 to all the other nodes
-function bmx6AllPaths(node1)
+//Get the BMX7 paths from node1 to all the other nodes
+function bmx7AllPaths(node1)
 {
 
-    var bmx6error = false;
+    var bmx7error = false;
     var debug = arguments;
 
     //Get the index for node1 and check that it is in the nodes list (if #1)
@@ -69,13 +69,13 @@ function bmx6AllPaths(node1)
 
     if (indexNode1 > -1 ) {
 
-        //Get, synchronously, the BMX6 originators list
-        bmx6Originators(node1, false);
+        //Get, synchronously, the BMX7 originators list
+        bmx7Originators(node1, false);
 
         //Request the path for all the originators
-        nodes[indexNode1].bmx6.originators.forEach( function(element) {
+        nodes[indexNode1].bmx7.originators.forEach( function(element) {
             if ( ipv62id(element.primaryIp) != node1 )
-                bmx6Path(node1,ipv62id(element.primaryIp));
+                bmx7Path(node1,ipv62id(element.primaryIp));
              });
     }
 
@@ -87,20 +87,20 @@ function bmx6AllPaths(node1)
 }
 
 
-//Get the BMX6 originators of all nodes
-function bmx6AllOriginators()
+//Get the BMX7 originators of all nodes
+function bmx7AllOriginators()
 {
-    var bmx6error = false;
+    var bmx7error = false;
     var debug = arguments;
 
     nodes.forEach(function (d) {
-        bmx6Originators(d.id, false);
+        bmx7Originators(d.id, false);
         });
 }
 
 
-//Get the BMX6 descriptors from nodeId
-function bmx6Descriptors(nodeId, asynchronous) {
+//Get the BMX7 descriptors from nodeId
+function bmx7Descriptors(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
     var debug = arguments;
@@ -113,17 +113,17 @@ function bmx6Descriptors(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //If not present, create an empty object to store BMX6 descriptors
-        if (nodes[nodeIndex].bmx6.descriptors == null)
-            nodes[nodeIndex].bmx6.descriptors = {};
+        //If not present, create an empty object to store BMX7 descriptors
+        if (nodes[nodeIndex].bmx7.descriptors == null)
+            nodes[nodeIndex].bmx7.descriptors = {};
 
-        //Get BMX6 descriptors from NCD via ubus
+        //Get BMX7 descriptors from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_descriptors/?nodeid=" + nodeId,
+                url: "../nc/bmx7_descriptors/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -135,11 +135,11 @@ function bmx6Descriptors(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
                              console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                         nodes[nodeIndex].bmx6.descriptors = data.descriptors;
+                         nodes[nodeIndex].bmx7.descriptors = data.descriptors;
                      }
                 },
 				error: function(data) {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_descriptors request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_descriptors request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -153,8 +153,8 @@ function bmx6Descriptors(nodeId, asynchronous) {
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is not in the nodes list");
 }
 
-//Get the BMX6 interfaces list from nodeId
-function bmx6Interfaces(nodeId, asynchronous) {
+//Get the BMX7 interfaces list from nodeId
+function bmx7Interfaces(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
     var debug = arguments;
@@ -165,17 +165,17 @@ function bmx6Interfaces(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //If not present, create an empty object to store BMX6 interfaces object
-        if (nodes[nodeIndex].bmx6.interfaces == null)
-            nodes[nodeIndex].bmx6.interfaces = {};
+        //If not present, create an empty object to store BMX7 interfaces object
+        if (nodes[nodeIndex].bmx7.interfaces == null)
+            nodes[nodeIndex].bmx7.interfaces = {};
 
-        //Get BMX6 interfaces from NCD via ubus
+        //Get BMX7 interfaces from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_interfaces/?nodeid=" + nodeId,
+                url: "../nc/bmx7_interfaces/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -187,11 +187,11 @@ function bmx6Interfaces(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
                              console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                         nodes[nodeIndex].bmx6.interfaces = data.interfaces;
+                         nodes[nodeIndex].bmx7.interfaces = data.interfaces;
                      }
                 },
                 error: function(data) {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_interfaces request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_interfaces request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -216,17 +216,17 @@ function bmx6Interfaces(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //If not present, create an empty object to store BMX6 interfaces object
-        if (nodes[nodeIndex].bmx6.interfaces == null)
-            nodes[nodeIndex].bmx6.interfaces = {};
+        //If not present, create an empty object to store BMX7 interfaces object
+        if (nodes[nodeIndex].bmx7.interfaces == null)
+            nodes[nodeIndex].bmx7.interfaces = {};
 
-        //Get BMX6 interfaces from NCD via ubus
+        //Get BMX7 interfaces from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_links/?nodeid=" + nodeId,
+                url: "../nc/bmx7_links/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -238,7 +238,7 @@ function bmx6Interfaces(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
                              console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                         nodes[nodeIndex].bmx6.links = data.links;
+                         nodes[nodeIndex].bmx7.links = data.links;
                      }
                 },
                 error: function(data) {
@@ -254,8 +254,8 @@ function bmx6Interfaces(nodeId, asynchronous) {
 
 
 
-//Get the BMX6 originators list from nodeId
-function bmx6Originators(nodeId, asynchronous) {
+//Get the BMX7 originators list from nodeId
+function bmx7Originators(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 
@@ -267,17 +267,17 @@ function bmx6Originators(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //If not present, create an empty object to store BMX6 originators object
-        if (nodes[nodeIndex].bmx6.originators == null)
-            nodes[nodeIndex].bmx6.originators = {};
+        //If not present, create an empty object to store BMX7 originators object
+        if (nodes[nodeIndex].bmx7.originators == null)
+            nodes[nodeIndex].bmx7.originators = {};
 
-        //Get BMX6 originators from NCD via ubus
+        //Get BMX7 originators from NCD via ubus
         $.ajax({
-        	url: "../nc/bmx6_originators/?nodeid=" + nodeId,
+        	url: "../nc/bmx7_originators/?nodeid=" + nodeId,
         	type: 'get',
         	dataType: 'json',
         	async: asynchronous,
@@ -287,11 +287,11 @@ function bmx6Originators(nodeId, asynchronous) {
             	}
             	else {
             		console.log("In function " + debug.callee.name + ". Ubus response: ", data);
-                	nodes[nodeIndex].bmx6.originators = data.originators;
+                	nodes[nodeIndex].bmx7.originators = data.originators;
 				}
 			},
 			error: function(data) {
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_originators request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_originators request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 				this.tryCount++;
 				if (this.tryCount <= this.retryLimit) {
 					this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -306,8 +306,8 @@ function bmx6Originators(nodeId, asynchronous) {
 
 }
 
-//Get the BMX6 parameters list from nodeId
-function bmx6Parameters(nodeId, asynchronous) {
+//Get the BMX7 parameters list from nodeId
+function bmx7Parameters(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 
@@ -319,13 +319,13 @@ function bmx6Parameters(nodeId, asynchronous) {
     if ( nodeIndex > -1 ) {
         log(DEBUG, arguments.callee.name, "Node " + nodeId + " is in the nodes list.");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //Get BMX6 parameters from NCD via ubus
+        //Get BMX7 parameters from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_parameters/?nodeid=" + nodeId,
+                url: "../nc/bmx7_parameters/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -337,11 +337,11 @@ function bmx6Parameters(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
                              console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                         nodes[nodeIndex].bmx6.parameters = data.OPTIONS;
+                         nodes[nodeIndex].bmx7.parameters = data.OPTIONS;
                      }
                 },
                 error: function(data) {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_parameters request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_parameters request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -356,11 +356,11 @@ function bmx6Parameters(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 path from node1 to node2 and save it to node1
-function bmx6Path(node1, node2)
+//Get the BMX7 path from node1 to node2 and save it to node1
+function bmx7Path(node1, node2)
 {
 
-    var bmx6error = false;
+    var bmx7error = false;
     var debug = arguments;
 
     //(if #1) Check that both nodes are different
@@ -371,16 +371,16 @@ function bmx6Path(node1, node2)
 
         if (indexNode1 > -1 ) {
 
-            //Check if node1 has the BMX6 object or create it (if #3)
-            if ( nodes[indexNode1].bmx6 == null )
-                 nodes[indexNode1].bmx6 = {};
+            //Check if node1 has the BMX7 object or create it (if #3)
+            if ( nodes[indexNode1].bmx7 == null )
+                 nodes[indexNode1].bmx7 = {};
 
-            //Check if node1 has the BMX6 paths array or create it (if #4)
-            if ( nodes[indexNode1].bmx6.paths == null )
-                 nodes[indexNode1].bmx6.paths = [];
+            //Check if node1 has the BMX7 paths array or create it (if #4)
+            if ( nodes[indexNode1].bmx7.paths == null )
+                 nodes[indexNode1].bmx7.paths = [];
 
             //Calculate the path from node1 to node2 and save it to path
-            var path = bmx6Traceroute(node1,node2);
+            var path = bmx7Traceroute(node1,node2);
 
             //Check if the calculated path has one or more hops (if #5)
             if (path.length > 0) {
@@ -391,19 +391,19 @@ function bmx6Path(node1, node2)
                 pathObject.path = path.reverse();
                 pathObject.id = node2;
 
-                var indexPath = nodes[indexNode1].bmx6.paths.map(function(element) {
+                var indexPath = nodes[indexNode1].bmx7.paths.map(function(element) {
                     return element.id;
                 }).indexOf(node2);
 
                 //Check if node1 already contains this path, to overwrite it (if #6)
                 if (indexPath > -1) {
                     //Overwrite the path
-                    nodes[indexNode1].bmx6.paths[indexPath] = pathObject;
+                    nodes[indexNode1].bmx7.paths[indexPath] = pathObject;
                 }
                 //(if #6) node1 does not contain the path
                 else {
                     //Save the path
-                    nodes[indexNode1].bmx6.paths.push(pathObject);
+                    nodes[indexNode1].bmx7.paths.push(pathObject);
                 }
             }
 
@@ -430,8 +430,8 @@ function bmx6Path(node1, node2)
 }
 
 
-//Get the BMX6 metrics from all nodes to
-function bmx6RemoteMetricsStatus(nodeId, asynchronous) {
+//Get the BMX7 metrics from all nodes to
+function bmx7RemoteMetricsStatus(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
     var debug = arguments;
@@ -442,20 +442,20 @@ function bmx6RemoteMetricsStatus(nodeId, asynchronous) {
         if (DEBUGMODE)
             console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-        //If not present, create an empty object to store BMX6 objects
-        if (nodes[nodeIndex].bmx6 == null)
-            nodes[nodeIndex].bmx6 = {};
+        //If not present, create an empty object to store BMX7 objects
+        if (nodes[nodeIndex].bmx7 == null)
+            nodes[nodeIndex].bmx7 = {};
 
-        //If not present, create an empty object to store BMX6 interfaces object
-        if (nodes[nodeIndex].bmx6.remoteMetrics == null)
-            nodes[nodeIndex].bmx6.remoteMetrics = {};
+        //If not present, create an empty object to store BMX7 interfaces object
+        if (nodes[nodeIndex].bmx7.remoteMetrics == null)
+            nodes[nodeIndex].bmx7.remoteMetrics = {};
 
         nodes.forEach(function(d) {
-            bmx6Originators(d.id, false);
+            bmx7Originators(d.id, false);
         });
-        //Get BMX6 interfaces from NCD via ubus
+        //Get BMX7 interfaces from NCD via ubus
         $.ajax({
-                url: "../nc/bmx6_status/?nodeid=" + nodeId,
+                url: "../nc/bmx7_status/?nodeid=" + nodeId,
         type: 'get',
         dataType: 'json',
         async: asynchronous,
@@ -467,11 +467,11 @@ function bmx6RemoteMetricsStatus(nodeId, asynchronous) {
             else {
                 if (DEBUGMODE)
                              console.log("Function: " + arguments.callee.name + ". Ubus response: ", data);
-                         nodes[nodeIndex].bmx6.status = data.status;
+                         nodes[nodeIndex].bmx7.status = data.status;
                      }
                 },
                 error: function(data) {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -486,8 +486,8 @@ function bmx6RemoteMetricsStatus(nodeId, asynchronous) {
 }
 
 
-//Set the BMX6 metric algorithm value and exponents to nodeId
-function bmx6SetBmx6Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor, asynchronous) {
+//Set the BMX7 metric algorithm value and exponents to nodeId
+function bmx7SetBmx7Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpNumerator, txExpDivisor, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : false;
 	var debug = arguments;
@@ -497,9 +497,9 @@ function bmx6SetBmx6Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpN
     if ( nodeIndex > -1 || nodeId=="local" ) {
 		console.log("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Set BMX6 metric algorithm via ubus
+		//Set BMX7 metric algorithm via ubus
 		$.ajax({
-			url: "../nc/set_bmx6_metricalgo/?nodeid=" + nodeId + "&algorithm=" + algorithm + "&rxExpNumerator=" + rxExpNumerator + "&rxExpDivisor=" + rxExpDivisor + "&txExpNumerator=" + txExpNumerator + "&txExpDivisor=" + txExpDivisor,
+			url: "../nc/set_bmx7_metricalgo/?nodeid=" + nodeId + "&algorithm=" + algorithm + "&rxExpNumerator=" + rxExpNumerator + "&rxExpDivisor=" + rxExpDivisor + "&txExpNumerator=" + txExpNumerator + "&txExpDivisor=" + txExpDivisor,
 
 			type: 'get',
 			dataType: 'json',
@@ -513,7 +513,7 @@ function bmx6SetBmx6Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpN
 				}
 			},
 			error: function(data) {
-				console.error("In function " + debug.callee.name + ". Ubus set_bmx6_metricalgo request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus set_bmx7_metricalgo request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -531,8 +531,8 @@ function bmx6SetBmx6Algo(nodeId, algorithm, rxExpNumerator, rxExpDivisor, txExpN
 
 
 
-//Get the BMX6 links information from nodeId
-function bmx6Links(nodeId, asynchronous) {
+//Get the BMX7 links information from nodeId
+function bmx7Links(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -543,15 +543,15 @@ function bmx6Links(nodeId, asynchronous) {
 
 	if ( n > -1 ) {
 		if ( nodes[n].ncd.active )
-			bmx6luncedLinks(nodeId, asynchronous);
+			bmx7luncedLinks(nodeId, asynchronous);
 		else
-			bmx6infoLinks(nodeId, asynchronous);
+			bmx7infoLinks(nodeId, asynchronous);
 	}
 }
 
 
-//Get the BMX6 options information from nodeId
-function bmx6Options(nodeId, asynchronous) {
+//Get the BMX7 options information from nodeId
+function bmx7Options(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -562,15 +562,15 @@ function bmx6Options(nodeId, asynchronous) {
 
 	if ( n > -1 ) {
 		if ( nodes[n].ncd.active )
-			bmx6luncedOptions(nodeId, asynchronous);
+			bmx7luncedOptions(nodeId, asynchronous);
 		else
-			bmx6infoOptions(nodeId, asynchronous);
+			bmx7infoOptions(nodeId, asynchronous);
 	}
 }
 
 
-//Get the BMX6 status information from nodeId
-function bmx6Status(nodeId, asynchronous) {
+//Get the BMX7 status information from nodeId
+function bmx7Status(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : false;
 	var debug = arguments;
@@ -581,15 +581,15 @@ function bmx6Status(nodeId, asynchronous) {
 
 	if ( n > -1 ) {
 		if ( nodes[n].ncd.active )
-			bmx6luncedStatus(nodeId, asynchronous);
+			bmx7luncedStatus(nodeId, asynchronous);
 		else
-			bmx6infoStatus(nodeId, asynchronous);
+			bmx7infoStatus(nodeId, asynchronous);
 	}
 }
 
 
-//Get the BMX6 descriptions information from nodeId via bmx6info
-function bmx6infoDescriptions(nodeId, asynchronous) {
+//Get the BMX7 descriptions information from nodeId via bmx7info
+function bmx7infoDescriptions(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -602,29 +602,29 @@ function bmx6infoDescriptions(nodeId, asynchronous) {
 
 		console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Get BMX6 interfaces from lunced via ubus
+		//Get BMX7 interfaces from lunced via ubus
 		$.ajax({
-			url: "../nc/bmx6info_descriptions/?nodeid=" + nodeId,
+			url: "../nc/bmx7info_descriptions/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
 
 			success: function(data) {
 				if (data == null || data == undefined)
-					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6info_descriptions from " + nodeId + " returned null.");
+					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7info_descriptions from " + nodeId + " returned null.");
 
 				else if (data != undefined && data != null && data != ""  ) {
-					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6info_descriptions from " + nodeId + " returned", data);
-					nodes[n].bmx6.descriptions = data.data;
+					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7info_descriptions from " + nodeId + " returned", data);
+					nodes[n].bmx7.descriptions = data.data;
 				}
 				else {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_descriptions request for " + nodeId + " returned an error:", data);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_descriptions request for " + nodeId + " returned an error:", data);
 				}
 			},
 
 			error: function(data) {
 				ncdError();
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_descriptions request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_descriptions request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -638,8 +638,8 @@ function bmx6infoDescriptions(nodeId, asynchronous) {
 	}
 }
 
-//Get the BMX6 links information from nodeId via bmx6info
-function bmx6infoLinks(nodeId, asynchronous) {
+//Get the BMX7 links information from nodeId via bmx7info
+function bmx7infoLinks(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -652,29 +652,29 @@ function bmx6infoLinks(nodeId, asynchronous) {
 
 		console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Get BMX6 interfaces from lunced via ubus
+		//Get BMX7 interfaces from lunced via ubus
 		$.ajax({
-			url: "../nc/bmx6info_links/?nodeid=" + nodeId,
+			url: "../nc/bmx7info_links/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
 
 			success: function(data) {
 				if (data == null || data == undefined)
-					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6_links from " + nodeId + " returned null.");
+					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7_links from " + nodeId + " returned null.");
 
 				else if (data.links != undefined && data.links != null && data.links != ""  ) {
-					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6_links from " + nodeId + " returned", data);
-					nodes[n].bmx6.links = data.links;
+					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7_links from " + nodeId + " returned", data);
+					nodes[n].bmx7.links = data.links;
 				}
 				else {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_links request for " + nodeId + " returned an error:", data);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_links request for " + nodeId + " returned an error:", data);
 				}
 			},
 
 			error: function(data) {
 				ncdError();
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_links request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_links request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -689,8 +689,8 @@ function bmx6infoLinks(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 options information from nodeId via bmx6info
-function bmx6infoOptions(nodeId, asynchronous) {
+//Get the BMX7 options information from nodeId via bmx7info
+function bmx7infoOptions(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -703,29 +703,29 @@ function bmx6infoOptions(nodeId, asynchronous) {
 
 		console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Get BMX6 interfaces from lunced via ubus
+		//Get BMX7 interfaces from lunced via ubus
 		$.ajax({
-			url: "../nc/bmx6info_options/?nodeid=" + nodeId,
+			url: "../nc/bmx7info_options/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
 
 			success: function(data) {
 				if (data == null || data == undefined)
-					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6info_options from " + nodeId + " returned null.");
+					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7info_options from " + nodeId + " returned null.");
 
 				else if (data != undefined && data != null && data != ""  ) {
-					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6info_options from " + nodeId + " returned", data);
-					nodes[n].bmx6.options = data.OPTIONS;
+					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7info_options from " + nodeId + " returned", data);
+					nodes[n].bmx7.options = data.OPTIONS;
 				}
 				else {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_options request for " + nodeId + " returned an error:", data);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_options request for " + nodeId + " returned an error:", data);
 				}
 			},
 
 			error: function(data) {
 				ncdError();
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_options request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_options request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -740,8 +740,8 @@ function bmx6infoOptions(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 originators information from nodeId via bmx6info
-function bmx6infoOriginators(nodeId, asynchronous) {
+//Get the BMX7 originators information from nodeId via bmx7info
+function bmx7infoOriginators(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -754,29 +754,29 @@ function bmx6infoOriginators(nodeId, asynchronous) {
 
 		console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Get BMX6 interfaces from lunced via ubus
+		//Get BMX7 interfaces from lunced via ubus
 		$.ajax({
-			url: "../nc/bmx6info_originators/?nodeid=" + nodeId,
+			url: "../nc/bmx7info_originators/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
 
 			success: function(data) {
 				if (data == null || data == undefined)
-					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6info_originators from " + nodeId + " returned null.");
+					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7info_originators from " + nodeId + " returned null.");
 
 				else if (data != undefined && data != null && data != ""  ) {
-					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6info_originators from " + nodeId + " returned", data);
-					nodes[n].bmx6.originators = data.data;
+					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7info_originators from " + nodeId + " returned", data);
+					nodes[n].bmx7.originators = data.data;
 				}
 				else {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_originators request for " + nodeId + " returned an error:", data);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_originators request for " + nodeId + " returned an error:", data);
 				}
 			},
 
 			error: function(data) {
 				ncdError();
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_originators request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_originators request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -790,8 +790,8 @@ function bmx6infoOriginators(nodeId, asynchronous) {
 	}
 }
 
-//Get the BMX6 status information from nodeId via bmx6info
-function bmx6infoStatus(nodeId, asynchronous) {
+//Get the BMX7 status information from nodeId via bmx7info
+function bmx7infoStatus(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -804,30 +804,30 @@ function bmx6infoStatus(nodeId, asynchronous) {
 
 		console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//Get BMX6 interfaces from lunced via ubus
+		//Get BMX7 interfaces from lunced via ubus
 		$.ajax({
-			url: "../nc/bmx6info_status/?nodeid=" + nodeId,
+			url: "../nc/bmx7info_status/?nodeid=" + nodeId,
 			type: 'get',
 			dataType: 'json',
 			async: asynchronous,
 
 			success: function(data) {
 				if (data == null || data == undefined)
-					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6_status from " + nodeId + " returned null.");
+					console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7_status from " + nodeId + " returned null.");
 
 				else if (data.status != undefined && data.status != null && data.status != ""  ) {
-					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6_status from " + nodeId + " returned", data);
-					nodes[n].bmx6.status = data.status;
+					console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7_status from " + nodeId + " returned", data);
+					nodes[n].bmx7.status = data.status;
 					updateName(nodeId);
 				}
 				else {
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_status request for " + nodeId + " returned an error:", data);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_status request for " + nodeId + " returned an error:", data);
 				}
 			},
 
 			error: function(data) {
 				ncdError();
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -842,8 +842,8 @@ function bmx6infoStatus(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 links list from nodeId via lunced
-function bmx6luncedLinks(nodeId, asynchronous) {
+//Get the BMX7 links list from nodeId via lunced
+function bmx7luncedLinks(nodeId, asynchronous) {
 
     asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -856,26 +856,26 @@ function bmx6luncedLinks(nodeId, asynchronous) {
 		if ( nodes[n].ncd.active ) {
 			console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-			//Get BMX6 links from lunced via ubus
+			//Get BMX7 links from lunced via ubus
 			$.ajax({
-				url: "../nc/bmx6_links/?nodeid=" + nodeId,
+				url: "../nc/bmx7_links/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
 
 				success: function(data) {
 					if (data == null || data == undefined)
-						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6_links from " + nodeId + " returned null.");
+						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7_links from " + nodeId + " returned null.");
 
 					else if (data.links != undefined && data.links != null && data.links != ""  ) {
-						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6_links from " + nodeId + " returned", data);
-						nodes[n].bmx6.links = data.links;
+						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7_links from " + nodeId + " returned", data);
+						nodes[n].bmx7.links = data.links;
 					}
 				},
 
 				error: function(data) {
 					ncdError();
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_links request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_links request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -894,8 +894,8 @@ function bmx6luncedLinks(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 options list from nodeId
-function bmx6luncedOptions(nodeId, asynchronous) {
+//Get the BMX7 options list from nodeId
+function bmx7luncedOptions(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -906,29 +906,29 @@ function bmx6luncedOptions(nodeId, asynchronous) {
 		if ( nodes[n].ncd.active ) {
 			console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-			//If not present, create an empty object to store BMX6 objects
-			if (nodes[n].bmx6 == undefined)
-				nodes[n].bmx6 = {};
+			//If not present, create an empty object to store BMX7 objects
+			if (nodes[n].bmx7 == undefined)
+				nodes[n].bmx7 = {};
 
-			//Get BMX6 options from lunced via ubus
+			//Get BMX7 options from lunced via ubus
 			$.ajax({
-				url: "../nc/bmx6_options/?nodeid=" + nodeId,
+				url: "../nc/bmx7_options/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
 
 				success: function(data) {
 					if (data == null){
-						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6_options from " + nodeId + " returned null.");
+						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7_options from " + nodeId + " returned null.");
 					}
 					else if (data.OPTIONS != undefined) {
-						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6_options from " + nodeId + " returned", data);
-						nodes[n].bmx6.options = data.OPTIONS;
+						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7_options from " + nodeId + " returned", data);
+						nodes[n].bmx7.options = data.OPTIONS;
 					}
 				},
 				error: function(data) {
 					ncdError();
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_options request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_options request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -947,8 +947,8 @@ function bmx6luncedOptions(nodeId, asynchronous) {
 }
 
 
-//Get the BMX6 status information from nodeId via lunced
-function bmx6luncedStatus(nodeId, asynchronous) {
+//Get the BMX7 status information from nodeId via lunced
+function bmx7luncedStatus(nodeId, asynchronous) {
 
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : true;
 	var debug = arguments;
@@ -961,29 +961,29 @@ function bmx6luncedStatus(nodeId, asynchronous) {
 		if ( nodes[n].ncd.active ) {
 			console.debug("In function " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-			//If not present, create an empty object to store BMX6 objects
-			if (nodes[n].bmx6 == undefined)
-				nodes[n].bmx6 = {};
-			//Get BMX6 status from lunced via ubus
+			//If not present, create an empty object to store BMX7 objects
+			if (nodes[n].bmx7 == undefined)
+				nodes[n].bmx7 = {};
+			//Get BMX7 status from lunced via ubus
 			$.ajax({
-				url: "../nc/bmx6_status/?nodeid=" + nodeId,
+				url: "../nc/bmx7_status/?nodeid=" + nodeId,
 				type: 'get',
 				dataType: 'json',
 				async: asynchronous,
 
 				success: function(data) {
 					if (data == null || data == undefined)
-						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx6_status from " + nodeId + " returned null.");
+						console.warn("In function " + arguments.callee.name + ". Ubus reply for bmx7_status from " + nodeId + " returned null.");
 
 					else if (data.status != undefined && data.status != null && data.status != ""  ) {
-						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx6_status from " + nodeId + " returned", data);
-						nodes[n].bmx6.status = data.status;
+						console.debug("In function " + arguments.callee.name + ". Ubus reply for bmx7_status from " + nodeId + " returned", data);
+						nodes[n].bmx7.status = data.status;
 					}
 				},
 
 				error: function(data) {
 					ncdError();
-					console.error("In function " + debug.callee.name + ". Ubus bmx6_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+					console.error("In function " + debug.callee.name + ". Ubus bmx7_status request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -1008,10 +1008,10 @@ function bmx6luncedStatus(nodeId, asynchronous) {
 
 
 
-//Calculate the BMX6 path from node1 to node2
-function bmx6Traceroute(node1, node2)
+//Calculate the BMX7 path from node1 to node2
+function bmx7Traceroute(node1, node2)
 {
-    var bmx6error = false;
+    var bmx7error = false;
     var debug = arguments;
 
     //Get the index for node1 and check that it is in the nodes list (if #1)
@@ -1019,24 +1019,24 @@ function bmx6Traceroute(node1, node2)
 
     if (indexNode1 > -1 ) {
 
-        //Update, synchronously, the BMX6 originators list of node1 to get the latest data
-        bmx6Originators(node1, false);
-        bmx6Interfaces(node1,false);
+        //Update, synchronously, the BMX7 originators list of node1 to get the latest data
+        bmx7Originators(node1, false);
+        bmx7Interfaces(node1,false);
 
         //Check if node1 has the originators list (if #2)
-        if ( nodes[indexNode1].bmx6 != null && nodes[indexNode1].bmx6.originators != null ) {
+        if ( nodes[indexNode1].bmx7 != null && nodes[indexNode1].bmx7.originators != null ) {
 
             //Check if node2 is in the originators list of node1 (if #3)
-            if (inBmx6OriginatorsList(node2, nodes[indexNode1].bmx6.originators)) {
+            if (inBmx7OriginatorsList(node2, nodes[indexNode1].bmx7.originators)) {
 
                 //Get the index of node2 in the originators list of node1
-                var index2InOriginators = indexBmx6Originators(node2, nodes[indexNode1].bmx6.originators);
+                var index2InOriginators = indexBmx7Originators(node2, nodes[indexNode1].bmx7.originators);
 
-                //Update, synchronously, the BMX6 links list of node1 to get the latest data
-                bmx6Links(node1, false);
+                //Update, synchronously, the BMX7 links list of node1 to get the latest data
+                bmx7Links(node1, false);
 
                 //Check if node1 has the links list (if #4)
-                if ( nodes[indexNode1].bmx6.links != null ) {
+                if ( nodes[indexNode1].bmx7.links != null ) {
 
                     //Update, synchronously, the neighbours list of node1 to get the latest data
                     addAllNeighbours(node1);
@@ -1055,14 +1055,14 @@ function bmx6Traceroute(node1, node2)
                             //Check if it is in the nodes list (if #6)
                             if (elementIndex > -1) {
 
-                                //Update, synchronously, the BMX6 interfaces list of element to get the latest data
-                                bmx6Interfaces(element, false);
+                                //Update, synchronously, the BMX7 interfaces list of element to get the latest data
+                                bmx7Interfaces(element, false);
 
-                                //Check that the element node has a non-empty BMX6 interfaces list (if #7)
-                                if ( nodes[elementIndex].bmx6 != null && nodes[elementIndex].bmx6.interfaces != null ) {
+                                //Check that the element node has a non-empty BMX7 interfaces list (if #7)
+                                if ( nodes[elementIndex].bmx7 != null && nodes[elementIndex].bmx7.interfaces != null ) {
 
                                     //Check if the element has the linklocal IP in node1's viaIP (if #8)
-                                    if (isIpv6InInterfaces (nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp, nodes[elementIndex].bmx6.interfaces) ){
+                                    if (isIpv6InInterfaces (nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp, nodes[elementIndex].bmx7.interfaces) ){
 
                                         console.log("Next hop for path from Node1 ("+ node1 + ") to Node2 (" + node2 + ") is node #" + elementIndex + " (" + nodes[elementIndex].id + ")");
                                         viaNeighbourIndex = index;
@@ -1071,14 +1071,14 @@ function bmx6Traceroute(node1, node2)
                                     //(if #8)
                                     else {
                                         if (DEBUGMODE)
-                                            console.log("Function: " + arguments.callee.name + ". Neighbour " + element + " of Node1 (" + node1 + ") does not have IPv6 " + nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp + " in the interfaces list");
+                                            console.log("Function: " + arguments.callee.name + ". Neighbour " + element + " of Node1 (" + node1 + ") does not have IPv6 " + nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp + " in the interfaces list");
                                         }
 
                                 }
                                 //(if #7)
                                 else {
                                     if (DEBUGMODE)
-                                        console.log("Function: " + arguments.callee.name + ". Neighbour " + element + " of Node1 (" + node1 + ") has no BMX6 interfaces list");
+                                        console.log("Function: " + arguments.callee.name + ". Neighbour " + element + " of Node1 (" + node1 + ") has no BMX7 interfaces list");
                                 }
 
 
@@ -1104,12 +1104,12 @@ function bmx6Traceroute(node1, node2)
 
                                 hopObject.in = {};
                                 hopObject.in.id = node1;
-                                hopObject.in.interface = nodes[indexNode1].bmx6.originators[index2InOriginators].viaDev;
-                                hopObject.in.ip = nodes[indexNode1].bmx6.interfaces[indexNameInInterfaces(hopObject.in.interface, nodes[indexNode1].bmx6.interfaces)].llocalIp.split("/")[0];
+                                hopObject.in.interface = nodes[indexNode1].bmx7.originators[index2InOriginators].viaDev;
+                                hopObject.in.ip = nodes[indexNode1].bmx7.interfaces[indexNameInInterfaces(hopObject.in.interface, nodes[indexNode1].bmx7.interfaces)].llocalIp.split("/")[0];
 								hopObject.out = {};
                                 hopObject.out.id = nextHop;
-                                hopObject.out.ip = nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp;
-                                hopObject.out.interface = nodes[indexNode(nextHop)].bmx6.interfaces[indexIpv6InInterfaces(nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp, nodes[indexNode(nextHop)].bmx6.interfaces)].devName;
+                                hopObject.out.ip = nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp;
+                                hopObject.out.interface = nodes[indexNode(nextHop)].bmx7.interfaces[indexIpv6InInterfaces(nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp, nodes[indexNode(nextHop)].bmx7.interfaces)].devName;
 
                                 path.push(hopObject);
 
@@ -1125,20 +1125,20 @@ function bmx6Traceroute(node1, node2)
                             else {
 
                                 if (DEBUGMODE)
-                                    console.log("Recursively calling bmx6Traceroute("+ nextHop +", " + node2 +")");
+                                    console.log("Recursively calling bmx7Traceroute("+ nextHop +", " + node2 +")");
 
-                                var path = bmx6Traceroute(nextHop,node2);
+                                var path = bmx7Traceroute(nextHop,node2);
 
                                 var hopObject = {};
 
                                 hopObject.in = {};
                                 hopObject.in.id = node1;
-                                hopObject.in.interface = nodes[indexNode1].bmx6.originators[index2InOriginators].viaDev;
-                                hopObject.in.ip = nodes[indexNode1].bmx6.interfaces[indexNameInInterfaces(hopObject.in.interface, nodes[indexNode1].bmx6.interfaces)].llocalIp.split("/")[0];
+                                hopObject.in.interface = nodes[indexNode1].bmx7.originators[index2InOriginators].viaDev;
+                                hopObject.in.ip = nodes[indexNode1].bmx7.interfaces[indexNameInInterfaces(hopObject.in.interface, nodes[indexNode1].bmx7.interfaces)].llocalIp.split("/")[0];
 								hopObject.out = {};
                                 hopObject.out.id = nextHop;
-                                hopObject.out.ip = nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp;
-                                hopObject.out.interface = nodes[indexNode(nextHop)].bmx6.interfaces[indexIpv6InInterfaces(nodes[indexNode1].bmx6.originators[index2InOriginators].viaIp, nodes[indexNode(nextHop)].bmx6.interfaces)].devName;
+                                hopObject.out.ip = nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp;
+                                hopObject.out.interface = nodes[indexNode(nextHop)].bmx7.interfaces[indexIpv6InInterfaces(nodes[indexNode1].bmx7.originators[index2InOriginators].viaIp, nodes[indexNode(nextHop)].bmx7.interfaces)].devName;
 
                                 path.push(hopObject);
 
@@ -1201,28 +1201,28 @@ function bmx6Traceroute(node1, node2)
 }
 
 //Get the index of metricAlgo in the options array, -1 if not found
-function indexBmx6OptionsAlgorithm(nodeId) {
-    return nodes[indexNode(nodeId)].bmx6.options.map(function(element) {
+function indexBmx7OptionsAlgorithm(nodeId) {
+    return nodes[indexNode(nodeId)].bmx7.options.map(function(element) {
       return element.name;
     }).indexOf("metricAlgo");
 }
 
 //Get the index of the exponent "expo" in the metricAlgo options array, -1 if not found
-function indexBmx6OptionsAlgorithmExponents(nodeId, expo) {
-    return nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].CHILD_OPTIONS.map(function(element) {
+function indexBmx7OptionsAlgorithmExponents(nodeId, expo) {
+    return nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].CHILD_OPTIONS.map(function(element) {
 		return element.name;
     }).indexOf(expo);
 }
 
 //Get the index of metricAlgo in the parameters array, -1 if not found
-function indexBmx6ParametersAlgorithm(nodeId) {
-    return nodes[indexNode(nodeId)].bmx6.parameters.map(function(element) {
+function indexBmx7ParametersAlgorithm(nodeId) {
+    return nodes[indexNode(nodeId)].bmx7.parameters.map(function(element) {
       return element.name;
     }).indexOf("metricAlgo");
 }
 
 //Get the index of METRIC_EXTENSION in the extensions array, -1 if not found
-function indexBmx6MetricExtensions(extensions) {
+function indexBmx7MetricExtensions(extensions) {
     return extensions.map(function(element) {
  		if ( element.METRIC_EXTENSION )
    			return true;
@@ -1231,15 +1231,15 @@ function indexBmx6MetricExtensions(extensions) {
 
 
 //Get the index of the exponent "expo" in the metricAlgo parameters array, -1 if not found
-function indexBmx6ParametersAlgorithmExponents(nodeId, expo) {
-    return nodes[indexNode(nodeId)].bmx6.parameters[indexBmx6ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES.map(function(element) {
+function indexBmx7ParametersAlgorithmExponents(nodeId, expo) {
+    return nodes[indexNode(nodeId)].bmx7.parameters[indexBmx7ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES.map(function(element) {
 		return element.name;
     }).indexOf(expo);
 }
 
 
-//Check if nodeId is in the BMX6 originators array
-function inBmx6OriginatorsList(nodeId, originators) {
+//Check if nodeId is in the BMX7 originators array
+function inBmx7OriginatorsList(nodeId, originators) {
     return originators.map(function(element) {
         return ipv62id(element.primaryIp);
         }).some(function(entry) {
@@ -1250,7 +1250,7 @@ function inBmx6OriginatorsList(nodeId, originators) {
 
 
 //Get the index of NodeId in the descriptors array, -1 if not found
-function indexBmx6NodeIdDescriptors(nodeId, descriptors) {
+function indexBmx7NodeIdDescriptors(nodeId, descriptors) {
 	console.log("DESCRIPTORS", descriptors);
     return descriptors.map(function(item) {
     	return JSON.stringify(item).contains(id2ipv6(nodeId));
@@ -1259,14 +1259,14 @@ function indexBmx6NodeIdDescriptors(nodeId, descriptors) {
 
 
 //Get the index of nodeId in the originators list, -1 if not found
-function indexBmx6Originators(nodeId, originators) {
+function indexBmx7Originators(nodeId, originators) {
     return originators.map(function(element) {
         return ipv62id(element.primaryIp);
         }).indexOf(nodeId);
 }
 
 
-//Check if an IPv6 address is in the BMX6 interfaces array
+//Check if an IPv6 address is in the BMX7 interfaces array
 function isIpv6InInterfaces (ipv6, interfaces) {
     return interfaces.some(function(item) {
         if (item.llocalIp.split("/")[0] == ipv6)
@@ -1274,14 +1274,14 @@ function isIpv6InInterfaces (ipv6, interfaces) {
     });
 }
 
-//Get the index of the interface with the IPv6 address in the BMX6 interfaces array
+//Get the index of the interface with the IPv6 address in the BMX7 interfaces array
 function indexIpv6InInterfaces (ipv6, interfaces) {
     return interfaces.map(function(item) {
     	return item.llocalIp.split("/")[0];
     	}).indexOf(ipv6);
 }
 
-//Get the index of the interface named intName  in the BMX6 interfaces array
+//Get the index of the interface named intName  in the BMX7 interfaces array
 function indexNameInInterfaces (intName, interfaces) {
     return interfaces.map(function(item) {
     	return item.devName.split("/")[0];
@@ -1289,14 +1289,14 @@ function indexNameInInterfaces (intName, interfaces) {
 }
 
 //Get the index of the path to nodeId in the paths list
-function indexBmx6Paths(paths, nodeId) {
+function indexBmx7Paths(paths, nodeId) {
     return paths.map(function(item) {
         return item.id;
         }).indexOf(nodeId);
 }
 
 //Return true if both paths are exactly the same, false otherwise
-function sameBmx6Paths(path1, path2) {
+function sameBmx7Paths(path1, path2) {
 
 	if ( path1.id != path2.id || path1.path.length != path2.path.length )
 		return false;

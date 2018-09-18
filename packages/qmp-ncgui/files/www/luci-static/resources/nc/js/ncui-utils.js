@@ -242,7 +242,7 @@ function inNodesList(nodeId) {
 
 //Get the index of node1 in node2's originators array, -1 if not found
 function indexOriginator(node1, node2) {
-    return nodes[indexNode(node2)].bmx6.originators.map(function(element) {
+    return nodes[indexNode(node2)].bmx7.originators.map(function(element) {
       return element.primaryIp;
     }).indexOf(id2ipv6(node1));
 }
@@ -272,7 +272,7 @@ function linkExists(sourceId, targetId) {
 }
 
 
-//Convert a BMX6 metric value (e.g. 54000K) to a regular number (54000000)
+//Convert a BMX7 metric value (e.g. 54000K) to a regular number (54000000)
 function metric2number(metric) {
 
     var result = metric;
@@ -537,7 +537,7 @@ function asynchronously(asynchronous) {
 	return "synchronously";
 }
 
-//Convert a BMX6 tun4address to an IPv4 address
+//Convert a BMX7 tun4address to an IPv4 address
 function tun4Address2ipAddress (tun4Address) {
 	tun4Address = typeof tun4Address !== 'undefined' ? tun4Address : "127.0.0.1";
 	return tun4Address.split("/")[0];

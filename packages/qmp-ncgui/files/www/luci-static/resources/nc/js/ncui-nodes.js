@@ -77,8 +77,8 @@ function addAllNeighbours(nodeId, refresh, asynchronous)
 
 		//if #2
 		else {
-			//OK, no NCD but maybe BMX6
-			if ( nodes[n].bmx6.active ) {
+			//OK, no NCD but maybe BMX7
+			if ( nodes[n].bmx7.active ) {
 				updateNeighboursList(nodeId, false);
 
 				nodes[n].neighbours.forEach(function(element,index) {
@@ -141,8 +141,8 @@ function addNode(nodeId) {
 			newNode.y = graphProperties.height/2 + nodes.length;
 			newNode.ncd = {};
 			newNode.ncd.active = true;
-			newNode.bmx6 = {};
-			newNode.bmx6.active = true;
+			newNode.bmx7 = {};
+			newNode.bmx7.active = true;
 
 		console.debug("In function " + debug.callee.name + ". Adding node " + nodeId + ".");
 		var n = nodes.push(newNode);
@@ -222,7 +222,7 @@ function initializeLocalNode()
 				localNode.x = graphProperties.width/2;
 				localNode.y = graphProperties.height/2;
 				localNode.ncd = {active: true};
-				localNode.bmx6 = {active: true};
+				localNode.bmx7 = {active: true};
 			}
 		},
 		error: function(data) {
@@ -324,8 +324,8 @@ function initializeNewNode(nodeId, asynchronous) {
 	//Get system board info to update the node's name
 	//updateSystemBoard(nodeId, false);
 
-	//Get BMX6 status to ensure BMX6 capability
-	//bmx6Status(nodeId, true);
+	//Get BMX7 status to ensure BMX7 capability
+	//bmx7Status(nodeId, true);
 
 }
 
@@ -377,12 +377,12 @@ function updateNeighboursList(nodeId, asynchronous)
 						nodes[n].neighbours = [];
 
 						data.nodes.forEach( function(element,index) {
-							//Check that BMX6 is not sending fake node names (i.e. outdated node ids)
+							//Check that BMX7 is not sending fake node names (i.e. outdated node ids)
 							if (element != "__" ) {
 								console.debug("In function " + debug.callee.name + ". Adding to " + nodeId + " neighbours' list node " + element);
 								nodes[n].neighbours.push(element);
 							} else
-								console.warn("In function " + debug.callee.name + ". BMX6 provided an invalid neighbour for " + nodeId + ": " + element);
+								console.warn("In function " + debug.callee.name + ". BMX7 provided an invalid neighbour for " + nodeId + ": " + element);
 						});
 
 					}
@@ -397,20 +397,20 @@ function updateNeighboursList(nodeId, asynchronous)
 		//else (if #2)
 		else {
 
-			if ( nodes[n].bmx6.active ) {
-				bmx6Links(nodeId, false);
-				bmx6infoOriginators(nodeId, false);
+			if ( nodes[n].bmx7.active ) {
+				bmx7Links(nodeId, false);
+				bmx7infoOriginators(nodeId, false);
 
-				if (nodes[n].bmx6.links != undefined && nodes[n].bmx6.links != null && nodes[n].bmx6.links != "") {
-					if (nodes[n].bmx6.links != undefined && nodes[n].bmx6.links != null && nodes[n].bmx6.links != "") {
+				if (nodes[n].bmx7.links != undefined && nodes[n].bmx7.links != null && nodes[n].bmx7.links != "") {
+					if (nodes[n].bmx7.links != undefined && nodes[n].bmx7.links != null && nodes[n].bmx7.links != "") {
 
 						nodes[n].neighbours = [];
 
-						for (var i=0; i<nodes[n].bmx6.links.length; i++) {
-							for (var j=0; j<nodes[n].bmx6.originators.length; j++) {
-								if ( nodes[n].bmx6.links[i].bestTxLink == 1 && nodes[n].bmx6.links[i].name != undefined && nodes[n].bmx6.links[i].name == nodes[n].bmx6.originators[j].name ||
-									 nodes[n].bmx6.links[i].bestTxLink == 1 && nodes[n].bmx6.links[i].globalId != undefined && nodes[n].bmx6.links[i].globalId == nodes[n].bmx6.originators[j].globalId ) {
-										nodes[n].neighbours.push(ipv62id(nodes[n].bmx6.originators[j].primaryIp));
+						for (var i=0; i<nodes[n].bmx7.links.length; i++) {
+							for (var j=0; j<nodes[n].bmx7.originators.length; j++) {
+								if ( nodes[n].bmx7.links[i].bestTxLink == 1 && nodes[n].bmx7.links[i].name != undefined && nodes[n].bmx7.links[i].name == nodes[n].bmx7.originators[j].name ||
+									 nodes[n].bmx7.links[i].bestTxLink == 1 && nodes[n].bmx7.links[i].globalId != undefined && nodes[n].bmx7.links[i].globalId == nodes[n].bmx7.originators[j].globalId ) {
+										nodes[n].neighbours.push(ipv62id(nodes[n].bmx7.originators[j].primaryIp));
 								}
 							}
 						}
@@ -442,21 +442,21 @@ function updateName(nodeId, refresh) {
 	if ( n > -1 ) {
 		console.debug("Function: " + arguments.callee.name + ". nodeId: " + nodeId + " is in the nodes list");
 
-		//TODO (if refresh) update SystemBoard (then BMX6status true)
+		//TODO (if refresh) update SystemBoard (then BMX7status true)
 
 		//Check if nodeId has the systemBoard info with the hostname
 		if (nodes[n].system != undefined && nodes[n].system.board != undefined && nodes[n].system.board.hostname != undefined) {
 			nodes[n].name = nodes[n].system.board.hostname;
 			updateLabels();
 		}
-		//or the BMX6 status info with the name
-		else if ( nodes[n].bmx6 != undefined && nodes[n].bmx6.status != undefined && nodes[n].bmx6.status.name != undefined ) {
-			nodes[n].name = nodes[n].bmx6.status.name;
+		//or the BMX7 status info with the name
+		else if ( nodes[n].bmx7 != undefined && nodes[n].bmx7.status != undefined && nodes[n].bmx7.status.name != undefined ) {
+			nodes[n].name = nodes[n].bmx7.status.name;
 			updateLabels();
 		}
-		//or the very old BMX6 status info with the globalId
-		else if ( nodes[n].bmx6 != undefined && nodes[n].bmx6.status != undefined && nodes[n].bmx6.status.globalId != undefined ) {
-			nodes[n].name = nodes[n].bmx6.status.globalId.split(".")[0];
+		//or the very old BMX7 status info with the globalId
+		else if ( nodes[n].bmx7 != undefined && nodes[n].bmx7.status != undefined && nodes[n].bmx7.status.globalId != undefined ) {
+			nodes[n].name = nodes[n].bmx7.status.globalId.split(".")[0];
 			updateLabels();
 		}
 		//Otherwise warn on the console

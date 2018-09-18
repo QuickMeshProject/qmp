@@ -47,7 +47,7 @@ if nixio.fs.stat("/usr/sbin/tinyproxy","type") ~= nil then
 end
 
 -- Option: b6m
--- local b6m = additional_services:option(Flag, "b6m", translate("BMX6 map"),
+-- local b6m = additional_services:option(Flag, "b6m", translate("BMX7 map"),
 -- translate("B6m is a decentralized, real-time geopositioning map based on OpenStreetMaps (Internet connection is only required for the OSM but not for the status/topology)"))
 -- b6m.default=0
 

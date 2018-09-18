@@ -204,7 +204,7 @@ function updateSystemInfo(nodeId, asynchronous)
             },
 
             error: function(data) {
-				console.error("In function " + debug.callee.name + ". Ubus bmx6_system_info request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
+				console.error("In function " + debug.callee.name + ". Ubus bmx7_system_info request for " + nodeId + " returned an error:", data, "Try count: " + this.tryCount);
 					this.tryCount++;
 					if (this.tryCount <= this.retryLimit) {
 						this.timeout = ajaxTimeout + this.tryCount*ajaxTimeoutAdd;
@@ -223,13 +223,13 @@ function updateSystemInfo(nodeId, asynchronous)
 }
 
 
-function updateSystemBoard(nodeId, asynchronous, thenBMX6Status)
+function updateSystemBoard(nodeId, asynchronous, thenBMX7Status)
 {
 	asynchronous = typeof asynchronous !== 'undefined' ? asynchronous : false;
-	thenBMX6Status = typeof thenBMX6Status !== 'undefined' ? thenBMX6Status : false;
+	thenBMX7Status = typeof thenBMX7Status !== 'undefined' ? thenBMX7Status : false;
 	var debug = arguments;
 
-	console.log("Function " + debug.callee.name + " called.", nodeId, asynchronous, thenBMX6Status);
+	console.log("Function " + debug.callee.name + " called.", nodeId, asynchronous, thenBMX7Status);
 
     //Get the index of the node in the nodes list
     var n = indexNode(nodeId);
@@ -297,8 +297,8 @@ function updateSystemBoard(nodeId, asynchronous, thenBMX6Status)
 			});
 		}
 
-		else if (thenBMX6Status) {
-			bmx6Status(nodeId,true);
+		else if (thenBMX7Status) {
+			bmx7Status(nodeId,true);
         }
     }
 
@@ -307,8 +307,8 @@ function updateSystemBoard(nodeId, asynchronous, thenBMX6Status)
         if (DEBUGMODE) {
 		console.warn("In function " + debug.callee.name + ". Node " + nodeId + " is not in the nodes list.");
 
-		if (thenBMX6Status)
-			bmx6Status(nodeId,true);
+		if (thenBMX7Status)
+			bmx7Status(nodeId,true);
         }
     }
 }

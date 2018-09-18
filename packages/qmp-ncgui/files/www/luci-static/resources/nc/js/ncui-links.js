@@ -1,7 +1,7 @@
 // A file with some functions to operate with the links on the NCui graph
 
-//Translate the BMX6 links information of a node to the links array of the graph
-function bmx6Links2Graph(nodeId) {
+//Translate the BMX7 links information of a node to the links array of the graph
+function bmx7Links2Graph(nodeId) {
 
     debugVar = arguments;
 
@@ -13,18 +13,18 @@ function bmx6Links2Graph(nodeId) {
 		if (DEBUGMODE)
             console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " is in the nodes list");
 
-		//Check if the node has BMX6 information (if #2)
-		if (nodes[nodeIndex].bmx6) {
+		//Check if the node has BMX7 information (if #2)
+		if (nodes[nodeIndex].bmx7) {
 
 
-			//Check if the node has BMX6 links information (if #3)
-			if (typeof nodes[nodeIndex].bmx6.links != "undefined") {
+			//Check if the node has BMX7 links information (if #3)
+			if (typeof nodes[nodeIndex].bmx7.links != "undefined") {
 
-				//Go one by one through the BMX6 links list and dump the information to the links list
-				nodes[nodeIndex].bmx6.links.forEach ( function(element) {
+				//Go one by one through the BMX7 links list and dump the information to the links list
+				nodes[nodeIndex].bmx7.links.forEach ( function(element) {
 
 					//Search for the remote node that owns the link-local IP
-					var rNodeId = nodeBmx6LinkLocalIp(element.llocalIp);
+					var rNodeId = nodeBmx7LinkLocalIp(element.llocalIp);
 
 					console.log(rNodeId);
 
@@ -50,7 +50,7 @@ function bmx6Links2Graph(nodeId) {
 					else //(if #4)
 					{
 					if (DEBUGMODE)
-            			console.log("[DEBUG]. Function " + arguments.callee.name + ": Link-local IP: " + element.llocalIp + " is not in any BMX6 interfaces list");
+            			console.log("[DEBUG]. Function " + arguments.callee.name + ": Link-local IP: " + element.llocalIp + " is not in any BMX7 interfaces list");
 
 					}
 
@@ -61,13 +61,13 @@ function bmx6Links2Graph(nodeId) {
 			//(if #3)
 			else
         	if (ERRORMODE)
-            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX6 links information");
+            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX7 links information");
 		}
 
 		//(if #2)
 		else
         if (ERRORMODE)
-            console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX6 information");
+            console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX7 information");
 
 
     }
@@ -79,8 +79,8 @@ function bmx6Links2Graph(nodeId) {
 }
 
 
-//Translate the BMX6 originators information of a node to the links array of the graph
-function bmx6Originators2Graph(nodeId) {
+//Translate the BMX7 originators information of a node to the links array of the graph
+function bmx7Originators2Graph(nodeId) {
 
     debugVar = arguments;
 
@@ -92,22 +92,22 @@ function bmx6Originators2Graph(nodeId) {
 		if (DEBUGMODE)
             console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " is in the nodes list");
 
-		//Check if the node has BMX6 information (if #2)
-		if (nodes[nodeIndex].bmx6) {
+		//Check if the node has BMX7 information (if #2)
+		if (nodes[nodeIndex].bmx7) {
 
-			//Check if the node has BMX6 links information (if #3)
-			if (typeof nodes[nodeIndex].bmx6.links != "undefined") {
+			//Check if the node has BMX7 links information (if #3)
+			if (typeof nodes[nodeIndex].bmx7.links != "undefined") {
 
-				//Check if the node has BMX6 links information (if #4)
-				if (typeof nodes[nodeIndex].bmx6.originators != "undefined") {
+				//Check if the node has BMX7 links information (if #4)
+				if (typeof nodes[nodeIndex].bmx7.originators != "undefined") {
 
-					//Go one by one through the BMX6 links list and dump the information to the links list
-					nodes[nodeIndex].bmx6.links.forEach ( function(element) {
+					//Go one by one through the BMX7 links list and dump the information to the links list
+					nodes[nodeIndex].bmx7.links.forEach ( function(element) {
 
 						console.log("links.element:", element);
 
 						//Search for the remote node that owns the link-local IP
-						var rNodeId = nodeBmx6LinkLocalIp(element.llocalIp);
+						var rNodeId = nodeBmx7LinkLocalIp(element.llocalIp);
 
 						console.log("rNodeId", rNodeId);
 
@@ -126,9 +126,9 @@ function bmx6Originators2Graph(nodeId) {
 
 
 
-								//If it is the element with the best tx link (the one that BMX6 will use)
+								//If it is the element with the best tx link (the one that BMX7 will use)
 								if (element.bestTxLink) {
-									links[linkIndex].metric = metric2number(nodes[nodeIndex].bmx6.originators[rIndexInOriginators].metric);
+									links[linkIndex].metric = metric2number(nodes[nodeIndex].bmx7.originators[rIndexInOriginators].metric);
 									tick();
 								}
 							}
@@ -142,7 +142,7 @@ function bmx6Originators2Graph(nodeId) {
 						else //(if #5)
 						{
 						if (DEBUGMODE)
-	            			console.log("[DEBUG]. Function " + arguments.callee.name + ": Link-local IP: " + element.llocalIp + " is not in any BMX6 interfaces list");
+	            			console.log("[DEBUG]. Function " + arguments.callee.name + ": Link-local IP: " + element.llocalIp + " is not in any BMX7 interfaces list");
 
 						}
 
@@ -153,7 +153,7 @@ function bmx6Originators2Graph(nodeId) {
 				//if (#4)
 				else
 					if (ERRORMODE)
-            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX6 originators information");
+            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX7 originators information");
 
 
 			}
@@ -161,13 +161,13 @@ function bmx6Originators2Graph(nodeId) {
 			//(if #3)
 			else
         	if (ERRORMODE)
-            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX6 links information");
+            	console.log("[ERROR]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX7 links information");
 		}
 
 		//(if #2)
 		else
         if (ERRORMODE)
-            console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX6 information");
+            console.log("[DEBUG]. Function " + arguments.callee.name + ": nodeId: " + nodeId + " has no BMX7 information");
 
 
     }
@@ -181,13 +181,13 @@ function bmx6Originators2Graph(nodeId) {
 
 
 //Get the ID of the node linkLocalIP belongs to
-function nodeBmx6LinkLocalIp(linkLocalIP) {
+function nodeBmx7LinkLocalIp(linkLocalIP) {
 	var nodeLinkLocalIP=null;
 
 	nodes.some(function (element){
 		console.log("ELEMENT:" + element.id);
-		if (element.bmx6 && element.bmx6.interfaces && element.bmx6.interfaces.length) {
-			element.bmx6.interfaces.some(function (interf) {
+		if (element.bmx7 && element.bmx7.interfaces && element.bmx7.interfaces.length) {
+			element.bmx7.interfaces.some(function (interf) {
 				if (areSameIPAddress(linkLocalIP, interf.llocalIp)) {
 					nodeLinkLocalIP=element.id;
 					return true;

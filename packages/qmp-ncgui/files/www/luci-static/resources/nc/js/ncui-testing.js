@@ -29,10 +29,10 @@ function testingMain(nodeId, showReload) {
 		.append("text").text("Advanced tests");
 
 	MainSpace.append("button")
-		.attr("id", "fcBMX6Button")
+		.attr("id", "fcBMX7Button")
 		.attr("class", "btn btn-group")
-		.attr("onclick", 'testingBMX6("'+nodeId+'", "fcMainSpace")' )
-		.append("text").text("BMX6 testing");
+		.attr("onclick", 'testingBMX7("'+nodeId+'", "fcMainSpace")' )
+		.append("text").text("BMX7 testing");
 
 	MainSpace.append("button")
 		.attr("id", "fcVisualizeData")

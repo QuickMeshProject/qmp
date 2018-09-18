@@ -66,19 +66,19 @@ function createPathTable(nodeIdA, nodeIdB, selection) {
 
     var CombiPath = [];
 
-    var fPath = nodes[indexNode(nodeIdA)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdA)].bmx6.paths, nodeIdB)];
-    var rPath = nodes[indexNode(nodeIdB)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdB)].bmx6.paths, nodeIdA)];
+    var fPath = nodes[indexNode(nodeIdA)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdA)].bmx7.paths, nodeIdB)];
+    var rPath = nodes[indexNode(nodeIdB)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdB)].bmx7.paths, nodeIdA)];
 
     for (i = 0; i < Math.max(fPath.path.length, rPath.path.length); i++) {
         var cPath = {};
 
-        if (i < nodes[indexNode(nodeIdA)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdA)].bmx6.paths, nodeIdB)].path.length)
-            cPath.nodeA = nodes[indexNode(nodeIdA)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdA)].bmx6.paths, nodeIdB)].path[i];
+        if (i < nodes[indexNode(nodeIdA)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdA)].bmx7.paths, nodeIdB)].path.length)
+            cPath.nodeA = nodes[indexNode(nodeIdA)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdA)].bmx7.paths, nodeIdB)].path[i];
         else
             cPath.nodeA = {};
 
-        if (i < nodes[indexNode(nodeIdB)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdB)].bmx6.paths, nodeIdA)].path.length)
-            cPath.nodeB = nodes[indexNode(nodeIdB)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdB)].bmx6.paths, nodeIdA)].path[nodes[indexNode(nodeIdB)].bmx6.paths[indexBmx6Paths(nodes[indexNode(nodeIdB)].bmx6.paths, nodeIdA)].path.length-1-i];
+        if (i < nodes[indexNode(nodeIdB)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdB)].bmx7.paths, nodeIdA)].path.length)
+            cPath.nodeB = nodes[indexNode(nodeIdB)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdB)].bmx7.paths, nodeIdA)].path[nodes[indexNode(nodeIdB)].bmx7.paths[indexBmx7Paths(nodes[indexNode(nodeIdB)].bmx7.paths, nodeIdA)].path.length-1-i];
         else
             cPath.nodeB = {};
 
@@ -148,76 +148,76 @@ function generatePathCell (hop) {
         return result;
 }
 
-//Fill (overwrite) a bmx6Algo object with the information from the metric_extension object
-function fillBmx6AlgoMetricExtension (bmx6Algo, metric_extension) {
+//Fill (overwrite) a bmx7Algo object with the information from the metric_extension object
+function fillBmx7AlgoMetricExtension (bmx7Algo, metric_extension) {
 
-	console.log("FILLBMX6ALGOMETRICEXTENSION", metric_extension);
-	bmx6Algo.value = metric_extension.metricAlgo;
+	console.log("FILLBMX7ALGOMETRICEXTENSION", metric_extension);
+	bmx7Algo.value = metric_extension.metricAlgo;
 
-	for (var i=0; i < bmx6Algo.exponents.length; i++) {
-		bmx6Algo.exponents[i].value = metric_extension[bmx6Algo.exponents[i].name];
+	for (var i=0; i < bmx7Algo.exponents.length; i++) {
+		bmx7Algo.exponents[i].value = metric_extension[bmx7Algo.exponents[i].name];
 	}
 
-	return bmx6Algo;
+	return bmx7Algo;
 }
 
-function generateBmx6Algo (nodeId, refresh) {
+function generateBmx7Algo (nodeId, refresh) {
 
 	refresh = typeof refresh !== 'undefined' ? refresh : true;
 
-	if ( nodes[indexNode(nodeId)].bmx6 == null || nodes[indexNode(nodeId)].bmx6.options == null || nodes[indexNode(nodeId)].bmx6.parameters == {}) {
-		bmx6All(nodeId, false);
+	if ( nodes[indexNode(nodeId)].bmx7 == null || nodes[indexNode(nodeId)].bmx7.options == null || nodes[indexNode(nodeId)].bmx7.parameters == {}) {
+		bmx7All(nodeId, false);
 	}
 
 	if (refresh) {
-		bmx6Options(nodeId, false);
-		bmx6Parameters(nodeId, false);
+		bmx7Options(nodeId, false);
+		bmx7Parameters(nodeId, false);
 	}
 
-	var bmx6Algo = {};
+	var bmx7Algo = {};
 
-	//Fill the bmx6Algo object with hard-coded default values
-	bmx6Algo.value = 16;
-	bmx6Algo.def = 16;
-	bmx6Algo.texts = [{"value":0,"name":"Hop count"},{"value":1,"name":"MP"},{"value":2,"name":"EP"},{"value":4,"name":"MB"},{"value":8,"name":"EB"},{"value":16,"name":"Vector bandwidth"}];
-	bmx6Algo.exponents = [{"name":"rxExpNumerator", "value":1, "min":0, "max":3, "def": 1},
+	//Fill the bmx7Algo object with hard-coded default values
+	bmx7Algo.value = 16;
+	bmx7Algo.def = 16;
+	bmx7Algo.texts = [{"value":0,"name":"Hop count"},{"value":1,"name":"MP"},{"value":2,"name":"EP"},{"value":4,"name":"MB"},{"value":8,"name":"EB"},{"value":16,"name":"Vector bandwidth"}];
+	bmx7Algo.exponents = [{"name":"rxExpNumerator", "value":1, "min":0, "max":3, "def": 1},
 						  {"name": "rxExpDivisor", "value":2, "min":1, "max":2, "def": 2},
 						  {"name": "txExpNumerator", "value":1, "min":0, "max":3, "def": 1},
 						  {"name": "txExpDivisor", "value":1, "min":1, "max":2, "def": 1}];
 
-	//Fill the bmx6Algo object with the default values obtained from BMX6, if any
-	if (indexBmx6OptionsAlgorithm(nodeId) > -1) {
-		if (typeof nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].def != "undefined" )
-			bmx6Algo.value = nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].def;
+	//Fill the bmx7Algo object with the default values obtained from BMX7, if any
+	if (indexBmx7OptionsAlgorithm(nodeId) > -1) {
+		if (typeof nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].def != "undefined" )
+			bmx7Algo.value = nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].def;
 
-		if (typeof nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].CHILD_OPTIONS != "undefined" ) {
-			for (var i=0; i < bmx6Algo.exponents.length; i++) {
-				if (indexBmx6OptionsAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name) > -1)
-					bmx6Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].CHILD_OPTIONS[indexBmx6OptionsAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name)].def;
+		if (typeof nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].CHILD_OPTIONS != "undefined" ) {
+			for (var i=0; i < bmx7Algo.exponents.length; i++) {
+				if (indexBmx7OptionsAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name) > -1)
+					bmx7Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].CHILD_OPTIONS[indexBmx7OptionsAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name)].def;
 				}
 			}
 	}
 
-	//Fill the bmx6Algo object with the current values obtained from BMX6, if any
-	if (indexBmx6ParametersAlgorithm(nodeId) > -1) {
-		if (typeof nodes[indexNode(nodeId)].bmx6.parameters[indexBmx6ParametersAlgorithm(nodeId)].INSTANCES[0].value != "undefined" )
-			bmx6Algo.value = nodes[indexNode(nodeId)].bmx6.parameters[indexBmx6ParametersAlgorithm(nodeId)].INSTANCES[0].value;
+	//Fill the bmx7Algo object with the current values obtained from BMX7, if any
+	if (indexBmx7ParametersAlgorithm(nodeId) > -1) {
+		if (typeof nodes[indexNode(nodeId)].bmx7.parameters[indexBmx7ParametersAlgorithm(nodeId)].INSTANCES[0].value != "undefined" )
+			bmx7Algo.value = nodes[indexNode(nodeId)].bmx7.parameters[indexBmx7ParametersAlgorithm(nodeId)].INSTANCES[0].value;
 
-		if (typeof nodes[indexNode(nodeId)].bmx6.parameters[indexBmx6ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES != "undefined" ) {
-			for (var i=0; i < bmx6Algo.exponents.length; i++) {
-				if (indexBmx6ParametersAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name) > -1)
-					bmx6Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx6.parameters[indexBmx6ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES[indexBmx6ParametersAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name)].value;
+		if (typeof nodes[indexNode(nodeId)].bmx7.parameters[indexBmx7ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES != "undefined" ) {
+			for (var i=0; i < bmx7Algo.exponents.length; i++) {
+				if (indexBmx7ParametersAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name) > -1)
+					bmx7Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx7.parameters[indexBmx7ParametersAlgorithm(nodeId)].INSTANCES[0].CHILD_INSTANCES[indexBmx7ParametersAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name)].value;
 			}
 		}
-		else if (typeof nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].CHILD_OPTIONS != "undefined" ) {
-			for (var i=0; i < bmx6Algo.exponents.length; i++) {
-				if (indexBmx6OptionsAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name) > -1)
-					bmx6Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx6.options[indexBmx6OptionsAlgorithm(nodeId)].CHILD_OPTIONS[indexBmx6OptionsAlgorithmExponents(nodeId, bmx6Algo.exponents[i].name)].def;
+		else if (typeof nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].CHILD_OPTIONS != "undefined" ) {
+			for (var i=0; i < bmx7Algo.exponents.length; i++) {
+				if (indexBmx7OptionsAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name) > -1)
+					bmx7Algo.exponents[i].value = nodes[indexNode(nodeId)].bmx7.options[indexBmx7OptionsAlgorithm(nodeId)].CHILD_OPTIONS[indexBmx7OptionsAlgorithmExponents(nodeId, bmx7Algo.exponents[i].name)].def;
 			}
 		}
 	}
 
-	return bmx6Algo;
+	return bmx7Algo;
 }
 
 
