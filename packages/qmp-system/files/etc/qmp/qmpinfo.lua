@@ -68,8 +68,12 @@ function qmpinfo.get_devices()
 				local ignore = isInTable(ignored,d)
 
 				if not ignore then
+					local do_insert = false
 					if nixio.fs.stat(sysnet..d..'/phy80211',"type") ~= nil then
-						table.insert(phydevs.wifi,d)
+						if string.sub(d, -1) ~= "a" then
+							table.insert(phydevs.wifi,d)
+							do_insert = true
+						end
 					else
 
             local toadd = true
@@ -83,10 +87,13 @@ function qmpinfo.get_devices()
 
 						if toadd == true then
 							table.insert(phydevs.eth,d)
+							do_insert = true
 						end
 					end
 
-					table.insert(phydevs.all,d)
+					if do_insert then
+						table.insert(phydevs.all,d)
+					end
 				end
 			end
 		end
