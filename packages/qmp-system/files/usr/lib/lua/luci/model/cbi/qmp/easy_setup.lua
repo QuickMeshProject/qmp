@@ -126,9 +126,10 @@ if uciout:get("qmp","roaming","ignore") == "1" then
   if ipv4mask ~= nil then
     ipv4 = string.sub(ipv4,1,ipv4mask-1)
   end
-  if ipv4 == uciout:get("qmp","networks","lan_address") then
+  -- This caused issue #465 and doesn't make much sense here... (ToDo: investigate further)
+  -- if ipv4 == uciout:get("qmp","networks","lan_address") then
     networkmode="community"
-  end
+  -- end
 else
   networkmode="roaming"
 end
