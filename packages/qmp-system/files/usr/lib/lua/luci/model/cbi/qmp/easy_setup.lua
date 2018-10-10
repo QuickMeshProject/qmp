@@ -338,9 +338,9 @@ function nodemode.write(self, section, value)
     local device_id = guifideviceid:formvalue(section)
     uciout:set("qmp","node","mesh_name",mesh_name)
     uciout:set("qmp","node","device_id",device_id)
-  else
-    uciout:set("qmp","node","community_name",community_name)
   end
+  uciout:set("qmp","node","community_name",community_name)
+
 
   if mode == "community" then
     uciout:set("qmp","roaming","ignore","1")
