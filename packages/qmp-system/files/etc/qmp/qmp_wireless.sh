@@ -33,7 +33,7 @@ qmp_prepare_wireless_iface() {
 ###################################
 # First parameter: device
 # Second parameter: channel
-# Third parameter: mode (adhoc, ap, adhoc_ap, aplan, client, clientwan, 80211s, 80211s_aplan none)
+# Third parameter: mode (adhoc, ap, adhoc_ap, aplan, client, clientwan, 80211s, 80211s_aplan, none)
 # It returns the same channel if it is right, and the new one fixet if not
 
 qmp_check_channel() {
