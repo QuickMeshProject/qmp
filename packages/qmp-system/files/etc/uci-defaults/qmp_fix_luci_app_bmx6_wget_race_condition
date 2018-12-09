@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Update BMX6's bmx6json.lua file to avoid race condition described in
+# https://github.com/openwrt-routing/packages/issues/436
+# TODO: Remove this script once the bug has been fixed upstream
+FILENAME="/usr/lib/lua/luci/model/bmx6json.lua"
+if [ -f $FILENAME ]; then
+        sed -i 's|raw,err = wget(url..field,1000)|raw,err = wget(url..field,1000)\n\t\tsys.exec("")|g' $FILENAME
+fi
+
+exit 0
