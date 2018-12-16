@@ -35,8 +35,9 @@ if [ $lastdev ]; then
 					# Check that channel configurations in /etc/config/qmp and /etc/config/wireless match
 					if [ "$qmpchannelnum" == "$wifichannelnum" ]; then
 
-						# If the channel configured in /etc/config/wireless and the one reported by iw differ, reset the wifi
-						if [ $wifichannelnum -ne $iwchannel ]; then
+						# If iw does not report a channel, or if it reports a channel different to the one
+						# configured in /etc/config/wireless, reset the wifi
+						if [ ! $iwchannel ] || [ $wifichannelnum -ne $iwchannel ]; then
 							wifi
 							exit 0
 						fi
