@@ -524,28 +524,28 @@ make_qmp_release() {
 
       [ "$FACTORY" ] && {
         echo "$NAME - FACTORY"
-        fw_file="$output_dir/$(echo $FACTORY | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $FACTORY)"
         output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_factory_"$(date +%Y%m%d-%H%M)".bin"
         echo cp "$fw_file" "$output_file"
         cp "$fw_file" "$output_file"
       }
       [ "$SYSUPGRADE" ] && {
         echo "$NAME - SYSUPGRADE"
-        fw_file="$output_dir/$(echo $SYSUPGRADE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $SYSUPGRADE)"
         output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_sysupgrade_"$(date +%Y%m%d-%H%M)".bin"
         echo cp "$fw_file" "$output_file"
         cp "$fw_file" "$output_file"
       }
       [ "$SQUASHIMAGE" ] && {
         echo "$NAME - SQUASHIMAGE"
-        fw_file="$output_dir/$(echo $SQUASHIMAGE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $SQUASHIMAGE)"
         output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_combined-squashfs_"$(date +%Y%m%d-%H%M)"."$BINEXT
         echo cp "$fw_file" "$output_file"
         cp "$fw_file" "$output_file"
       }
       [ "$EXT4IMAGE" ] && {
         echo "$NAME - EXT4IMAGE"
-        fw_file="$output_dir/$(echo $EXT4IMAGE | sed 's/_/-/g')"
+        fw_file="$output_dir/$(echo $EXT4IMAGE)"
         output_file=$bin_output"/qMp_"$VERSION_NUMBER"-"$VERSION_NICK"_"$NAME"_combined-ext4_"$(date +%Y%m%d-%H%M)"."$BINEXT
         echo cp "$fw_file" "$output_file"
         cp "$fw_file" "$output_file"
