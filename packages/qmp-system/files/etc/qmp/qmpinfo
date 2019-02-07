@@ -25,10 +25,11 @@ end
 function print_modes()
 	local data = qmpinfo.get_modes(op1)
 	local output = ""
-	if data.b  then output = output .. "b " end
-	if data.g  then output = output .. "g " end
-	if data.a  then output = output .. "a " end
-	if data.n  then output = output .. "n " end
+	if data.ac  then output = output .. "a ac "
+	elseif data.a then output = output .. "a "  end
+	if data.b   then output = output .. "b "  end
+	if data.g   then output = output .. "g "  end
+	if data.n   then output = output .. "n "  end
 	print(output)
 end
 

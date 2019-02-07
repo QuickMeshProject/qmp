@@ -28,13 +28,17 @@ qmp_prepare_wireless_iface() {
 	qmp_uci_set_raw wireless.$device=wifi-iface
 }
 
-###################################
-# Check channel for wifi interface
-###################################
-# First parameter: device
-# Second parameter: channel
-# Third parameter: mode (adhoc, ap, adhoc_ap, aplan, client, clientwan, 80211s, 80211s_aplan, none)
-# It returns the same channel if it is right, and the new one fixet if not
+################################
+# function qmp_check_channel() #
+################################
+#
+# Check if a specific channel and mode combination is valid for a wifi device.
+# It returns the same channel if valid, or a valid channel otherwise.
+#
+# Parameters:
+#  1: wireless device (e.g.: wlan0)
+#  2: channel number
+#  3: operation mode (e.g.: adhoc, 80211s_aplan, none)
 
 qmp_check_channel() {
 		local dev="$1"
@@ -103,20 +107,23 @@ qmp_configure_wifi_driver() {
 	esac
 }
 
-########################
-# Configure wifi device
-########################
-# Configure a wifi device according qmp config file
-# Parameters are: 1-> qmp config id, 2-> device name
+########################################
+# function qmp_configure_wifi_device() #
+########################################
+#
+# Configure a wifi device according to qMp's config file
+#
+# Parameters:
+#  1: wireless device number in qMp's config file
 
 qmp_configure_wifi_device() {
-	echo ""
-	echo "Configuring device $2"
 
 	local id=$1
 	local device="$(qmp_uci_get @wireless[$id].device)"
+	local channel="$(qmp_uci_get @wireless[$id].channel)"
 
-
+	echo ""
+	echo "Configuring device #${1} (${device})"
 
 	# Remove the wireless device in $device from the previous lan/wan/mesh groups
 	# and put it in the appropriate ones according to the selected mode
@@ -427,9 +434,8 @@ qmp_wifi_get_default() {
 	#  else depending on index
 
 	if [ "$what" == "mode" ]; then
-
-		# Count the total number of devices, single-band 802.11a/an devices,
-		# single-band 802.11b/bg/bgn and dual-band 802.11ab/abg/abgn devices.
+		# Count the total number of devices, single-band 802.11a/an/ac devices,
+		# single-band 802.11b/bg/bgn and dual-band 802.11ab/abg/abgn/ac devices.
 		local devices=0
 		local a_devices=0
 		local bg_devices=0
