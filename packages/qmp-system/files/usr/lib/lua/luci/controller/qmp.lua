@@ -43,7 +43,9 @@ function index()
     entry({"qmp","configuration","network","wireless"}, cbi("qmp/network_wireless"), "Wireless interfaces", 33).dependent=false
     entry({"qmp","configuration","network","advanced"}, cbi("qmp/network_adv"), "Advanced settings", 34).dependent=false
   entry({"qmp","configuration","services"}, cbi("qmp/services"), "qMp services", 40).dependent=false
-  entry({"qmp","configuration","gateways"}, cbi("qmp/gateways"), "qMp gateways", 50).dependent=false
+  entry({"qmp","configuration","gateways"}, cbi("qmp/gateways_search"), "qMp gateways", 50).dependent=false
+    entry({"qmp","configuration","gateways","search"}, cbi("qmp/gateways_search"), "Gateways to search for", 51).dependent=false
+    entry({"qmp","configuration","gateways","offer"}, cbi("qmp/gateways_offer"), "Offered gateways", 52).dependent=false
 
 	entry({"qmp","tools"}, call("action_tools"), "Tools", 5).dependent=false
 	entry({"qmp","tools","tools"}, call("action_tools"), "Network testing", 1).dependent=false
