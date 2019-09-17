@@ -43,6 +43,7 @@ qmp_check_device() {
 	ip link show $1 1> /dev/null 2>/dev/null
 	return $?
 }
+
 # Function qmp_set_vlan()
 #
 # This function creates a VLAN interface on top of an interface in order to
@@ -181,6 +182,8 @@ qmp_configure_smart_network() {
 	local dev=""
 	local phydevs=""
 	local ignore_devs=""
+	local default_lan=$(qmp_get_openwrt_default_network "lan")
+	local default_wan=$(qmp_get_openwrt_default_network "wan")
 
 	[ "$force" != "force" ] && {
 		ignore_devs="$(qmp_uci_get interfaces.ignore_devices)"
@@ -240,33 +243,35 @@ qmp_configure_smart_network() {
 			[ $cnt -eq 1 ] && continue
 		}
 
-		# If not found before...
-		[ "$dev" == "eth0" ] || [ "$dev" == "eth0.1" ] && {
+		# If the device is not configured already, assign its role acording to
+		# OpenWrt's defaults. This avoids the per-device hooks that swapped roles
+		[ "$dev" == "$default_lan" ] && {
 			lan="$lan $dev"
 			mesh="$mesh $dev"
 			continue
 		}
+		[ "$dev" == "$default_wan" ] && {
+			wan="$wan $dev"
+			mesh="$mesh $dev"
+			continue
+		}
 
-		## if there is not yet a LAN device, configuring as lan and mesh
-		##[ -z "$lan" ] && { lan="$dev"; mesh="$dev" && continue
-
-		# if it is a wifi device
+		# If it is a wifi device
 		[ -e "/sys/class/net/$dev/phy80211" ] && {
 			j=0
 			while qmp_uci_test qmp.@wireless[$j]; do
 				[ "$(qmp_uci_get @wireless[$j].device)" == "$dev" ] && {
 					mode="$(qmp_uci_get @wireless[$j].mode)"
-					[ "$mode" == "ap" ] && lan="$dev $lan" || mesh="$dev $mesh"
+					( [ "$mode" == "aplan" ] || [ "$mode" == "80211s_aplan" ] || [ "$mode" == "adhoc_ap" ] ) && lan="$dev $lan"
+					( [ "$mode" == "80211s" ] || [ "$mode" == "80211s_aplan" ] || [ "$mode" == "80211s_adhoc" ] || [ "$mode" == "adhoc" ] || [ "$mode" == "adhoc_ap" ] ) && mesh="$dev $mesh"
 					break
 				}
 				j=$(($j+1))
 			done
 		} && continue
 
-		# if there is already LAN device and it is not wifi, use as WAN+MESH
-		[ -z "$wan" ] && wan="$dev" && mesh="$mesh $dev" || {
-			# else use as LAN and MESH
-			lan="$dev $lan"
+		# If its not wireless nor a default wan/lan, set it to mesh
+		[ "$dev" != "$default_lan" ] && [ "$dev" != "$default_wan" ] && {
 			mesh="$dev $mesh"
 		}
 
@@ -282,6 +287,16 @@ qmp_configure_smart_network() {
 	qmp_uci_set interfaces.mesh_devices "$(echo $mesh | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.wan_devices "$(echo $wan | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.ignore_devices "$ignore_devs"
+}
+
+qmp_get_openwrt_default_network() {
+	local role=$1
+	local board_file="/etc/board.json"
+	local flen=$(wc -l $board_file | cut -d " " -f 1)
+
+	[ "$role" != "lan" ] && [ "$role" != "wan" ] && return
+
+	grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "ifname" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
 }
 
 qmp_attach_device_to_interface() {
