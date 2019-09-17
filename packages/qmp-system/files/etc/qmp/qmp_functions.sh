@@ -43,6 +43,7 @@ qmp_check_device() {
 	ip link show $1 1> /dev/null 2>/dev/null
 	return $?
 }
+
 # Function qmp_set_vlan()
 #
 # This function creates a VLAN interface on top of an interface in order to
@@ -282,6 +283,16 @@ qmp_configure_smart_network() {
 	qmp_uci_set interfaces.mesh_devices "$(echo $mesh | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.wan_devices "$(echo $wan | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.ignore_devices "$ignore_devs"
+}
+
+qmp_get_openwrt_default_network() {
+	local role=$1
+	local board_file="/etc/board.json"
+	local flen=$(wc -l $board_file | cut -d " " -f 1)
+
+	[ "$role" != "lan" ] && [ "$role" != "wan" ] && return
+
+	grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "ifname" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
 }
 
 qmp_attach_device_to_interface() {
