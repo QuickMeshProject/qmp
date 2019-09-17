@@ -1,1 +1,0 @@
-../scripts/eth0-wan_eth1-lan.sh
