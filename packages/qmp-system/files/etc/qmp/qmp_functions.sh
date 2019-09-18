@@ -245,19 +245,24 @@ qmp_configure_smart_network() {
 
 		# If the device is not configured already, assign its role acording to
 		# OpenWrt's defaults. This avoids the per-device hooks that swapped roles
-		[ "$dev" == "$default_lan" ] && {
-			lan="$lan $dev"
-			mesh="$mesh $dev"
-			continue
-		}
-		[ "$dev" == "$default_wan" ] && {
-			wan="$wan $dev"
-			mesh="$mesh $dev"
-			continue
-		}
-
+		for ddev in $default_lan; do
+			[ "$dev" == "$ddev" ] && {
+				lan="$lan $dev"
+				mesh="$mesh $dev"
+				continue
+			}
+		done
+		for ddev in $default_wan; do
+			[ "$dev" == "$ddev" ] && {
+				wan="$wan $dev"
+				mesh="$mesh $dev"
+				continue
+			}
+		done
+echo "AAA"
 		# If it is a wifi device
 		[ -e "/sys/class/net/$dev/phy80211" ] && {
+			echo $dev
 			j=0
 			while qmp_uci_test qmp.@wireless[$j]; do
 				[ "$(qmp_uci_get @wireless[$j].device)" == "$dev" ] && {
@@ -269,10 +274,15 @@ qmp_configure_smart_network() {
 				j=$(($j+1))
 			done
 		} && continue
-
+echo "CCCC"
 		# If its not wireless nor a default wan/lan, set it to mesh
 		[ "$dev" != "$default_lan" ] && [ "$dev" != "$default_wan" ] && {
-			mesh="$dev $mesh"
+			inmesh="0"
+			# A small trick to avoid duplicates when $default_xan = "eth1 eth2" (e.g., APUs)
+			for mdev in $mesh; do
+				[ "$mdev" == "$dev" ] && inmesh="1"
+			done
+			[ "$inmesh" == "0"] && mesh="$dev $mesh"
 		}
 
 	done
