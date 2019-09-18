@@ -259,10 +259,9 @@ qmp_configure_smart_network() {
 				continue
 			}
 		done
-echo "AAA"
+
 		# If it is a wifi device
 		[ -e "/sys/class/net/$dev/phy80211" ] && {
-			echo $dev
 			j=0
 			while qmp_uci_test qmp.@wireless[$j]; do
 				[ "$(qmp_uci_get @wireless[$j].device)" == "$dev" ] && {
@@ -274,7 +273,7 @@ echo "AAA"
 				j=$(($j+1))
 			done
 		} && continue
-echo "CCCC"
+
 		# If its not wireless nor a default wan/lan, set it to mesh
 		[ "$dev" != "$default_lan" ] && [ "$dev" != "$default_wan" ] && {
 			inmesh="0"
@@ -282,7 +281,7 @@ echo "CCCC"
 			for mdev in $mesh; do
 				[ "$mdev" == "$dev" ] && inmesh="1"
 			done
-			[ "$inmesh" == "0"] && mesh="$dev $mesh"
+			[ "$inmesh" == "0" ] && mesh="$dev $mesh"
 		}
 
 	done
