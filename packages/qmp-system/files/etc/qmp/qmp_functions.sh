@@ -62,33 +62,37 @@ qmp_set_vlan() {
   # Replace dots by underscores to use the interface name as part of another one
   local uiface="$(echo $iface | sed -r 's/\./_/g')"
 
-  uci set network.${uiface}_${vid}=device
-  if [ -e "/sys/class/net/$dev/phy80211" ]; then
-    # 802.1q VLANs for wireless interfaces
-    uci set network.${uiface}_${vid}.type=8021q
-		echo "VLAN $vid for interface $iface is of type 802.1q"
-  else
+	uci set network.${uiface}_${vid}=device
+	local vtype=""
+	# If $dev exists and is not wireless
+  if [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ]; then
     # 802.1ad VLANs for wired interfaces
     uci set network.${uiface}_${vid}.type=8021ad
+		vtype="ad"
 		echo "VLAN $vid for interface $iface is of type 802.1ad (QinQ)"
-  fi
-
-  uci set network.${uiface}_${vid}.name=${uiface}_${vid}
-  if [ -e "/sys/class/net/$dev/phy80211" ]; then
-    # VLANs for wireless interfaces need to be configured on top of the
-    # logical interface the radio is put in (e.g. mesh_w0 for wlan0)
-    uci set network.${uiface}_${vid}.ifname='@'${liface}
   else
-    # VLANs for wired interfaces are configured directly on top of the physical
-    # interface (e.g. eth0.2, eth1)
-    uci set network.${uiface}_${vid}.ifname=${iface}
+		# 802.1q VLANs for wireless interfaces
+		uci set network.${uiface}_${vid}.type=8021q
+		echo "VLAN $vid for interface $iface is of type 802.1q"
+		vtype="q"
   fi
-  uci set network.${uiface}_${vid}.vid=${vid}
 
-  uci set network.${uiface}_${vid}_ad=interface
-  uci set network.${uiface}_${vid}_ad.ifname=${uiface}_${vid}
-  uci set network.${uiface}_${vid}_ad.proto=${none}
-  uci set network.${uiface}_${vid}_ad.auto=1
+	uci set network.${uiface}_${vid}.name=${uiface}_${vid}
+	if [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ]; then
+		# VLANs for wired interfaces are configured directly on top of the physical
+		# interface (e.g. eth0.2, eth1)
+		uci set network.${uiface}_${vid}.ifname=${iface}
+	else
+		# VLANs for wireless interfaces need to be configured on top of the
+		# logical interface the radio is put in (e.g. mesh_w0 for wlan0)
+		uci set network.${uiface}_${vid}.ifname='@'${liface}
+	fi
+	uci set network.${uiface}_${vid}.vid=${vid}
+
+  uci set network.${uiface}_${vid}_${vtype}=interface
+  uci set network.${uiface}_${vid}_${vtype}.ifname=${uiface}_${vid}
+  uci set network.${uiface}_${vid}_${vtype}.proto=${none}
+  uci set network.${uiface}_${vid}_${vtype}.auto=1
   uci commit network
 
 }
@@ -260,8 +264,8 @@ qmp_configure_smart_network() {
 			}
 		done
 
-		# If it is a wifi device
-		[ -e "/sys/class/net/$dev/phy80211" ] && {
+		# if it is a wifi device (actually, if it is not a non-wifi device)
+		! ( [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ) && {
 			j=0
 			while qmp_uci_test qmp.@wireless[$j]; do
 				[ "$(qmp_uci_get @wireless[$j].device)" == "$dev" ] && {
@@ -811,10 +815,10 @@ fi
 
 		uci set $conf.mesh_$counter="dev"
 		uci set $conf.mesh_$counter.dev="$ifname"
-		if [ -e "/sys/class/net/$dev/phy80211" ]; then
-			uci set $conf.mesh_$counter.linklayer=2
-		else
+		if [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ]; then
 			uci set $conf.mesh_$counter.linklayer=1
+		else
+			uci set $conf.mesh_$counter.linklayer=2
 		fi
 
 	    if qmp_uci_test qmp.networks.bmx6_ipv4_address ; then

@@ -391,7 +391,7 @@ qmp_configure_mesh() {
     # IPv6 address. However, the radios must be "assigned" to some interface to
     # bring them up; otherwise the VLAN interface on top of the radio interface
     # can't be brought up
-    if [ -e "/sys/class/net/$dev/phy80211" ]; then
+    if ! ( [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ); then
       local wireless_network="$(uci get wireless.${dev}.network)"
         if [ -z "$wireless_network" ]; then
           qmp_configure_rescue_ip_device "$dev" "$viface"
