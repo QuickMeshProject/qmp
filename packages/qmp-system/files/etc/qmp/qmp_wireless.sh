@@ -255,6 +255,7 @@ qmp_configure_wifi_device() {
 	local name="$(qmp_uci_get @wireless[$id].name)"
 	local essidap="$(qmp_uci_get @wireless[$id].essidap)"
 	local mesh80211s="$(qmp_uci_get @wireless[$id].mesh80211s)"
+	local meshkey="$(qmp_uci_get @wireless[$id].meshkey)"
 	local driver="$(qmp_uci_get wireless.driver)"
 	local country="$(qmp_uci_get wireless.country)"
 	local mrate="$(qmp_uci_get wireless.mrate)"
@@ -263,6 +264,7 @@ qmp_configure_wifi_device() {
 	local network="$(qmp_get_virtual_iface $device)"
 	local key="$(qmp_uci_get @wireless[$id].key)"
 	[ $(echo "$key" | wc -c) -lt 8 ] && encrypt="none" || encrypt="psk2"
+	( [ $(echo "$meshkey" | wc -c) -lt 8 ] || [ $(echo "$meshkey" | wc -c) -gt 63 ] ) && meshcrypt="none" || meshcrypt="sae"
 
 	local dev_id="$(echo $device | tr -d [A-z])"
 	dev_id=${dev_id:-$(date +%S)}
@@ -279,10 +281,11 @@ qmp_configure_wifi_device() {
 	echo "AdHoc ESSID   $name"
 	echo "AP ESSID      $essidap"
 	echo "Mesh network" $mesh80211s
+	echo "Mesh key"     $meshkey
 	echo "HTmode        $htmode"
 	echo "11mode        $mode11"
 	echo "Mrate         $mrate"
-  echo "Disabled     $dev_disabled"
+  echo "Disabled      $dev_disabled"
 	echo "------------------------"
 
 	[ -z $essidap ] && essidap=$(echo ${name:0:29})"-AP"
@@ -336,13 +339,14 @@ qmp_configure_wifi_device() {
 	 -e s/"#QMP_SSID"/"$(echo "${name:0:32}" | sed -e 's|/|\\/|g')"/ \
 	 -e s/"#QMP_APSSID"/"$(echo "${essidap:0:32}" | sed -e 's|/|\\/|g')"/ \
 	 -e s/"#QMP_MSSID"/"$(echo "${mesh80211s:0:32}" | sed -e 's|/|\\/|g')"/ \
+	 -e s/"#QMP_MKEY"/"$(echo "${meshkey:0:63}" | sed -e 's|/|\\/|g')"/ \
+	 -e s/"#QMP_MCRYPT"/"$meshcrypt"/ \
 	 -e s/"#QMP_BSSID"/"$bssid"/ \
 	 -e s/"#QMP_NETWORK"/"$network"/ \
 	 -e s/"#QMP_ENC"/"$encrypt"/ \
 	 -e s/"#QMP_KEY"/"$key"/ \
 	 -e s/"#QMP_MODE"/"$mode"/ > $TMP/qmp_wifi_iface
-
-}
+	}
 
 	# If virtual AP interface has to be configured
   vap_template="$TEMPLATE_BASE/iface.ap"
