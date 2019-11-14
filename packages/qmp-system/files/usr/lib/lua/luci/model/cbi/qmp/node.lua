@@ -56,6 +56,8 @@ guifimesh_name:value("Raval", "Raval (RAV)")
 guifimesh_name:value("GuifiSants", "Sants-Les Corts-UPC (GS)")
 guifimesh_name:value("SantAndreu", "Sant Andreu (SAND)")
 guifimesh_name:value("Vallcarca", "Vallcarca (VKK)")
+guifimesh_name:value("Herguijuela", "La Herguijuela (LHer)")
+guifimesh_name:value("CepedaLaMora", "Cepeda la Mora (CPD)")
 
 device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use alphanumeric characters only, without spaces or symbols."))
 device_id:depends("community_name","Guifi.net")

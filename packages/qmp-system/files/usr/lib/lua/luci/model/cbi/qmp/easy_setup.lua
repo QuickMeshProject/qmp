@@ -83,6 +83,8 @@ guifimeshname:value("Raval", "Raval (RAV)")
 guifimeshname:value("GuifiSants", "Sants-Les Corts-UPC (GS)")
 guifimeshname:value("SantAndreu", "Sant Andreu (SAND)")
 guifimeshname:value("Vallcarca", "Vallcarca (VKK)")
+guifimeshname:value("Herguijuela", "La Herguijuela (LHer)")
+guifimeshname:value("CepedaLaMora", "Cepeda la Mora (CPD)")
 
 if uciout:get("qmp","node","mesh_name") ~= nil then
   guifimeshname.default=uciout:get("qmp","node","mesh_name")
