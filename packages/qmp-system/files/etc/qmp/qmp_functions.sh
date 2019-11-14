@@ -253,6 +253,7 @@ qmp_configure_smart_network() {
 			[ "$dev" == "$ddev" ] && {
 				lan="$lan $dev"
 				mesh="$mesh $dev"
+				novlan="$novlan $dev"
 				continue
 			}
 		done
@@ -260,6 +261,7 @@ qmp_configure_smart_network() {
 			[ "$dev" == "$ddev" ] && {
 				wan="$wan $dev"
 				mesh="$mesh $dev"
+				novlan="$novlan $dev"
 				continue
 			}
 		done
@@ -278,14 +280,20 @@ qmp_configure_smart_network() {
 			done
 		} && continue
 
-		# If its not wireless nor a default wan/lan, set it to mesh
+		# If it's not wireless nor a default wan/lan, set it to mesh
 		[ "$dev" != "$default_lan" ] && [ "$dev" != "$default_wan" ] && {
 			inmesh="0"
+			innovlan="0"
 			# A small trick to avoid duplicates when $default_xan = "eth1 eth2" (e.g., APUs)
 			for mdev in $mesh; do
 				[ "$mdev" == "$dev" ] && inmesh="1"
 			done
 			[ "$inmesh" == "0" ] && mesh="$dev $mesh"
+
+			for mdev in $novlan; do
+				[ "$mdev" == "$dev" ] && innovlan="1"
+			done
+			[ "$innovlan" == "0" ] && novlan="$dev $novlan"
 		}
 
 	done
@@ -294,11 +302,13 @@ qmp_configure_smart_network() {
 	echo "- LAN $lan"
 	echo "- MESH $mesh"
 	echo "- WAN $wan"
+	echo "- NO VLAN $novlan"
 
 	# Writes the devices to the config
 	qmp_uci_set interfaces.lan_devices "$(echo $lan | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.mesh_devices "$(echo $mesh | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.wan_devices "$(echo $wan | sed -e s/"^ "//g -e s/" $"//g)"
+	qmp_uci_set interfaces.no_vlan_devices "$(echo $novlan | sed -e s/"^ "//g -e s/" $"//g)"
 	qmp_uci_set interfaces.ignore_devices "$ignore_devs"
 }
 
