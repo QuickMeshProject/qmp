@@ -129,12 +129,21 @@ for _,wdev in ipairs(wdevs) do
   essid:depends("mode","adhoc_ap")
 
   -- Network name for 80211s
-  local mesh80211s = s_wireless:option(Value,"mesh80211s","802.11s network",
-    translate("Name of the 802.11s mesh network. All the nodes must use the same network name."))
+  local mesh80211s = s_wireless:option(Value,"mesh80211s","802.11s mesh network name",
+  translate("802.11s mesh network identifier. All the nodes must use the same network name."))
   mesh80211s.maxlength = 32
   mesh80211s.default = "qMp"
   mesh80211s:depends("mode","80211s")
   mesh80211s:depends("mode","80211s_aplan")
+
+  -- Key for 80211s
+  local meshkey = s_wireless:option(Value,"meshkey","802.11s mesh network key",
+  translate("802.11s mesh network WPA3/SAE network key. All the nodes must use the same network key. Leave blank to not use any encryption."))
+  meshkey.minleght = 8
+  meshkey.maxlength = 63
+  meshkey.default = ""
+  meshkey:depends("mode","80211s")
+  meshkey:depends("mode","80211s_aplan")
 
   -- Network ESSID for ap or client
   local essidap = s_wireless:option(Value,"essidap","AP ESSID",
