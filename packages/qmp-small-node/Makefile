@@ -52,7 +52,7 @@ define Package/qmp-small-node
   CATEGORY:=qMp
   URL:=https://qmp.cat
   DEPENDS:= +qmp-tiny-node \
-	+iputils-arping +iputils-clockdiff +tcpdump-mini +b6m +b6m-spread \
+	+iputils-arping +iputils-clockdiff +tcpdump-mini \
 	+iputils-ping6 +mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
 	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
@@ -66,7 +66,7 @@ define Package/qmp-small-node/description
   - BMX6 routing protocol
   - Full LuCI web interface
   - IP/TCP utils
-  - LibreMap and b6m tools
+  - LibreMap
   - SNMP and Munin
   - IP over IP tunneling support
 
