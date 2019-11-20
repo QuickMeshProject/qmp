@@ -64,7 +64,7 @@ define Package/qmp-big-node/description
   - BMX6 routing protocol
   - Full LuCI web interface (via HTTPS with SSL)
   - IP/TCP utils
-  - LibreMap and b6m tools
+  - LibreMap
   - SNMP and Munin
   - IP over IP tunneling support
   - Tinyproxy with captive portal
