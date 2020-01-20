@@ -52,7 +52,7 @@ define Package/qmp-small-node
   CATEGORY:=qMp
   URL:=https://qmp.cat
   DEPENDS:= +qmp-tiny-node \
-	+iputils-arping +iputils-clockdiff +tcpdump-mini \
+	+iputils-clockdiff +tcpdump-mini \
 	+mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
 	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
