@@ -26,6 +26,14 @@ local uciout = luci.model.uci.cursor()
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"
 
+local wdevs = qmpinfo.get_wifi_index()
+
+for _,wdev in ipairs(wdevs) do
+  mydev = uci:get("qmp",wdev,"device")
+end
+
+local iw = luci.sys.wifi.getiwinfo(mydev)
+
 ------------
 -- Header --
 ------------
@@ -325,6 +333,20 @@ for i,v in ipairs(devices.wifi) do
   nodedevs_wifi[i] = {v,wmode,wchan}
 end
 
+-- Country selection (global, not per-device)
+local cl = iw and iw.countrylist
+
+if cl and #cl > 0 then
+  wcountry = m:field(ListValue, "country", translate("Country"))
+
+  wcountry.default = uciout:get("qmp","wireless","country")
+  for _, s in ipairs(cl) do
+    wcountry:value(s.alpha2, "%s - %s" %{ s.alpha2, s.name })
+  end
+
+else
+  wcountry = m:field(Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes."))
+end
 
 
 function nodemode.write(self, section, value)
@@ -418,6 +440,9 @@ function nodemode.write(self, section, value)
   uciout:set("qmp","interfaces","lan_devices",lan_devices)
   uciout:set("qmp","interfaces","wan_devices",wan_devices)
   uciout:set("qmp","interfaces","mesh_devices",mesh_devices)
+
+  local country = wcountry:formvalue(section)
+  uciout:set("qmp", "wireless", "country", country)
 
   uciout:commit("qmp")
   apply()

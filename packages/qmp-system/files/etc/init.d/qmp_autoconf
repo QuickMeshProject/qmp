@@ -78,7 +78,7 @@ configure() {
 
 	log "[Preparing wifi]"
 	country="$(uci get qmp.wireless.country 2>/dev/null)"
-	country="${country:-00}"
+	country="${country:-US}"
 	log Using countrycode $country
 	prepare_wifi
 
