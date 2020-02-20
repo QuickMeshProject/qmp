@@ -228,7 +228,7 @@ end
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
 wired_interface_mode_help.rawhtml = true
-wired_interface_mode_help.default = "<legend>" .. translate("Network interfaces") .. "</legend>" .. "<br/> <br/>" ..
+wired_interface_mode_help.default = "<legend>" .. translate("Wired network interfaces") .. "</legend>" .. "<br/> <br/>" ..
   translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
   translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
   translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
@@ -285,9 +285,10 @@ end
 local wireless_interface_mode_help
 wireless_interface_mode_help = m:field(DummyValue,"wireless_interface_mode_help")
 wireless_interface_mode_help.rawhtml = true
-wireless_interface_mode_help.default = translate("Select the working mode of the wireless network interfaces:") .. "<br/> <br/>" ..
-  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> mode") .."<br/>" ..
-  translate("· <em>802.11s (mesh) + Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> or in <strong>legacy ad hoc mesh</strong> mode. Use this one for <strong>backwards compatibility</strong> with old qMp deployments.") .."<br/>" ..
+wireless_interface_mode_help.default = "<legend>" .. translate("Wireless network interfaces") .. "</legend>" .. "<br/> <br/>" ..
+  translate("Select the working mode of the wireless network interfaces") .. ":<br/> <br/>" ..
+  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in <strong>802.11s mesh</strong> mode") .."<br/>" ..
+  translate("· <em>802.11s (mesh) + Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>802.11s mesh</strong> or in <strong>legacy ad hoc mesh</strong> mode. Use this one for <strong>backwards compatibility</strong> with old qMp deployments.") .."<br/>" ..
   translate("· <em>Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>legacy ad hoc mesh</strong> mode") .. "<br/>" ..
   translate("· <em>AP (mesh)</em> mode is used to create an access point for other mesh nodes to connect as clients") .. "<br/>" ..
   translate("· <em>Client (mesh)</em> mode is used to link with a mesh node operating in AP mode") .. "<br/>" ..
