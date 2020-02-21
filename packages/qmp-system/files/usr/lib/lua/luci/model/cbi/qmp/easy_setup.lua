@@ -47,23 +47,36 @@ m = SimpleForm("qmp", translate("qMp easy setup"), translate("This page provides
 local devicename_help
 local devicename_help = m:field(DummyValue,"_devicename_help")
 devicename_help.rawhtml = true
-devicename_help.default = "<legend>"..translate("Device identification").."</legend>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
+devicename_help.default = "<legend>"..translate("Device identification").."</legend>".."<br/> <br/>"..translate("Choose a name and a numeric ID for this device. It will be used to identify it in the mesh network:").."<br/> <br/>"
 
-local devicename = m:field(Value, "_devicename", " ", translate("Use only alphanumeric characters, dots, dashes and underscores."))
+local devicename = m:field(Value, "_devicename", translate("Device name"), translate("Use only alphanumeric characters, dots, dashes and underscores."))
 devicename.datatype="hostname"
 devicename.optional=false
 devicename.default="MyMeshDevice"
 
 if uciout:get("qmp","node","device_name") ~= nil then
-  devicename.default=uciout:get("qmp","node","device_name")
+  devicename.default = uciout:get("qmp","node","device_name")
+else
+  devicename.default = "qMp"
 end
 
+-- Device ID device
+local deviceid = m:field(Value, "_deviceid", translate("Device ID"), translate("Use hexadecimal characters only."))
+deviceid:depends({_communityname = "Guifi.net"})
+deviceid.datatype="string"
+deviceid.optional = false
+
+if uciout:get("qmp","node","device_id") ~= nil then
+  deviceid.default = uciout:get("qmp","node","device_id")
+else
+  deviceid.default = "0000"
+end
 
 -- Community network name
 local communityname_help
 communityname_help = m:field(DummyValue,"_communityname_help")
 communityname_help.rawhtml = true
-communityname_help.default = translate("Select the name of the community network this device belongs to.") .. "<br/> <br/>"
+communityname_help.default = translate("If the device is part of a community network, select it:") .. "<br/> <br/>"
 
 local communityname = m:field(Value, "_communityname", " ", translate("Select a predefined community network from the list, type your own name or leave it blank."))
 communityname.datatype="string"
@@ -96,15 +109,6 @@ guifimeshname:value("CepedaLaMora", "Cepeda la Mora (CPD)")
 
 if uciout:get("qmp","node","mesh_name") ~= nil then
   guifimeshname.default=uciout:get("qmp","node","mesh_name")
-end
-
--- Guifi device
-local guifideviceid = m:field(Value, "_guifideviceid", " ", translate("Device ID in Guifi.net's web site. Use numbers only."))
-guifideviceid:depends({_communityname = "Guifi.net"})
-guifideviceid.datatype="uinteger"
-
-if uciout:get("qmp","node","device_id") ~= nil then
-  guifideviceid.default=uciout:get("qmp","node","device_id")
 end
 
 
@@ -360,12 +364,11 @@ function nodemode.write(self, section, value)
   local community_name = communityname:formvalue(section)
   if community_name == "Guifi.net" then
     local mesh_name = guifimeshname:formvalue(section)
-    local device_id = guifideviceid:formvalue(section)
+    local device_id = deviceid:formvalue(section)
     uciout:set("qmp","node","mesh_name",mesh_name)
     uciout:set("qmp","node","device_id",device_id)
   end
   uciout:set("qmp","node","community_name",community_name)
-
 
   if mode == "community" then
     uciout:set("qmp","roaming","ignore","1")

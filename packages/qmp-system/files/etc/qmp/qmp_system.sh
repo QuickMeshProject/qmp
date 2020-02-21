@@ -14,21 +14,20 @@ qmp_configure_system() {
 	else
 		local device_id=$(qmp_get_id_hostname)
 		device_id="$(echo -n $device_id | tr -cd 'ABCDEFabcdef0123456789' | tail -c 4)"
+		[ $(echo -n $device_id | wc -c) -lt 4 ] && {
+			qmp_log "Warning, device_id not defined properly, using failsafe 0000"
+			device_id=0000
+		}
 		qmp_uci_set node.device_id $device_id
 	fi
-
-	[ $(echo -n $device_id | wc -c) -lt 4 ] && {
-		qmp_log "Warning, device_id not defined properly, using failsafe 0000"
-		device_id=0000
-	}
 
 	local device_name="$(qmp_uci_get node.device_name)"
 	[ -z "$device_name" ] && device_name="qMp" && qmp_uci_set node.device_name $device_name
 
 	# set hostname
-	local ig_roaming="$(uci get qmp.roaming.ignore)"
+	local append_id="$(uci get qmp.node.append_id)"
 	
-	if [ $ig_roaming -eq 1 ]; then
+	if [ $append_id -eq 0 ]; then
 		uci set system.@system[0].hostname="${device_name}"
 		echo "${device_name}" > /proc/sys/kernel/hostname
 	else

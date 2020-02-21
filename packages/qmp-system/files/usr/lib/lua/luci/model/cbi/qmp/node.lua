@@ -24,6 +24,18 @@ local uci = luci.model.uci.cursor()
 local qmpinfo = require "qmpinfo"
 local util = require "luci.util"
 
+devices = qmpinfo.get_devices()
+
+devname = uci:get("qmp","node","device_name")
+devid = uci:get("qmp","node","device_id")
+
+if (devname == nil or devname == '') then
+  devname = "qMp"
+end
+
+if (devid == nil or devid == '') then
+  devid = "0000"
+end
 
 m = Map("qmp", "qMp node settings", translate("This page allows to configure the basic node settings, like the device identification, location and contact details.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
@@ -36,6 +48,18 @@ device_name.optional = false
 device_name.rmempty = false
 device_name.default = "qMp"
 
+device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use hexadecimal characters only."))
+device_id:depends("community_name","Guifi.net")
+device_id.datatype = "string"
+device_id.optional = false
+device_id.rmempty = false
+
+append_id = device_section:option(ListValue, "append_id", translate("Append ID"),translatef("Append the device ID to the device name (e.g., %s-%s)", devname, devid))
+append_id:value("0", translate ("No"))
+append_id:value("1", translate("Yes"))
+append_id.default = "1"
+append_id.optional = false
+append_id.rmempty = false
 
 community_name = device_section:option(Value, "community_name", translate ("Community Network name"), translate("Select a predefined community network from the list, type your own name or leave it blank."))
 community_name.datatype="string"
@@ -58,14 +82,6 @@ guifimesh_name:value("SantAndreu", "Sant Andreu (SAND)")
 guifimesh_name:value("Vallcarca", "Vallcarca (VKK)")
 guifimesh_name:value("Herguijuela", "La Herguijuela (LHer)")
 guifimesh_name:value("CepedaLaMora", "Cepeda la Mora (CPD)")
-
-device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use alphanumeric characters only, without spaces or symbols."))
-device_id:depends("community_name","Guifi.net")
-device_id.datatype = "string"
-device_id.optional = true
-device_id.rmempty = false
-
-devices = qmpinfo.get_devices()
 
 primary_device = device_section:option(Value,"primary_device", translate("Primary network interface"), translate("The name of the node's primary network interface. The last four digits of this device's MAC address will be appended to the node name."))
 primary_device.datatype = "network"
