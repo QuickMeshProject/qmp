@@ -95,17 +95,17 @@ local guifimeshname = m:field(Value, "_guifimeshname", " ", translate("Select a 
 guifimeshname:depends("_communityname","Guifi.net")
 guifimeshname.datatype="string"
 guifimeshname.default="GuifiSants"
-guifimeshname:value("GuifiBaix", "Baix Llobregat (GuifiBaix)")
-guifimeshname:value("Bellvitge", "Bellvitge (HW)")
-guifimeshname:value("GraciaSenseFils", "Gràcia Sense Fils (GSF)")
-guifimeshname:value("PoblenouSenseFils", "Poblenou Sense Fils (P9SF)")
-guifimeshname:value("Quesa", "Quesa (QUESA)")
-guifimeshname:value("Raval", "Raval (RAV)")
-guifimeshname:value("GuifiSants", "Sants-Les Corts-UPC (GS)")
-guifimeshname:value("SantAndreu", "Sant Andreu (SAND)")
-guifimeshname:value("Vallcarca", "Vallcarca (VKK)")
-guifimeshname:value("Herguijuela", "La Herguijuela (LHer)")
-guifimeshname:value("CepedaLaMora", "Cepeda la Mora (CPD)")
+guifimeshname:value("GB", "Baix Llobregat - GuifiBaix (GB)")
+guifimeshname:value("HW", "Bellvitge (HW)")
+guifimeshname:value("GSF", "Gràcia Sense Fils (GSF)")
+guifimeshname:value("P9SF", "Poblenou Sense Fils (P9SF)")
+guifimeshname:value("QS", "Quesa (QS)")
+guifimeshname:value("RAV", "Raval (RAV)")
+guifimeshname:value("GS", "Sants-Les Corts-UPC (GS)")
+guifimeshname:value("SAND", "Sant Andreu (SAND)")
+guifimeshname:value("VKK", "Vallcarca (VKK)")
+guifimeshname:value("LHER", "La Herguijuela (LHER)")
+guifimeshname:value("CPD", "Cepeda la Mora (CPD)")
 
 if uciout:get("qmp","node","mesh_name") ~= nil then
   guifimeshname.default=uciout:get("qmp","node","mesh_name")

@@ -14,28 +14,46 @@ qmp_configure_system() {
 	else
 		local device_id=$(qmp_get_id_hostname)
 		device_id="$(echo -n $device_id | tr -cd 'ABCDEFabcdef0123456789' | tail -c 4)"
-		[ $(echo -n $device_id | wc -c) -lt 4 ] && {
-			qmp_log "Warning, device_id not defined properly, using failsafe 0000"
-			device_id=0000
-		}
+	fi
+
+	[ $(echo -n $device_id | wc -c) -lt 4 ] && {
+		qmp_log "Warning, device_id not defined properly, using failsafe 0000"
+		device_id=0000
 		qmp_uci_set node.device_id $device_id
+	}
+
+	if [ -n "$(qmp_uci_get node.mesh_name)" ]; then
+		local mesh_name=$(qmp_uci_get node.mesh_name)
+	else
+		local mesh_name=""
 	fi
 
 	local device_name="$(qmp_uci_get node.device_name)"
 	[ -z "$device_name" ] && device_name="qMp" && qmp_uci_set node.device_name $device_name
 
 	# set hostname
-	local append_id="$(uci get qmp.node.append_id)"
-	
-	if [ $append_id -eq 0 ]; then
-		uci set system.@system[0].hostname="${device_name}"
-		echo "${device_name}" > /proc/sys/kernel/hostname
-	else
-		uci set system.@system[0].hostname="${device_name}-${device_id}"
-		echo "${device_name}-${device_id}" > /proc/sys/kernel/hostname
+	local append_id=0
+	if [ -n "$(qmp_uci_get node.append_id)" ]; then
+		append_id="$(uci get qmp.node.append_id)"
 	fi
-	uci commit system
 
+	local prepend_cnm=0
+	if [ -n "$(qmp_uci_get node.prepend_cnm)" ]; then
+		prepend_cnm="$(uci get qmp.node.prepend_cnm)"
+	fi
+
+	if [ $append_id -eq 1 ]; then
+		device_name="${device_name}-${device_id}"
+	fi
+
+	if [ $prepend_cnm -eq 1 ] && [ -n "${mesh_name}" ]; then
+		device_name="${mesh_name}-${device_name}"
+	fi
+
+	uci set system.@system[0].hostname="${device_name}"
+	echo "${device_name}" > /proc/sys/kernel/hostname
+
+	uci commit system
 
 	uci set uhttpd.main.listen_http="80"
 	uci set uhttpd.main.listen_https="443"
