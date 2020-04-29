@@ -1,0 +1,11 @@
+{
+        "qmp-system": {
+                "description": "Grant qMp full access to UCI configuration files, legacy-style",
+                "read": {
+                        "uci": [ "*" ]
+                },
+                "write": {
+                        "uci": [ "*" ]
+                }
+        }
+}
