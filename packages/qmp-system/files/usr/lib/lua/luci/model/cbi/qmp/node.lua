@@ -53,17 +53,6 @@ device_name.optional = false
 device_name.rmempty = false
 device_name.default = "qMp"
 
-device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use hexadecimal characters only."))
-device_id:depends("community_name","Guifi.net")
-device_id.datatype = "string"
-device_id.optional = false
-device_id.rmempty = false
-
-append_id = device_section:option(Flag, "append_id", translate("Append ID"),translatef("Append the device ID to the device name (e.g., %s-%s)", devname, devid))
-append_id.default = 1
-append_id.optional = false
-append_id.rmempty = false
-
 community_name = device_section:option(Value, "community_name", translate ("Community Network name"), translate("Select a predefined community network from the list, type your own name or leave it blank."))
 community_name.datatype="string"
 community_name:value("Bogotá Mesh","Bogotá Mesh")
@@ -88,11 +77,28 @@ guifimesh_name:value("LHER", "La Herguijuela (LHER)")
 guifimesh_name:value("CPD", "Cepeda la Mora (CPD)")
 
 prepend_cnm = device_section:option(Flag, "prepend_cnm", translate("Prepend mesh ID"),translatef("Prepend the mesh network ID to the device name (e.g., %s-%s-%s)", meshname, devname, devid))
+prepend_cnm:depends("community_name","Guifi.net")
 prepend_cnm.default = 1
 prepend_cnm.optional = false
 prepend_cnm.rmempty = false
 
-primary_device = device_section:option(Value,"primary_device", translate("Primary network interface"), translate("The name of the node's primary network interface. The last four digits of this device's MAC address will be appended to the node name."))
+device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use hexadecimal characters only."))
+device_id:depends("community_name","Guifi.net")
+device_id.datatype = "string"
+device_id.optional = false
+device_id.rmempty = false
+
+append_id = device_section:option(Flag, "append_id", translate("Append ID"),translatef("Append the device ID to the device name (e.g., %s-%s)", devname, devid))
+append_id:depends("community_name","Guifi.net")
+append_id.default = 1
+append_id.optional = false
+append_id.rmempty = false
+
+
+interface_section = m:section(NamedSection, "node", "qmp", translate("Primary interface"), translate("The following setting is used to auto-configure internal aspects of your device."))
+interface_section.addremove = False
+
+primary_device = interface_section:option(Value,"primary_device", translate("Primary network interface"), translate("The name of the node's primary network interface. The last four digits of this device's MAC address will be appended to the node name."))
 primary_device.datatype = "network"
 primary_device.optional = false
 primary_device.rmempty = false

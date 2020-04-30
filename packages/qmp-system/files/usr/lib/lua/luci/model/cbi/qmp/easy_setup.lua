@@ -60,18 +60,6 @@ else
   devicename.default = "qMp"
 end
 
--- Device ID device
-local deviceid = m:field(Value, "_deviceid", translate("Device ID"), translate("Use hexadecimal characters only."))
-deviceid:depends({_communityname = "Guifi.net"})
-deviceid.datatype="string"
-deviceid.optional = false
-
-if uciout:get("qmp","node","device_id") ~= nil then
-  deviceid.default = uciout:get("qmp","node","device_id")
-else
-  deviceid.default = "0000"
-end
-
 -- Community network name
 local communityname_help
 communityname_help = m:field(DummyValue,"_communityname_help")
@@ -111,6 +99,17 @@ if uciout:get("qmp","node","mesh_name") ~= nil then
   guifimeshname.default=uciout:get("qmp","node","mesh_name")
 end
 
+-- Device ID device
+local deviceid = m:field(Value, "_deviceid", translate("Device ID"), translate("Use hexadecimal characters only."))
+deviceid:depends({_communityname = "Guifi.net"})
+deviceid.datatype="string"
+deviceid.optional = false
+
+if uciout:get("qmp","node","device_id") ~= nil then
+  deviceid.default = uciout:get("qmp","node","device_id")
+else
+  deviceid.default = "0000"
+end
 
 ----------------------------------------
 -- Node mode and public IPv4 address  --
