@@ -162,7 +162,7 @@ help() {
 	echo "Safe configuration:"
 	echo " save_state			: Saves current state of configuration files"
 	echo " recover_state			: Recovers previous saved state"
-	echo " safe_apply			: Performs a safe configure_all. If something wrong it comes back to old state"
+	echo " safe_apply			: Performs a safe configure_all. If something goes wrong, it comes back to the previous state"
 
 	echo ""
 	echo "Gateways:"
@@ -178,7 +178,7 @@ help() {
 	echo " enable_ns_xm_ppt		: Enable PoE passtrough from NanoStation XM M2/M5 devices. Be careful with this option!"
 	echo " enable_ns_xw_ppt		: Enable PoE passtrough from NanoStation XW M2/M5 devices. Be careful with this option!"
 	echo " upgrade [URL]			: Upgrade system. By default to the last version, but image url can be provided to force"
-	echo " hard_reboot				: Performs a hard reboot (using kernel sysrq)"
+	echo " hard_reboot			: Performs a hard reboot (using kernel sysrq)"
 
 	echo ""
 	exit 0
