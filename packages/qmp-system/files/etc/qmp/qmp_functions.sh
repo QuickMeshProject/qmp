@@ -888,9 +888,9 @@ qmp_configure_initial() {
 	qmp_hooks_exec firstboot
 	qmp_configure_wifi_initial
 	qmp_configure_wifi
-	/etc/init.d/network restart
 	/etc/init.d/network reload
-	sleep 1
+	/etc/init.d/network restart
+	sleep 5 # Let WiFi devices start up
 	qmp_configure_smart_network
 }
 

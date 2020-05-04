@@ -51,6 +51,7 @@ configure_network() {
 	qmp_bmx6_reload
 	/etc/init.d/network reload
 	/etc/init.d/network restart
+	sleep 5 # Let WiFi devices start up
 	if /etc/init.d/gwck enabled
 	then
 		/etc/init.d/gwck restart
