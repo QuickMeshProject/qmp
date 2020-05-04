@@ -293,6 +293,7 @@ qmp_configure_wifi_device() {
 
 	local vap=0
 	local ahl=0
+
 	[ $mode == "adhoc_ap" ] && {
 		mode="adhoc"
 		vap=1
@@ -329,8 +330,10 @@ qmp_configure_wifi_device() {
   echo $device
 	qmp_prepare_wireless_iface $device
 
-    echo "Mode is $mode"
-    echo "Network is $network"
+	echo "Mode is $mode"
+	[ "$vap" == 1 ] && echo "plus AP mode"
+	[ "$ahl" == 1 ] && echo "plus legacy mode"
+	echo "Network is $network"
 
 	cat $iface_template | grep -v ^# | sed \
 	 -e s/"#QMP_RADIO"/"$radio"/ \
@@ -398,7 +401,7 @@ qmp_configure_wifi_device() {
 
 qmp_configure_wifi() {
 
-	echo "Backuping wireless config file to: $OWRT_WIRELESS_CONFIG.qmp_backup"
+	echo "Backing up current wireless config file to: $OWRT_WIRELESS_CONFIG.qmp_backup"
 	cp $OWRT_WIRELESS_CONFIG $OWRT_WIRELESS_CONFIG.qmp_backup 2>/dev/null
 	echo "" > $OWRT_WIRELESS_CONFIG
 
