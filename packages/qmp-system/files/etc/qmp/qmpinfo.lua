@@ -71,8 +71,10 @@ function qmpinfo.get_devices()
 					local do_insert = false
 					if nixio.fs.stat(sysnet..d..'/phy80211',"type") ~= nil then
 						if string.sub(d, -1) ~= "a" then
-							table.insert(phydevs.wifi,d)
-							do_insert = true
+							if string.sub(d, -2) ~= "ap" then
+								table.insert(phydevs.wifi,d)
+								do_insert = true
+							end
 						end
 					else
 
