@@ -101,7 +101,8 @@ hard_reboot() {
 configure_all() {
 	configure_system
 	configure_wifi
-	configure_network
+	# configure_wifi just called configure_network immediately before
+	# configure_network
 }
 
 safe_apply() {
