@@ -82,14 +82,14 @@ end
 local guifimeshname = m:field(Value, "_guifimeshname", " ", translate("Select a predefined mesh network, type your own name or leave it blank."))
 guifimeshname:depends("_communityname","Guifi.net")
 guifimeshname.datatype="string"
-guifimeshname.default="GuifiSants"
+guifimeshname.default="GS"
 guifimeshname:value("GB", "Baix Llobregat - GuifiBaix (GB)")
 guifimeshname:value("HW", "Bellvitge (HW)")
 guifimeshname:value("GSF", "Gràcia Sense Fils (GSF)")
 guifimeshname:value("P9SF", "Poblenou Sense Fils (P9SF)")
 guifimeshname:value("QS", "Quesa (QS)")
 guifimeshname:value("RAV", "Raval (RAV)")
-guifimeshname:value("GS", "Sants-Les Corts-UPC (GS)")
+guifimeshname:value("GS", "GuifiSants-Les Corts-UPC (GS)")
 guifimeshname:value("SAND", "Sant Andreu (SAND)")
 guifimeshname:value("VKK", "Vallcarca (VKK)")
 guifimeshname:value("LHER", "La Herguijuela (LHER)")
