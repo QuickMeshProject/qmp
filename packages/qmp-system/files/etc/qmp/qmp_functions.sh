@@ -118,6 +118,7 @@ qmp_get_virtual_iface() {
 				qmp_log "LOG: 5"
 				qmp_log "Viface: $viface"
 				qmp_log $device $viface
+				qmp_log $(qmp_get_wifi_devices)
 				echo $viface
 				return
 			fi

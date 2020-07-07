@@ -162,8 +162,11 @@ qmp_debug() {
 
 # Returns the names of the wifi devices from the system
 qmp_get_wifi_devices() {
+	# Legacy code, sometimes not reporting all the interfaces as they take some time to appear there
 	proc_net_wireless=$(awk 'NR>2 { gsub(/:$/,"",$1); print $1 }' /proc/net/wireless | grep -v -e "wlan[0-9]-[0-9]" | sort -u)
 
+
+	# Initial fix for #481, but some devices would still fail
 	sys_class_net=""
 	for i in $(ls /sys/class/net/); do
 			[ -e /sys/class/net/${i}/phy80211 ] && sys_class_net="${sys_class_net} ${i}"
@@ -173,6 +176,14 @@ qmp_get_wifi_devices() {
 
 	for i in $sys_class_net; do
 		! qmp_is_in $i $proc_net_wireless && echo $i
+	done
+
+
+	# Actual fix for #481, using ubus
+	ubus_network_wireless=$(ubus call network.wireless status | jsonfilter -e '@.*.interfaces.*.section')
+
+	for i in $ubus_network_wireless; do
+		! qmp_is_in $i $proc_net_wireless && ! qmp_is_in $i $sys_class_net && echo $i
 	done
 }
 

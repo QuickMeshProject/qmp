@@ -349,13 +349,14 @@ qmp_configure_mesh() {
 	qmp_uci_test qmp.networks.mesh_protocol_vids; then
 
 	for dev in $(qmp_get_devices mesh); do
-		echo "Configuring "$dev" for meshing"
+		echo "Configuring ${dev} for meshing"
 
 		# Check if the current device is configured as no-vlan
 		local use_vlan=1
 		for no_vlan_int in $(qmp_uci_get interfaces.no_vlan_devices 2>/dev/null); do
 			[ "$no_vlan_int" == "$dev" ] && use_vlan=0
 		done
+    echo " -> Using VLAN: $use_vlan"
 
 		local protocol_vids="$(qmp_uci_get networks.mesh_protocol_vids 2>/dev/null)"
 		[ -z "$protocol_vids" ] && protocol_vids="bmx6:12"
@@ -368,9 +369,11 @@ qmp_configure_mesh() {
 
 			# if no vlan is specified do not use vlan
 			[ -z "$vid" ] && vid=1 && use_vlan=0
-			# virtual interface
+
+      # virtual interface
+      echo " -> Getting virtual interface for ${dev}"
 			local viface=$(qmp_get_virtual_iface $dev)
-      echo "device $dev is in viface $viface"
+      echo " -> Device ${dev} is in viface ${viface}"
 			# put typical IPv6 prefix (2002::), otherwise ipv6 calc assumes mapped or embedded ipv4 address
 			local ip6_suffix="2002::${counter}${vid}"
 
