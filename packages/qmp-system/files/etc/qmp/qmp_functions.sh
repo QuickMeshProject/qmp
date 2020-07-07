@@ -114,10 +114,11 @@ qmp_get_virtual_iface() {
 	for l in $(qmp_get_devices lan); do
 		if [ "$l" == "$device" ]; then
 			viface="lan"
-			if [ ! -e "/sys/class/net/$device/phy80211" ]; then
+			if [ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
 				qmp_log "LOG: 5"
 				qmp_log "Viface: $viface"
 				qmp_log $device $viface
+				qmp_log $(qmp_get_wifi_devices)
 				echo $viface
 				return
 			fi
