@@ -26,6 +26,14 @@ local uciout = luci.model.uci.cursor()
 package.path = package.path .. ";/etc/qmp/?.lua"
 qmpinfo = require "qmpinfo"
 
+local wdevs = qmpinfo.get_wifi_index()
+
+for _,wdev in ipairs(wdevs) do
+  mydev = uci:get("qmp",wdev,"device")
+end
+
+local iw = luci.sys.wifi.getiwinfo(mydev)
+
 ------------
 -- Header --
 ------------
@@ -39,23 +47,24 @@ m = SimpleForm("qmp", translate("qMp easy setup"), translate("This page provides
 local devicename_help
 local devicename_help = m:field(DummyValue,"_devicename_help")
 devicename_help.rawhtml = true
-devicename_help.default = "<legend>"..translate("Device identification").."</legend>".."<br/> <br/>"..translate("Choose a name for this device. It will be used to identify it in the mesh network.").."<br/> <br/>"
+devicename_help.default = "<legend>"..translate("Device identification").."</legend>".."<br/> <br/>"..translate("Choose a name and a numeric ID for this device. It will be used to identify it in the mesh network:").."<br/> <br/>"
 
-local devicename = m:field(Value, "_devicename", " ", translate("Use only alphanumeric characters, dots, dashes and underscores."))
+local devicename = m:field(Value, "_devicename", translate("Device name"), translate("Use only alphanumeric characters, dots, dashes and underscores."))
 devicename.datatype="hostname"
 devicename.optional=false
 devicename.default="MyMeshDevice"
 
 if uciout:get("qmp","node","device_name") ~= nil then
-  devicename.default=uciout:get("qmp","node","device_name")
+  devicename.default = uciout:get("qmp","node","device_name")
+else
+  devicename.default = "qMp"
 end
-
 
 -- Community network name
 local communityname_help
 communityname_help = m:field(DummyValue,"_communityname_help")
 communityname_help.rawhtml = true
-communityname_help.default = translate("Select the name of the community network this device belongs to.") .. "<br/> <br/>"
+communityname_help.default = translate("If the device is part of a community network, select it:") .. "<br/> <br/>"
 
 local communityname = m:field(Value, "_communityname", " ", translate("Select a predefined community network from the list, type your own name or leave it blank."))
 communityname.datatype="string"
@@ -73,32 +82,34 @@ end
 local guifimeshname = m:field(Value, "_guifimeshname", " ", translate("Select a predefined mesh network, type your own name or leave it blank."))
 guifimeshname:depends("_communityname","Guifi.net")
 guifimeshname.datatype="string"
-guifimeshname.default="GuifiSants"
-guifimeshname:value("GuifiBaix", "Baix Llobregat (GuifiBaix)")
-guifimeshname:value("Bellvitge", "Bellvitge (HW)")
-guifimeshname:value("GraciaSenseFils", "Gràcia Sense Fils (GSF)")
-guifimeshname:value("PoblenouSenseFils", "Poblenou Sense Fils (P9SF)")
-guifimeshname:value("Quesa", "Quesa (QUESA)")
-guifimeshname:value("Raval", "Raval (RAV)")
-guifimeshname:value("GuifiSants", "Sants-Les Corts-UPC (GS)")
-guifimeshname:value("SantAndreu", "Sant Andreu (SAND)")
-guifimeshname:value("Vallcarca", "Vallcarca (VKK)")
-guifimeshname:value("Herguijuela", "La Herguijuela (LHer)")
-guifimeshname:value("CepedaLaMora", "Cepeda la Mora (CPD)")
+guifimeshname.default="GS"
+guifimeshname:value("GB", "Baix Llobregat - GuifiBaix (GB)")
+guifimeshname:value("HW", "Bellvitge (HW)")
+guifimeshname:value("GSF", "Gràcia Sense Fils (GSF)")
+guifimeshname:value("P9SF", "Poblenou Sense Fils (P9SF)")
+guifimeshname:value("QS", "Quesa (QS)")
+guifimeshname:value("RAV", "Raval (RAV)")
+guifimeshname:value("GS", "GuifiSants-Les Corts-UPC (GS)")
+guifimeshname:value("SAND", "Sant Andreu (SAND)")
+guifimeshname:value("VKK", "Vallcarca (VKK)")
+guifimeshname:value("LHER", "La Herguijuela (LHER)")
+guifimeshname:value("CPD", "Cepeda la Mora (CPD)")
 
 if uciout:get("qmp","node","mesh_name") ~= nil then
   guifimeshname.default=uciout:get("qmp","node","mesh_name")
 end
 
--- Guifi device
-local guifideviceid = m:field(Value, "_guifideviceid", " ", translate("Device ID in Guifi.net's web site. Use numbers only."))
-guifideviceid:depends({_communityname = "Guifi.net"})
-guifideviceid.datatype="uinteger"
+-- Device ID device
+local deviceid = m:field(Value, "_deviceid", translate("Device ID"), translate("Use hexadecimal characters only."))
+deviceid:depends({_communityname = "Guifi.net"})
+deviceid.datatype="string"
+deviceid.optional = false
 
 if uciout:get("qmp","node","device_id") ~= nil then
-  guifideviceid.default=uciout:get("qmp","node","device_id")
+  deviceid.default = uciout:get("qmp","node","device_id")
+else
+  deviceid.default = "0000"
 end
-
 
 ----------------------------------------
 -- Node mode and public IPv4 address  --
@@ -220,7 +231,7 @@ end
 local wired_interface_mode_help
 wired_interface_mode_help = m:field(DummyValue,"wired_interface_mode_help")
 wired_interface_mode_help.rawhtml = true
-wired_interface_mode_help.default = "<legend>" .. translate("Network interfaces") .. "</legend>" .. "<br/> <br/>" ..
+wired_interface_mode_help.default = "<legend>" .. translate("Wired network interfaces") .. "</legend>" .. "<br/> <br/>" ..
   translate("Select the working mode of the wired network interfaces") .. ":<br/> <br/>" ..
   translate("· <em>LAN</em> mode is used to provide connectivity to end-users (a DHCP server will be enabled to assign IP addresses to the devices connecting)") .. "<br/>" ..
   translate(" · <em>WAN</em> mode is used on interfaces connected to an Internet up-link or any other gateway connection") .. "<br/>" ..
@@ -277,9 +288,10 @@ end
 local wireless_interface_mode_help
 wireless_interface_mode_help = m:field(DummyValue,"wireless_interface_mode_help")
 wireless_interface_mode_help.rawhtml = true
-wireless_interface_mode_help.default = translate("Select the working mode of the wireless network interfaces:") .. "<br/> <br/>" ..
-  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> mode") .."<br/>" ..
-  translate("· <em>802.11s (mesh) + Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>current 802.11s mesh</strong> or in <strong>legacy ad hoc mesh</strong> mode. Use this one for <strong>backwards compatibility</strong> with old qMp deployments.") .."<br/>" ..
+wireless_interface_mode_help.default = "<legend>" .. translate("Wireless network interfaces") .. "</legend>" .. "<br/> <br/>" ..
+  translate("Select the working mode of the wireless network interfaces") .. ":<br/> <br/>" ..
+  translate("· <em>802.11s (mesh)</em> mode is used to link with other mesh nodes operating in <strong>802.11s mesh</strong> mode") .."<br/>" ..
+  translate("· <em>802.11s (mesh) + Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>802.11s mesh</strong> or in <strong>legacy ad hoc mesh</strong> mode. Use this one for <strong>backwards compatibility</strong> with old qMp deployments.") .."<br/>" ..
   translate("· <em>Ad hoc (legacy mesh)</em> mode is used to link with other mesh nodes operating in <strong>legacy ad hoc mesh</strong> mode") .. "<br/>" ..
   translate("· <em>AP (mesh)</em> mode is used to create an access point for other mesh nodes to connect as clients") .. "<br/>" ..
   translate("· <em>Client (mesh)</em> mode is used to link with a mesh node operating in AP mode") .. "<br/>" ..
@@ -325,6 +337,20 @@ for i,v in ipairs(devices.wifi) do
   nodedevs_wifi[i] = {v,wmode,wchan}
 end
 
+-- Country selection (global, not per-device)
+local cl = iw and iw.countrylist
+
+if cl and #cl > 0 then
+  wcountry = m:field(ListValue, "country", translate("Country"))
+
+  wcountry.default = uciout:get("qmp","wireless","country")
+  for _, s in ipairs(cl) do
+    wcountry:value(s.alpha2, "%s - %s" %{ s.alpha2, s.name })
+  end
+
+else
+  wcountry = m:field(Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes."))
+end
 
 
 function nodemode.write(self, section, value)
@@ -337,12 +363,11 @@ function nodemode.write(self, section, value)
   local community_name = communityname:formvalue(section)
   if community_name == "Guifi.net" then
     local mesh_name = guifimeshname:formvalue(section)
-    local device_id = guifideviceid:formvalue(section)
+    local device_id = deviceid:formvalue(section)
     uciout:set("qmp","node","mesh_name",mesh_name)
     uciout:set("qmp","node","device_id",device_id)
   end
   uciout:set("qmp","node","community_name",community_name)
-
 
   if mode == "community" then
     uciout:set("qmp","roaming","ignore","1")
@@ -418,6 +443,9 @@ function nodemode.write(self, section, value)
   uciout:set("qmp","interfaces","lan_devices",lan_devices)
   uciout:set("qmp","interfaces","wan_devices",wan_devices)
   uciout:set("qmp","interfaces","mesh_devices",mesh_devices)
+
+  local country = wcountry:formvalue(section)
+  uciout:set("qmp", "wireless", "country", country)
 
   uciout:commit("qmp")
   apply()

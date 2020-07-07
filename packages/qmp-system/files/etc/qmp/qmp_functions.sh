@@ -98,29 +98,44 @@ qmp_set_vlan() {
 }
 
 qmp_get_virtual_iface() {
-  local device="$1"
-  local viface=""
+	local device="$1"
+	local viface=""
 
-	# is lan?
+	# Is it the br-lan interface?
 	if [ "$device" == "br-lan" ]; then
 		viface="lan"
 		if [ ! -e "/sys/class/net/$device/phy80211" ]; then
 			echo $viface
 			return
 		fi
-  	fi
+	fi
 
+	# Is it in the LAN bridge, and not wireless?
 	for l in $(qmp_get_devices lan); do
 		if [ "$l" == "$device" ]; then
 			viface="lan"
 			if [ ! -e "/sys/class/net/$device/phy80211" ]; then
+				qmp_log "LOG: 5"
+				qmp_log "Viface: $viface"
+				qmp_log $device $viface
 				echo $viface
 				return
 			fi
 		fi
 	done
 
-	[ ! -e "/sys/class/net/$device/phy80211" ] && [ -n "$viface" ] && { echo $viface; return; }
+	qmp_log "LOG: 6"
+	qmp_log "Viface: $viface"
+	qmp_log $device $viface
+
+	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
+		echo $viface;
+		qmp_log "LOG: 7"
+		qmp_log "Viface: $viface"
+		qmp_log $device $viface
+		echo "$viface"
+		return;
+	}
 
 	# id_char is the first char of the device: [e]th0 [w]lan1a
 	local id_char=$(echo $device | cut -c 1)
@@ -129,28 +144,29 @@ qmp_get_virtual_iface() {
 	# id_extra are the extra characters after the number: eth0[], wlan1[a]
 	local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
 
-	# is wan?
+	# It it a WAN device?
 	for w in $(qmp_get_devices wan); do
 		if [ "$w" == "$device" ]; then
 			viface="wan_${id_char}${id_num}"
+			qmp_log "LOG: 8"
+			qmp_log "Viface: $viface"
+			qmp_log $device $viface
 			echo $viface
 			return
 		fi
 	done
 
-	qmp_log "LOG: 5"
-		qmp_log "Viface: $viface"
-
-qmp_log $device $viface
-	# is mesh?
+	# Is it mesh?
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
 			viface="mesh_${id_char}${id_num}${id_extra}"
-			break
+			qmp_log "LOG: 8"
+			qmp_log "Viface: $viface"
+			qmp_log $device $viface
+			echo "$viface"
+			return
 		fi
 	done
-
-	echo "$viface"
 }
 
 # arg1=<mesh|lan|wan>, returns the devices which have to be configured in such mode
@@ -888,9 +904,9 @@ qmp_configure_initial() {
 	qmp_hooks_exec firstboot
 	qmp_configure_wifi_initial
 	qmp_configure_wifi
-	/etc/init.d/network restart
 	/etc/init.d/network reload
-	sleep 1
+	/etc/init.d/network restart
+	sleep 5 # Let WiFi devices start up
 	qmp_configure_smart_network
 }
 

@@ -30,15 +30,12 @@ reset_wifi() {
 }
 
 configure_wifi() {
+	# Configure WiFi on qMp config file
 	qmp_configure_wifi_initial
+	# Configure WiFi on OpenWrt config file
 	qmp_configure_wifi
+	# Configure the whole network to apply wifi settings
 	configure_network
-	/etc/init.d/network restart
-	/etc/init.d/network reload
-	if /etc/init.d/gwck enabled
-	then
-		/etc/init.d/gwck restart
-	fi
 }
 
 configure_gw() {
@@ -52,8 +49,9 @@ apply_services() {
 configure_network() {
 	qmp_configure
 	qmp_bmx6_reload
-	/etc/init.d/network restart
 	/etc/init.d/network reload
+	/etc/init.d/network restart
+	sleep 5 # Let WiFi devices start up
 	if /etc/init.d/gwck enabled
 	then
 		/etc/init.d/gwck restart
@@ -104,7 +102,8 @@ hard_reboot() {
 configure_all() {
 	configure_system
 	configure_wifi
-	configure_network
+	# configure_wifi just called configure_network immediately before
+	# configure_network
 }
 
 safe_apply() {
@@ -164,7 +163,7 @@ help() {
 	echo "Safe configuration:"
 	echo " save_state			: Saves current state of configuration files"
 	echo " recover_state			: Recovers previous saved state"
-	echo " safe_apply			: Performs a safe configure_all. If something wrong it comes back to old state"
+	echo " safe_apply			: Performs a safe configure_all. If something goes wrong, it comes back to the previous state"
 
 	echo ""
 	echo "Gateways:"
@@ -180,7 +179,7 @@ help() {
 	echo " enable_ns_xm_ppt		: Enable PoE passtrough from NanoStation XM M2/M5 devices. Be careful with this option!"
 	echo " enable_ns_xw_ppt		: Enable PoE passtrough from NanoStation XW M2/M5 devices. Be careful with this option!"
 	echo " upgrade [URL]			: Upgrade system. By default to the last version, but image url can be provided to force"
-	echo " hard_reboot				: Performs a hard reboot (using kernel sysrq)"
+	echo " hard_reboot			: Performs a hard reboot (using kernel sysrq)"
 
 	echo ""
 	exit 0

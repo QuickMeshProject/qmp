@@ -24,6 +24,23 @@ local uci = luci.model.uci.cursor()
 local qmpinfo = require "qmpinfo"
 local util = require "luci.util"
 
+devices = qmpinfo.get_devices()
+
+devname = uci:get("qmp","node","device_name")
+devid = uci:get("qmp","node","device_id")
+meshname = uci:get("qmp","node","mesh_name")
+
+if (devname == nil or devname == '') then
+  devname = "qMp"
+end
+
+if (devid == nil or devid == '') then
+  devid = "0000"
+end
+
+if (meshname == nil or meshname == '') then
+  meshname = "GS"
+end
 
 m = Map("qmp", "qMp node settings", translate("This page allows to configure the basic node settings, like the device identification, location and contact details.") .. "<br/> <br/>" .. translate("You can check the on-line documentation at <a href=\"https://www.qmp.cat/Web_interface\">https://www.qmp.cat/Web_interface</a> for more information about the different options."))
 
@@ -36,7 +53,6 @@ device_name.optional = false
 device_name.rmempty = false
 device_name.default = "qMp"
 
-
 community_name = device_section:option(Value, "community_name", translate ("Community Network name"), translate("Select a predefined community network from the list, type your own name or leave it blank."))
 community_name.datatype="string"
 community_name:value("Bogotá Mesh","Bogotá Mesh")
@@ -47,27 +63,42 @@ community_name:value("NYCMesh","NYC Mesh")
 guifimesh_name = device_section:option(Value, "mesh_name", translate ("Mesh Network name"), translate("Select a predefined community subnetwork or type your own name (optional)."))
 guifimesh_name:depends("community_name","Guifi.net")
 guifimesh_name.datatype="string"
-guifimesh_name:value("GuifiBaix", "Baix Llobregat (GuifiBaix)")
-guifimesh_name:value("Bellvitge", "Bellvitge (HW)")
-guifimesh_name:value("GraciaSenseFils", "Gràcia Sense Fils (GSF)")
-guifimesh_name:value("PoblenouSenseFils", "Poblenou Sense Fils (P9SF)")
-guifimesh_name:value("Quesa", "Quesa (QUESA)")
-guifimesh_name:value("Raval", "Raval (RAV)")
-guifimesh_name:value("GuifiSants", "Sants-Les Corts-UPC (GS)")
-guifimesh_name:value("SantAndreu", "Sant Andreu (SAND)")
-guifimesh_name:value("Vallcarca", "Vallcarca (VKK)")
-guifimesh_name:value("Herguijuela", "La Herguijuela (LHer)")
-guifimesh_name:value("CepedaLaMora", "Cepeda la Mora (CPD)")
+guifimesh_name.default="GS"
+guifimesh_name:value("GB", "Baix Llobregat - GuifiBaix (GB)")
+guifimesh_name:value("HW", "Bellvitge (HW)")
+guifimesh_name:value("GSF", "Gràcia Sense Fils (GSF)")
+guifimesh_name:value("P9SF", "Poblenou Sense Fils (P9SF)")
+guifimesh_name:value("QS", "Quesa (QS)")
+guifimesh_name:value("RAV", "Raval (RAV)")
+guifimesh_name:value("GS", "GuifiSants-Les Corts-UPC (GS)")
+guifimesh_name:value("SAND", "Sant Andreu (SAND)")
+guifimesh_name:value("VV", "Vallcarca (VKK)")
+guifimesh_name:value("LHER", "La Herguijuela (LHER)")
+guifimesh_name:value("CPD", "Cepeda la Mora (CPD)")
 
-device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use alphanumeric characters only, without spaces or symbols."))
+prepend_cnm = device_section:option(Flag, "prepend_cnm", translate("Prepend mesh ID"),translatef("Prepend the mesh network ID to the device name (e.g., %s-%s-%s)", meshname, devname, devid))
+prepend_cnm:depends("community_name","Guifi.net")
+prepend_cnm.default = 1
+prepend_cnm.optional = false
+prepend_cnm.rmempty = false
+
+device_id = device_section:option(Value,"device_id", translate("Device ID"), translate("The ID of this device in the mesh network (optional). Use hexadecimal characters only."))
 device_id:depends("community_name","Guifi.net")
 device_id.datatype = "string"
-device_id.optional = true
+device_id.optional = false
 device_id.rmempty = false
 
-devices = qmpinfo.get_devices()
+append_id = device_section:option(Flag, "append_id", translate("Append ID"),translatef("Append the device ID to the device name (e.g., %s-%s)", devname, devid))
+append_id:depends("community_name","Guifi.net")
+append_id.default = 1
+append_id.optional = false
+append_id.rmempty = false
 
-primary_device = device_section:option(Value,"primary_device", translate("Primary network interface"), translate("The name of the node's primary network interface. The last four digits of this device's MAC address will be appended to the node name."))
+
+interface_section = m:section(NamedSection, "node", "qmp", translate("Primary interface"), translate("The following setting is used to auto-configure internal aspects of your device."))
+interface_section.addremove = False
+
+primary_device = interface_section:option(Value,"primary_device", translate("Primary network interface"), translate("The name of the node's primary network interface. The last four digits of this device's MAC address will be appended to the node name."))
 primary_device.datatype = "network"
 primary_device.optional = false
 primary_device.rmempty = false

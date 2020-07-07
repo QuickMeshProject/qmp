@@ -52,19 +52,24 @@ stop_services() {
 prepare_wifi() {
 	i=0
 	radios=$(uci show wireless | grep wireless\.radio.*wifi-device -c)
+	log "Detected $radios WiFi device(s)"
 	while [ $i -lt $radios ]; do
+		log "Enabling radio${i}"
 		uci set wireless.radio${i}.disabled="0" 2>/dev/null
 		uci set wireless.radio${i}.country="$country" 2>/dev/null
 		i=$(($i+1))
 	done
 
 	uci commit wireless
+	log "Enabling WiFi and waiting 10 seconds to come up..."
 	wifi up
 	sleep 10
+	log ""
 
-	log WiFi devices:
+
+	log "Detected WiFi devices:"
 	log --------------------------------------------------
-	log $(iwinfo)
+	log "$(iwinfo)"
 	log --------------------------------------------------
 }
 
@@ -72,60 +77,79 @@ configure() {
 	stop_services
 	log Redirecting stderr to $QMP_LOG
 	exec 2>>$QMP_LOG 1>&2
-	log Starting qmp configuration...
-	log Waiting 10 seconds to be sure all is configured
-	sleep 10
+	log "[Starting qMp autoconfiguration]"
+	log "Waiting 15 seconds to make sure everything else is ready..."
+	sleep 15
+	log "... done!"
+	log ""
 
-	log "[Preparing wifi]"
+	log "[WiFi devices detection]"
 	country="$(uci get qmp.wireless.country 2>/dev/null)"
-	country="${country:-00}"
-	log Using countrycode $country
+	country="${country:-US}"
+	log "Using country code $country."
+	log "Preparing wifi devices"
 	prepare_wifi
+	log "... done!"
+	log ""
 
 	# Execute birth hooks if it is the first boot of the device
+	log "[Birth hooks]"
 	[ ! -e "$BIRTH_FILE" ] && exechooks birth && touch "$BIRTH_FILE"
+	log "... done!"
+	log ""
 
 	# Configure system and reboot
+	log "[Loading qMp functions]"
 	. $QMP_DIR/qmp_functions.sh
-	log "[Configuring initial system]"
-	qmp_configure_initial
-	log "[Configuring full system]"
-	qmp_configure
+	log "... done!"
+	log ""
 
-	log Rebooting
+	log "[Initial qMp system configuration]"
+	qmp_configure_initial
+	log "... done!"
+	log ""
+
+	log "[Full qMp system configuration]"
+	qmp_configure
+	log "... done!"
+	log ""
+
+	log "[Finishing qMp autoconfiguration]"
 	touch "$CONTROL_FILE"
-	[ -f "$CONTROL_FILE" ] && reboot || log CRITICAL, cannot write file $CONTROL_FILE
+	[ -f "$CONTROL_FILE" ] && log "Rebooting..." && reboot || log "CRITICAL ERROR, cannot write file $CONTROL_FILE"
 }
 
-# This function is executed in each boot
+# This function is executed on each boot
 startup() {
 	# Set HostName
 	. $QMP_DIR/qmp_system.sh
 	qmp_set_hosts
 	[ $(qmp_uci_get services.bwtest) -eq 1 ] && qmp_enable_netserver
-	
+
 	# Run hooks
 	exechooks anyboot
 
 	# Generate current qmp key
 	logread | md5sum | awk '{print $1}' > $QMP_KEY
 
-	# Start firewall 
+	# Start firewall
 	sh /etc/firewall.user
 }
 
 start() {
 	if [ ! -e "$CONTROL_FILE" ]; then
+		echo "qMp is not configured. Starting autoconfiguration..."
+		echo ""
 		configure
 	else
-		echo "qMp already configured. Remove $CONTROL_FILE to force reconfiguration"
+		echo "qMp is already configured. Delete file $CONTROL_FILE to force reconfiguration."
 	fi
 
 	startup
 }
 
 stop() {
-	log Nothing to do
+	log "Nothing to do"
 }
 
 restart() {

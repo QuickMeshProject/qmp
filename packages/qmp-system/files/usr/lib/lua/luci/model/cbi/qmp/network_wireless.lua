@@ -57,7 +57,7 @@ if cl and #cl > 0 then
   end
 
 else
-  s_wireless_main:option(Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes2."))
+  s_wireless_main:option(Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes."))
 end
 
 -- BSSID

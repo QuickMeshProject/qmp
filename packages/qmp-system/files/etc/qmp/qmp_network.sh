@@ -306,9 +306,17 @@ qmp_configure_lan() {
   # Attaching LAN devices to br-lan
   local device
   for device in $(qmp_get_devices lan) ; do
-      # Do not attach to br-lan wireless devices, they do it themselves
-      # somewhere else via /etc/config/wireless
-      if ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
+    echo " -> LAN device $device"
+      qmp_log "Current wifi devices:"
+      for ldev in $(qmp_get_wifi_devices); do
+        qmp_log ${ldev}
+      done
+      if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] ; then
+        # Do not attach to br-lan wireless devices, they do it themselves
+        # somewhere else via /etc/config/wireless
+        echo " -> Wireless device $device is attached automatically"
+      else
+        echo " -> Attaching device $device to br-lan"
         qmp_attach_device_to_interface $device lan
         qmp_set_mss_clamping_and_masq $device remove
       fi
@@ -339,7 +347,7 @@ qmp_configure_mesh() {
 	qmp_uci_test qmp.networks.mesh_protocol_vids; then
 
 	for dev in $(qmp_get_devices mesh); do
-		echo "Configuring "$dev" for Meshing"
+		echo "Configuring "$dev" for meshing"
 
 		# Check if the current device is configured as no-vlan
 		local use_vlan=1
@@ -355,9 +363,6 @@ qmp_configure_mesh() {
 		for protocol_vid in $protocol_vids; do
 			local protocol_name="$(echo $protocol_vid | awk -F':' '{print $1}')"
 			local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
-
-			# if no vlan is specified do not use vlan
-			[ -z "$vid" ] && vid=1 && use_vlan=0
 
 			# if no vlan is specified do not use vlan
 			[ -z "$vid" ] && vid=1 && use_vlan=0
@@ -410,17 +415,18 @@ qmp_configure_rescue_ip_device() {
 	local dev="$1"
 	local viface="$2"
 
-	if qmp_is_in "$dev" $(qmp_get_devices wan) || [ "$dev" == "br-lan" ]; then
-    echo "WAN_OR_LAN"
-		# If it is WAN or LAN
-		qmp_configure_rescue_ip $dev ${viface}_rescue
-    if qmp_is_in "$dev" $(qmp_get_devices wan) ; then
-		    #qmp_attach_device_to_interface $dev ${viface}_rescue
-        qmp_attach_device_to_interface $dev $viface
-      fi
+  echo "Configuring rescue IP for device $dev, with viface $viface."
+
+  if qmp_is_in "$dev" $(qmp_get_devices wan); then
+    echo " -> Device has WAN role"
+    qmp_configure_rescue_ip $dev ${viface}_rescue
+    #qmp_attach_device_to_interface $dev ${viface}_rescue
+    qmp_attach_device_to_interface $dev $viface
+  elif [ "$dev" == "br-lan" ]; then
+    echo " -> Device is br-lan"
+    qmp_configure_rescue_ip $dev ${viface}_rescue
 	elif qmp_is_in "$dev" $(qmp_get_devices mesh) && [ "$dev" != "br-lan" ]; then
-    echo "MESH_NOT_LAN"
-		# If it is only mesh device
+    echo " -> Device has mesh role and is not br-lan"
 		qmp_configure_rescue_ip $dev
 		qmp_attach_device_to_interface $dev $viface
 	fi
