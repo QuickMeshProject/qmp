@@ -308,7 +308,9 @@ qmp_configure_lan() {
   for device in $(qmp_get_devices lan) ; do
     echo " -> LAN device $device"
       qmp_log "Current wifi devices:"
-      qmp_log $(qmp_get_wifi_devices)
+      for ldev in $(qmp_get_wifi_devices); do
+        qmp_log ${ldev}
+      done
       if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] ; then
         # Do not attach to br-lan wireless devices, they do it themselves
         # somewhere else via /etc/config/wireless

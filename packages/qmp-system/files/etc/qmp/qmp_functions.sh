@@ -124,7 +124,18 @@ qmp_get_virtual_iface() {
 		fi
 	done
 
-	[ ! -e "/sys/class/net/$device/phy80211" ] && [ -n "$viface" ] && { echo $viface; return; }
+	qmp_log "LOG: 6"
+	qmp_log "Viface: $viface"
+	qmp_log $device $viface
+
+	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
+		echo $viface;
+		qmp_log "LOG: 7"
+		qmp_log "Viface: $viface"
+		qmp_log $device $viface
+		echo "$viface"
+		return;
+	}
 
 	# id_char is the first char of the device: [e]th0 [w]lan1a
 	local id_char=$(echo $device | cut -c 1)
@@ -137,7 +148,7 @@ qmp_get_virtual_iface() {
 	for w in $(qmp_get_devices wan); do
 		if [ "$w" == "$device" ]; then
 			viface="wan_${id_char}${id_num}"
-			qmp_log "LOG: 6"
+			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
 			qmp_log $device $viface
 			echo $viface
@@ -149,7 +160,7 @@ qmp_get_virtual_iface() {
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
 			viface="mesh_${id_char}${id_num}${id_extra}"
-			qmp_log "LOG: 7"
+			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
 			qmp_log $device $viface
 			echo "$viface"
