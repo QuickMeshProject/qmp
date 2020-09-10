@@ -32,7 +32,7 @@ QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
 QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
 QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
-QMP_RELEASE?=4.2.3
+QMP_RELEASE?=4.2.4
 QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
 QMP_CODENAME?=Macondo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
