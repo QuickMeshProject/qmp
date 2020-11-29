@@ -54,9 +54,7 @@ define Package/qmp-small-node
   DEPENDS:= +qmp-tiny-node \
 	+tcpdump-mini +mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
-	+libremap-agent +luci-lib-libremap-contact +luci-lib-libremap-wireless \
-	+luci +luci-lib-libremap-system +luci-lib-libremap-location \
-	+luci-lib-libremap-bmx6 +luci-lib-libremap-qmp +bmx6-mdns
+	+luci +bmx6-mdns
 endef
 
 define Package/qmp-small-node/description
@@ -65,7 +63,6 @@ define Package/qmp-small-node/description
   - BMX6 routing protocol
   - Full LuCI web interface
   - IP/TCP utils
-  - LibreMap
   - SNMP and Munin
   - IP over IP tunneling support
 
