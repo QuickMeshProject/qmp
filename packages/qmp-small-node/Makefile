@@ -53,8 +53,7 @@ define Package/qmp-small-node
   URL:=https://qmp.cat
   DEPENDS:= +qmp-tiny-node \
 	+tcpdump-mini +mtr +netperf +luci-mod-admin-full \
-	+munin-mesh +mini_snmpd +cgi-bin-zero +ipip +kmod-ipip +kmod-gre \
-	+luci +bmx6-mdns
+	+munin-mesh +mini_snmpd +cgi-bin-zero +luci +bmx6-mdns
 endef
 
 define Package/qmp-small-node/description
