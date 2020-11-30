@@ -624,7 +624,9 @@ qmp_configure_wifi_initial() {
 	#Changing to configured countrycode
 	iw reg set $(qmp_uci_get wireless.country)
 
+	qmp_log "[Getting wifi mac devices]"
 	macs="$(qmp_get_wifi_mac_devices | uniq)"
+	qmp_log "${macs}"
 
 	#Looking for configured devices
 	id_configured=""

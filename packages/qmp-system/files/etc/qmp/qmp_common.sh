@@ -192,6 +192,7 @@ qmp_get_wifi_devices() {
 qmp_get_wifi_mac_devices() {
 	for device in $(qmp_get_wifi_devices)
 	do
+		qmp_log "[Device ${device} in qmp_get_wifi_mac_devices]"
 		if [ -s "/sys/class/net/$device/phy80211/macaddress" ]
 		then
 			cat "/sys/class/net/$device/phy80211/macaddress"
@@ -210,6 +211,7 @@ qmp_get_dev_from_mac() {
 # Returns the mac address of the device
 # qmp_get_mac_for_dev eth0
 qmp_get_mac_for_dev() {
+	qmp_log "[qmp_get_mac_for_dev $1]"
 	mac="$(cat /sys/class/net/$1/address)"
 	[ -z "$mac" ] && mac="00:00:00:00:00:00"
 	echo "$mac"

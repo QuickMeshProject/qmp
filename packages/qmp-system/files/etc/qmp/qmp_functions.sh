@@ -902,8 +902,12 @@ qmp_check_force_internet() {
 }
 
 qmp_configure_initial() {
+	qmp_log "[Executing firstboot hooks]"
 	qmp_hooks_exec firstboot
+	qmp_log "... done!"
+	qmp_log "[Executing initial wifi configuration]"
 	qmp_configure_wifi_initial
+	qmp_log "... done!"
 	qmp_configure_wifi
 	/etc/init.d/network reload
 	/etc/init.d/network restart
