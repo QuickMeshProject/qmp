@@ -180,7 +180,7 @@ qmp_get_wifi_devices() {
 
 
 	# Actual fix for #481, using ubus
-	ubus_network_wireless=$(ubus call network.wireless status | jsonfilter -e '@.*.interfaces.*.section')
+	ubus_network_wireless=$(ubus call network.wireless status | jsonfilter -e '@.*.interfaces.*.ifname')
 
 	for i in $ubus_network_wireless; do
 		! qmp_is_in $i $proc_net_wireless && ! qmp_is_in $i $sys_class_net && echo $i
