@@ -206,9 +206,23 @@ qmp_configure_smart_network() {
 	local default_lan=$(qmp_get_openwrt_default_network "lan")
 	local default_wan=$(qmp_get_openwrt_default_network "wan")
 
+	echo "Default device network:"
+	echo "- LAN $default_lan"
+	echo "- WAN $default_wan"
+
 	[ "$force" != "force" ] && {
 		ignore_devs="$(qmp_uci_get interfaces.ignore_devices)"
 	}
+
+	# Wait up to 15 seconds for $default_lan and $default_wan devices to appear in
+	# /sys/class/net (fixes bug #484 affecting slow devices with switched eth0.1).
+	for deflw in $default_lan $default_wan; do
+		for i in $(seq 0 14); do
+			[ -e /sys/class/net/$deflw ] && break
+			echo "Waiting for $deflw...  (${i})"
+			sleep 1
+		done
+	done
 
 	for dev in $(ls /sys/class/net/); do
 		[ -e /sys/class/net/$dev/device ] || [ dev == "eth0" ] && {
