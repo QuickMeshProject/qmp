@@ -384,59 +384,80 @@ qmp_configure_mesh() {
       qmp_set_vlan $dev $vid $viface
 			}
 
-      dev="$(echo $dev | sed -r 's/\./_/g')"
+      devu="$(echo $dev | sed -r 's/\./_/g')"
 			# Configure IPv6 address only if mesh_prefix48 is defined (bmx6 does not need it)
 			if qmp_uci_test qmp.networks.${protocol_name}_mesh_prefix48; then
 				local ip6="$(qmp_get_ula96 $(uci get qmp.networks.${protocol_name}_mesh_prefix48):: $primary_mesh_device $ip6_suffix 128)"
 				echo "Configuring $ip6 for $protocol_name"
-				qmp_uci_set_raw network.${dev}_$vid.proto=static
-				qmp_uci_set_raw network.${dev}_$vid.ip6addr="$ip6"
+				qmp_uci_set_raw network.${devu}_$vid.proto=static
+				qmp_uci_set_raw network.${devu}_$vid.ip6addr="$ip6"
 			else
-				qmp_uci_set_raw network.${dev}_$vid.proto=none
-				qmp_uci_set_raw network.${dev}_$vid.auto=1
+				qmp_uci_set_raw network.${devu}_$vid.proto=none
+				qmp_uci_set_raw network.${devu}_$vid.auto=1
 			fi
 		done
 
-    # Rescue IPs are no longer needed since all the interfaces have link-local
-    # IPv6 address. However, the radios must be "assigned" to some interface to
-    # bring them up; otherwise the VLAN interface on top of the radio interface
-    # can't be brought up
-    if ! ( [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ); then
-      local wireless_network="$(uci get wireless.${dev}.network)"
-        if [ -z "$wireless_network" ]; then
-          qmp_configure_rescue_ip_device "$dev" "$viface"
-        else
-          qmp_configure_rescue_ip_device "$dev" "$wireless_network"
+    # Rescue IPs are no longer needed for wired devices with LAN or WAN roles,
+    # since they'll have a link-local IPv6 address. However, if they only have
+    # MESH role, or for wireless devices, they must be assigned to some logical
+    # interface so that they can be brought up and eventually put a VLAN on top
+    for i in $(seq 0 5); do
+      if [ -e "/sys/class/net/$dev" ]; then
+        if [ -e "/sys/class/net/$dev/phy80211" ] && ! [ -z "$(uci get wireless.${dev}.network)" ]; then
+          local wireless_network="$(uci get wireless.${dev}.network)"
+          if [ -z "$wireless_network" ]; then
+            qmp_log "Wifi!"
+            viface="$(uci get wireless.${dev}.network)"
+          fi
         fi
-    fi
+        break;
+      else
+        echo "Waiting for $dev...  (${i})"
+        sleep 1
+      fi
+    done
+
+    qmp_add_logical_interface "$dev" "$viface"
+
 		counter=$(( $counter + 1 ))
 	done
 	fi
 }
 
 # rescue IP configuration functions
-
-qmp_configure_rescue_ip_device() {
+qmp_add_logical_interface() {
 	local dev="$1"
 	local viface="$2"
 
   echo "Configuring rescue IP for device $dev, with viface $viface."
 
   if qmp_is_in "$dev" $(qmp_get_devices wan); then
-    echo " -> Device has WAN role"
-    qmp_configure_rescue_ip $dev ${viface}_rescue
-    #qmp_attach_device_to_interface $dev ${viface}_rescue
-    qmp_attach_device_to_interface $dev $viface
-  elif [ "$dev" == "br-lan" ]; then
-    echo " -> Device is br-lan"
-    qmp_configure_rescue_ip $dev ${viface}_rescue
+    echo " -> Device has WAN role, will get IPv6 link-local address by default"
+    # qmp_configure_rescue_ip $dev ${viface}_rescue
+    # qmp_attach_device_to_interface $dev $viface
+elif qmp_is_in "$dev" $(qmp_get_devices lan) || [ "$dev" == "br-lan" ] || [ "$viface" == "br-lan" ]; then
+    echo " -> Device has LAN role, will get IPv6 link-local address by default"
+    # qmp_configure_rescue_ip $dev ${viface}_rescue
 	elif qmp_is_in "$dev" $(qmp_get_devices mesh) && [ "$dev" != "br-lan" ]; then
-    echo " -> Device has mesh role and is not br-lan"
-		qmp_configure_rescue_ip $dev
+    echo " -> Device has MESH role, not LAN nor WAN"
+		qmp_configure_option_auto $dev
 		qmp_attach_device_to_interface $dev $viface
 	fi
 }
 
+qmp_configure_option_auto() {
+	local device=$1
+	[ -z "$device" ] && return 1
+
+	local viface="${2:-$(qmp_get_virtual_iface $device)}"
+
+	local conf="network"
+	uci set $conf.${viface}="interface"
+	uci set $conf.${viface}.auto="1"
+	uci commit $conf
+}
+
+# Legacy function
 qmp_configure_rescue_ip() {
 	local device=$1
 	[ -z "$device" ] && return 1
@@ -457,6 +478,7 @@ qmp_configure_rescue_ip() {
 	uci commit $conf
 }
 
+# Legacy function
 qmp_get_rescue_ip() {
 	local device=$1
 	local mac=""
