@@ -117,8 +117,8 @@ qmp_get_virtual_iface() {
 			if [ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
 				qmp_log "LOG: 5"
 				qmp_log "Viface: $viface"
-				qmp_log $device $viface
-				qmp_log $(qmp_get_wifi_devices)
+				qmp_log "${device} ${viface}"
+				qmp_log "$(qmp_get_wifi_devices)"
 				echo $viface
 				return
 			fi
@@ -127,13 +127,13 @@ qmp_get_virtual_iface() {
 
 	qmp_log "LOG: 6"
 	qmp_log "Viface: $viface"
-	qmp_log $device $viface
+	qmp_log "${device} ${viface}"
 
 	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
 		echo $viface;
 		qmp_log "LOG: 7"
 		qmp_log "Viface: $viface"
-		qmp_log $device $viface
+		qmp_log "${device} ${viface}"
 		echo "$viface"
 		return;
 	}
@@ -151,7 +151,7 @@ qmp_get_virtual_iface() {
 			viface="wan_${id_char}${id_num}"
 			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "${device} ${viface}"
 			echo $viface
 			return
 		fi
@@ -163,7 +163,7 @@ qmp_get_virtual_iface() {
 			viface="mesh_${id_char}${id_num}${id_extra}"
 			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "${device} ${viface}"
 			echo "$viface"
 			return
 		fi
