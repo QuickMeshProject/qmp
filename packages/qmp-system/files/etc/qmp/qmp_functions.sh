@@ -138,12 +138,12 @@ qmp_get_virtual_iface() {
 		return;
 	}
 
-	# id_char is the first char of the device: [e]th0 [w]lan1a
+	# id_char is the first char of the device: [e]th0, [w]lan1a, [e]th1.2
 	local id_char=$(echo $device | cut -c 1)
-	# id_num is the number of the device: eth[0], wlan[1]a
+	# id_num is the number of the device: eth[0], wlan[1]a, [e1_2] in eth1.2
 	local id_num=$(echo $device | tr -d "[A-z]" | tr - _ | tr . _)
-	# id_extra are the extra characters after the number: eth0[], wlan1[a]
-	local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
+	# id_extra are the extra characters after the number: eth0[], wlan1[a], eth1.2[]
+	local id_extra=$(echo $device | tr -d . | sed -e 's/^[a-z]*[0-9]*//g')
 
 	# It it a WAN device?
 	for w in $(qmp_get_devices wan); do
@@ -161,7 +161,7 @@ qmp_get_virtual_iface() {
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
 			viface="mesh_${id_char}${id_num}${id_extra}"
-			qmp_log "LOG: 8"
+			qmp_log "LOG: 9"
 			qmp_log "Viface: $viface"
 			qmp_log "${device} ${viface}"
 			echo "$viface"
