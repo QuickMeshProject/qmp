@@ -191,7 +191,7 @@ qmp_get_devices() {
 
 
 # Scan and configure the network devices (lan, mesh and wan)
-# if $1 is set to "force", it rescan all devices
+# if $1 is set to "force", it rescans all devices
 qmp_configure_smart_network() {
 	echo "---------------------------------------"
 	echo "Starting smart networking configuration"
