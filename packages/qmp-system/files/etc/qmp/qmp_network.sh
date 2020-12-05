@@ -441,7 +441,7 @@ qmp_add_logical_interface() {
     echo " -> Device has LAN role, will get IPv6 link-local address by default"
     # qmp_configure_rescue_ip $dev ${viface}_rescue
   fi
-	if qmp_is_in "$dev" $(qmp_get_devices mesh) && ! qmp_is_in "$dev" $(qmp_get_devices wan) &&  qmp_is_in "$dev" $(qmp_get_devices lan) && [ "$dev" != "br-lan" ] || [ -e "/sys/class/net/$dev/phy80211" ]; then
+	if qmp_is_in "$dev" $(qmp_get_devices mesh) && ! qmp_is_in "$dev" $(qmp_get_devices wan) &&  ! qmp_is_in "$dev" $(qmp_get_devices lan) && [ "$dev" != "br-lan" ] || [ -e "/sys/class/net/$dev/phy80211" ]; then
     echo " -> Device has MESH role and not in LAN or WAN, or is WiFi"
 		qmp_configure_option_auto $dev
 		qmp_attach_device_to_interface $dev $viface
