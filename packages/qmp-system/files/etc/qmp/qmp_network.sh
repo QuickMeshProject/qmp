@@ -34,7 +34,7 @@ qmp_set_mss_clamping_and_masq() {
 
 # Prepare config files
 qmp_configure_prepare_network() {
-	local toRemove="$(uci show network | egrep "network.(lan|wan|mesh_).*=(interface|device)" | cut -d. -f2 | cut -d= -f1)"
+	local toRemove="$(uci show network | egrep "network.(lan|wan|mesh_).*=(interface|device)" | cut -d. -f2 | cut -d= -f1 | egrep -v ".?an_eth.?*_dev")"
 	qmp_log "Removing current network configuration"
 	for i in $toRemove; do
 		uci del network.$i
