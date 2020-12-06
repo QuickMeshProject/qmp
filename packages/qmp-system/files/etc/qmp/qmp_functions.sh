@@ -923,6 +923,7 @@ qmp_configure_initial() {
 	qmp_configure_wifi_initial
 	qmp_log "... done!"
 	qmp_configure_wifi
+	wifi
 	/etc/init.d/network reload
 	/etc/init.d/network restart
 	sleep 5 # Let WiFi devices start up
