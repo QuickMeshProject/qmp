@@ -307,21 +307,24 @@ qmp_configure_lan() {
   local device
   for device in $(qmp_get_devices lan) ; do
     echo " -> LAN device $device"
-      qmp_log "Current wifi devices (with qmp_get_wifi_devices()):"
-      for ldev in $(qmp_get_wifi_devices); do
-        qmp_log "${ldev}"
-      done
-      qmp_log "Current network devices (with ls /sys/class/net):"
-      qmp_log "$(ls /sys/class/net)"
-      if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] ; then
-        # Do not attach to br-lan wireless devices, they do it themselves
-        # somewhere else via /etc/config/wireless
-        echo " -> Wireless device $device is attached automatically"
-      else
-        echo " -> Attaching device $device to br-lan"
-        qmp_attach_device_to_interface $device lan
-        qmp_set_mss_clamping_and_masq $device remove
-      fi
+    for i in $(seq 0 14); do
+      [ -e /sys/class/net/$device ] && break
+      echo "Waiting for $device...  (${i})"
+      sleep 1
+    done
+
+    qmp_log "Current wifi devices (with qmp_get_wifi_devices()):"
+    qmp_log "$(qmp_get_wifi_devices)"
+
+    if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] ; then
+      # Do not attach to br-lan wireless devices, they do it themselves
+      # somewhere else via /etc/config/wireless
+      echo " -> Wireless device $device will be attached automatically via /etc/config/wireless"
+    else
+      echo " -> Attaching device $device to br-lan"
+      qmp_attach_device_to_interface $device lan
+      qmp_set_mss_clamping_and_masq $device remove
+    fi
   done
 }
 
