@@ -400,7 +400,6 @@ qmp_configure_mesh() {
     # since they'll have a link-local IPv6 address. However, if they only have
     # MESH role, or for wireless devices, they must be assigned to some logical
     # interface so that they can be brought up and eventually put a VLAN on top
-    qmp_log " -----> Reloading WiFi... $(wifi)"
     for i in $(seq 0 10); do
       if [ -e "/sys/class/net/$dev" ]; then
         echo " -----> Device $dev found"
