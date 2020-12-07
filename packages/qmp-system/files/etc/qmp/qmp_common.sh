@@ -160,32 +160,39 @@ qmp_debug() {
 # Networking and Wifi related commands
 #######################################
 
-# Returns the names of the wifi devices from the system
+# Returns the names of the wifi devices in the system, one per line
 qmp_get_wifi_devices() {
+
 	# Legacy code, sometimes not reporting all the interfaces as they take some time to appear there
-	proc_net_wireless=$(awk 'NR>2 { gsub(/:$/,"",$1); print $1 }' /proc/net/wireless | grep -v -e "wlan[0-9]-[0-9]" | sort -u)
-
-
-	# Initial fix for #481, but some devices would still fail
-	sys_class_net=""
+	local proc_net_wireless=$(awk 'NR>2 { gsub(/:$/,"",$1); print $1 }' /proc/net/wireless | grep -v -e "wlan[0-9]-[0-9]" | sort -u)
+	# Initial fix for #481, but some devices would still fail. Gather devices from /sys/class/net
+	local sys_class_net
 	for i in $(ls /sys/class/net/); do
 			[ -e /sys/class/net/${i}/phy80211 ] && sys_class_net="${sys_class_net} ${i}"
 	done
-
-	echo $proc_net_wireless
-
-	for i in $sys_class_net; do
-		! qmp_is_in $i $proc_net_wireless && echo $i
-	done
-
-
 	# Actual fix for #481, using ubus
-	ubus_network_wireless=$(ubus call network.wireless status | jsonfilter -e '@.*.interfaces.*.section')
+	local ubus_network_wireless=$(ubus call network.wireless status | jsonfilter -e '@.*.interfaces.*.ifname')
+	# Last, fetch those devices in /etc/config/wireless
+	local uci_show_wireless=$(uci show wireless | grep wireless\..*\.ifname | cut -d '=' -f 2 | tr -d "'")
 
+	# Print the devices gotten from /proc/net/wireless
+	for i in $proc_net_wireless; do
+		echo $i
+	done
+	# Print the remaining devices gotten from /sys/class/net
+	for i in $sys_class_net; do
+		! qmp_is_in $i $proc_net_wireless && echo "$i"
+	done
+	# Print the remaining devices gotten from ubus
 	for i in $ubus_network_wireless; do
-		! qmp_is_in $i $proc_net_wireless && ! qmp_is_in $i $sys_class_net && echo $i
+		! qmp_is_in $i $proc_net_wireless && ! qmp_is_in $i $sys_class_net && echo "$i"
+	done
+	# Print the remaining devices gotten from /etc/configc/wireless
+	for i in $uci_show_wireless; do
+		! qmp_is_in $i $proc_net_wireless && ! qmp_is_in $i $sys_class_net && ! qmp_is_in $i $ubus_network_wireless && echo "$i"
 	done
 }
+
 
 # Returns the MAC address of the wifi devices
 # (get MAC addres of the physical wifi device, if exists)
