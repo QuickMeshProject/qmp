@@ -307,16 +307,11 @@ qmp_configure_lan() {
   local device
   for device in $(qmp_get_devices lan) ; do
     echo " -> LAN device $device"
-    for i in $(seq 0 14); do
-      [ -e /sys/class/net/$device ] && break
-      echo "Waiting for $device...  (${i})"
-      sleep 1
-    done
 
     qmp_log "Current wifi devices (with qmp_get_wifi_devices()):"
     qmp_log "$(qmp_get_wifi_devices)"
 
-    if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] || [ ! -z $(uci -q get wireless.${devivce}) ]; then
+    if qmp_is_in "$device" $(qmp_get_wifi_devices); then
       # Do not attach to br-lan wireless devices, they do it themselves
       # somewhere else via /etc/config/wireless
       echo " -> Wireless device $device will be attached automatically via /etc/config/wireless"
@@ -405,14 +400,15 @@ qmp_configure_mesh() {
     # since they'll have a link-local IPv6 address. However, if they only have
     # MESH role, or for wireless devices, they must be assigned to some logical
     # interface so that they can be brought up and eventually put a VLAN on top
-    qmp_log "$(wifi)"
+    qmp_log " -----> Reloading WiFi... $(wifi)"
     for i in $(seq 0 10); do
       if [ -e "/sys/class/net/$dev" ]; then
         echo " -----> Device $dev found"
         if [ -e "/sys/class/net/$dev/phy80211" ] && ! [ -z "$(uci -q get wireless.${dev}.network)" ]; then
-          echo " -----> Device $dev is configured in network $wireless_network"
-          echo " -----> Device $dev will be in virtual interface $viface"
+          echo " -----> Device $dev was to be in virtual interface $viface"
           viface="$(uci get wireless.${dev}.network)"
+          echo " -----> Device $dev is configured in network $viface in /etc/config/wireless"
+          echo " -----> Device $dev will be in virtual interface $viface"
         fi
         break;
       else

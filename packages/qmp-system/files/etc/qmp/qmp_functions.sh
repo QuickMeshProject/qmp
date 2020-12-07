@@ -110,15 +110,14 @@ qmp_get_virtual_iface() {
 		fi
 	fi
 
-	# Is it in the LAN bridge, and not wireless?
+	# Is it in the LAN bridge, and not wireless
 	for l in $(qmp_get_devices lan); do
 		if [ "$l" == "$device" ]; then
 			viface="lan"
-			if [ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
+			if ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
 				qmp_log "LOG: 5"
 				qmp_log "Viface: $viface"
 				qmp_log "${device} ${viface}"
-				qmp_log "$(qmp_get_wifi_devices)"
 				echo $viface
 				return
 			fi
@@ -129,7 +128,7 @@ qmp_get_virtual_iface() {
 	qmp_log "Viface: $viface"
 	qmp_log "${device} ${viface}"
 
-	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
+	! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
 		echo $viface;
 		qmp_log "LOG: 7"
 		qmp_log "Viface: $viface"
