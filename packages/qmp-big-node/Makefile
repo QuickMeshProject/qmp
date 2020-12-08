@@ -54,7 +54,12 @@ define Package/qmp-big-node
   DEPENDS:= +qmp-small-node \
 	+qmp-tinyproxy +tinymce \
 	+openssl-util +luci-ssl \
-	+lsof +wget +bmon +bwm-ng +ebtables +pv
+	+tcpdump-mini \
+	+lsof +wget +bmon +bwm-ng +ebtables +pv \
+	+ipip +kmod-ipip +kmod-gre \
+	+luci-lib-libremap-system +luci-lib-libremap-location \
+	+luci-lib-libremap-bmx6 +luci-lib-libremap-qmp \
+	+luci-lib-libremap-contact +luci-lib-libremap-wireless
 endef
 
 define Package/qmp-big-node/description
