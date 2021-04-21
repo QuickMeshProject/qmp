@@ -101,11 +101,14 @@ qmp_get_virtual_iface() {
 	local device="$1"
 	local viface=""
 
+	qmp_log "[Function: qmp_get_virtual_iface(). Device: ${device}]"
+
 	# Is it the br-lan interface?
 	if [ "$device" == "br-lan" ]; then
 		viface="lan"
 		if [ ! -e "/sys/class/net/$device/phy80211" ]; then
 			echo $viface
+			qmp_log "600. "'$viface'": ${viface}"
 			return
 		fi
 	fi
@@ -114,27 +117,21 @@ qmp_get_virtual_iface() {
 	for l in $(qmp_get_devices lan); do
 		if [ "$l" == "$device" ]; then
 			viface="lan"
+			qmp_log "610. "'$viface'": ${viface}"
 			if [ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
-				qmp_log "LOG: 5"
-				qmp_log "Viface: $viface"
-				qmp_log $device $viface
-				qmp_log $(qmp_get_wifi_devices)
+				qmp_log "611." '$viface'": ${viface}"
+				qmp_log "612." $(qmp_get_wifi_devices)
 				echo $viface
 				return
 			fi
 		fi
 	done
 
-	qmp_log "LOG: 6"
-	qmp_log "Viface: $viface"
-	qmp_log $device $viface
+	qmp_log "620. "'$viface'": ${viface}"
 
 	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
-		echo $viface;
-		qmp_log "LOG: 7"
-		qmp_log "Viface: $viface"
-		qmp_log $device $viface
-		echo "$viface"
+		qmp_log "630. "'$viface'": ${viface}"
+		echo $viface
 		return;
 	}
 
@@ -145,13 +142,15 @@ qmp_get_virtual_iface() {
 	# id_extra are the extra characters after the number: eth0[], wlan1[a]
 	local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
 
+	qmp_log "640. "'$id_char'": ${id_char}"
+	qmp_log "641. "'$id_num'": ${id_num}"
+	qmp_log "642. "'$id_extra'": ${id_extra}"
+
 	# It it a WAN device?
 	for w in $(qmp_get_devices wan); do
 		if [ "$w" == "$device" ]; then
 			viface="wan_${id_char}${id_num}"
-			qmp_log "LOG: 8"
-			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "650. "'$viface'": ${viface}"
 			echo $viface
 			return
 		fi
@@ -161,13 +160,13 @@ qmp_get_virtual_iface() {
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
 			viface="mesh_${id_char}${id_num}${id_extra}"
-			qmp_log "LOG: 8"
-			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "660. "'$viface'": ${viface}"
 			echo "$viface"
 			return
 		fi
 	done
+
+	qmp_log "699. Leaving without finding the virtual interface."
 }
 
 # arg1=<mesh|lan|wan>, returns the devices which have to be configured in such mode
