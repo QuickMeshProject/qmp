@@ -203,42 +203,74 @@ qmp_configure_smart_network() {
 	local dev=""
 	local phydevs=""
 	local ignore_devs=""
+	local novlan=""
 	local default_lan=$(qmp_get_openwrt_default_network "lan")
 	local default_wan=$(qmp_get_openwrt_default_network "wan")
 
+	local all_sysclassnet_devices=""
+	for dev in $(ls /sys/class/net/); do
+		all_sysclassnet_devices="${dev} ${all_sysclassnet_devices}"
+	done
+	echo "Network devices detected in /sys/class/net:"
+	echo " - ${all_sysclassnet_devices}"
+
 	[ "$force" != "force" ] && {
-		ignore_devs="$(qmp_uci_get interfaces.ignore_devices)"
+		ignore_devs="$(qmp_uci_get interfaces.ignore_devices) "
+		[ -n "${ignore_devs}" ] && \
+		echo "Devices to ignore in qMp config:"
+		echo " - ${ignore_devs}"
 	}
 
+	# Detect physical devices in /sys/class/net
 	for dev in $(ls /sys/class/net/); do
 		[ -e /sys/class/net/$dev/device ] || [ dev == "eth0" ] && {
 			local id
 			local ignore=0
 
-			# Check if device is in the ignore list
+			# Check if device is in the qMp ignore list to skip it
 				for id in $ignore_devs; do
 					[ "$id" == "$dev" ] && ignore=1
 				done
 
-			# [Qin] The device might be a wired device (e.g. eth0) with a switch
-			# and two or more virtual switched devices (e.g. eth0.1, eth0.2)
+			# The device might be a wired device (e.g. eth0) with a managed switch to
+			# drive several ports. If it uses the old switch driver, virtual switched
+			# devices are named with a dot (e.g. eth0.1, eth0.2). We check for
+			# switched device that has the current device as its upper physical device
+			# and add them instead (processing eth0? => add eth0.1 and eth0.2)
 			for sdev in $(ls /sys/class/net/$dev/ | grep upper_$dev. | cut -d "_" -f2); do
-				phydevs="$phydevs $sdev\n"
+				phydevs="$phydevs $sdev"
 				ignore=1
+				# Add $dev to ignore list (only when different from $sdev, to avoid
+				# adding wireless devices to it)
+				[ "${dev}" != "${sdev}" ] && ignore_devs="$ignore_devs $dev"
 			done
 
+			# The device might be a wired device (e.g. eth0) with a managed switch to
+			# drive several ports. If it uses the new DSA switch driver, virtual
+			# switched devices are named like regular interfaces (e.g., lan1, lan2).
+			# We check for the "dsa" subdirectory in the physical device to skip it.
+			[ -e /sys/class/net/$dev/dsa ] && ignore=1 && ignore_devs="$ignore_devs $dev"
+
 			if [ $ignore -eq 0 ]; then
-				phydevs="$phydevs $dev\n"
+				phydevs="$phydevs $dev"
 			fi
 		}
 	done
-	phydevs="$(echo -e "$phydevs" | grep -v -e ".*ap$" | sort -u | tr -d ' ' \t)"
+	phydevs=$(for i in ${phydevs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t)
+	ignore_devs=$(for i in ${ignore_devs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t)
+
+	echo "Physical devices to process:"
+	echo " - "${phydevs}
+	[ -n "${ignore_devs}" ] && \
+		echo "Devices to ignore:" && \
+		echo " - "${ignore_devs}
 
 	# if force is not enabled, we are not changing the existing lan/wan/mesh (only adding new ones)
 	[ "$force" != "force" ] && {
 		lan="$(qmp_uci_get interfaces.lan_devices)"
 		wan="$(qmp_uci_get interfaces.wan_devices)"
 		mesh="$(qmp_uci_get interfaces.mesh_devices)"
+		novlan="$(qmp_uci_get interfaces.no_vlan_devices)"
 	}
 
 	local j=0
@@ -268,17 +300,17 @@ qmp_configure_smart_network() {
 		# OpenWrt's defaults. This avoids the per-device hooks that swapped roles
 		for ddev in $default_lan; do
 			[ "$dev" == "$ddev" ] && {
-				lan="$lan $dev"
-				mesh="$mesh $dev"
-				novlan="$novlan $dev"
+				lan="$dev $lan"
+				mesh="$dev $mesh"
+				novlan="$dev $novlan"
 				continue
 			}
 		done
 		for ddev in $default_wan; do
 			[ "$dev" == "$ddev" ] && {
-				wan="$wan $dev"
-				mesh="$mesh $dev"
-				novlan="$novlan $dev"
+				wan="$dev $wan"
+				mesh="$dev $mesh"
+				novlan="$dev $novlan"
 				continue
 			}
 		done
@@ -315,11 +347,14 @@ qmp_configure_smart_network() {
 
 	done
 
-	echo "Network devices found:"
-	echo "- LAN $lan"
-	echo "- MESH $mesh"
-	echo "- WAN $wan"
-	echo "- NO VLAN $novlan"
+	echo ""
+	echo "Smart network configuration result:"
+	echo " - LAN: ${lan}"
+	echo " - WAN: ${wan}"
+	echo " - Mesh: ${mesh}"
+	echo " - No VLAN: ${novlan}"
+	echo " - Ignored: ${ignore_devs}"
+	echo ""
 
 	# Writes the devices to the config
 	qmp_uci_set interfaces.lan_devices "$(echo $lan | sed -e s/"^ "//g -e s/" $"//g)"
