@@ -317,15 +317,51 @@ qmp_tac() {
 }
 
 qmp_get_dec_node_id() {
-  PRIMARY_MESH_DEVICE="$(uci get qmp.interfaces.mesh_devices | awk '{print $1}')"
-  LSB_PRIM_MAC="$( qmp_get_mac_for_dev $PRIMARY_MESH_DEVICE | awk -F':' '{print $6}' )"
+	qmp_log "Getting decimal node id"
 
-  if qmp_uci_test qmp.node.device_id; then
-    DEVICE_ID="$(uci get qmp.node.device_id)"
-  elif ! [ -z "$PRIMARY_MESH_DEVICE" ] ; then
-    DEVICE_ID=$LSB_PRIM_MAC
-  fi
-  echo $(printf %d 0x$DEVICE_ID)
+	local DEVICE_ID=""
+	local PRIMARY_DEVICE=""
+
+	if qmp_uci_test qmp.node.device_id; then
+		qmp_log "Getting device_id from qMp config"
+		DEVICE_ID="$(uci get qmp.node.device_id)"
+		qmp_log "Device id: ${DEVICE_ID}"
+	fi
+
+	if [ -z "$DEVICE_ID" ] && qmp_uci_test qmp.node.primary_device; then
+		qmp_log "Getting primary_device from qMp config"
+		local QMPCONFIG_PRIMARY_DEVICE="$(uci get qmp.node.primary_device)"
+		if [ -e "/sys/class/net/$QMPCONFIG_PRIMARY_DEVICE" ]; then
+			PRIMARY_DEVICE=$QMPCONFIG_PRIMARY_DEVICE
+			qmp_log "Primary device found: ${PRIMARY_DEVICE}"
+		else
+			qmp_log "Primary device not found: ${QMPCONFIG_PRIMARY_DEVICE}"
+		fi
+	fi
+	if [ -z "$DEVICE_ID" ] && [ -z "$PRIMARY_DEVICE" ] && \
+	qmp_uci_test qmp.interfaces.mesh_devices; then
+		qmp_log "Getting first mesh device from qMp config"
+		qmp_log "Found mesh devices: $(uci get qmp.interfaces.mesh_devices)"
+		local PRIMARY_DEVICE="$(uci get qmp.interfaces.mesh_devices | awk '{print $1}')"
+		qmp_log "Mesh primary device: $PRIMARY_DEVICE"
+	fi
+
+	if [ -n "$PRIMARY_DEVICE" ]; then
+		qmp_log "Getting MAC for device $PRIMARY_DEVICE"
+		LSB_PRIM_MAC="$( qmp_get_mac_for_dev $PRIMARY_DEVICE | awk -F':' '{print $6}' )"
+		qmp_log "Primary device LSBs: $LSB_PRIM_MAC"
+		if [ -n $LSB_PRIM_MAC ]; then
+			DEVICE_ID=${LSB_PRIM_MAC}
+		fi
+	fi
+
+  if [ -n "$DEVICE_ID" ]; then
+		qmp_log "Decimal node id: $(printf %d 0x$DEVICE_ID)"
+		echo "$(printf %d 0x$DEVICE_ID)"
+	else
+		qmp_log "Decimal node id not found, returning 0xABCD."
+			echo "$(printf %d 0xABCD)"
+	fi
 }
 
 # Returns the prefix /XX from netmask

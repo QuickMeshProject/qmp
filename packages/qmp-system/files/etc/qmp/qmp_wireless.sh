@@ -427,6 +427,7 @@ qmp_configure_wifi() {
 qmp_wifi_get_default() {
 	local what="$1"
 	local device="$2"
+	qmp_log "Getting default ${what} for device ${device}"
 
 	# WIRELESS MODE
 	#
@@ -524,6 +525,7 @@ qmp_wifi_get_default() {
 
 		# channel AdHoc is the last available (qmp_tac = inverse order) plus index*2+1 (1 3 5 ...)
 		[ "$mode" == "adhoc" ] || [ "$mode" == "80211s" ] || [ -z "$mode" ] && {
+			qmp_log "Getting default ${what} for device ${device} in mode ${mode}"
 
 			#this is global
 			ADHOC_INDEX=${ADHOC_INDEX:-0}
@@ -553,6 +555,7 @@ qmp_wifi_get_default() {
 		# channel AP = ( node_id + index*3 ) % ( num_channels_ap) + 1
 		# channel is 1, 6 or 11 for coexistence and performance
 		[ "$mode" = "ap" -o "$mode" = "adhoc_ap" -o "$mode" = "80211s_aplan" ] && {
+			qmp_log "Getting default ${what} for device ${device} in mode ${mode}"
 
 			AP_INDEX=${AP_INDEX:-0}
 
