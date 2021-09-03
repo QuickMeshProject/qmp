@@ -30,7 +30,7 @@ QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
 QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
 QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
-QMP_RELEASE?=5.0.0
+QMP_RELEASE?=5.0.1
 QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
 QMP_CODENAME?=Leverage
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
