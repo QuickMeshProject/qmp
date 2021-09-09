@@ -5,7 +5,11 @@
 }
 
 [ "$(uci get qmp.update.url)" == "http://fw.qmp.cat/testing" ] && {
-	uci set qmp.update.url="http://fw.qmp.cat/testing"
+	uci set qmp.update.url="http://fw.qmp.cat/stable"
+}
+
+[ "$(uci get qmp.update.url)" == "http://fw.qmp.cat/trunk" ] && {
+	uci set qmp.update.url="http://fw.qmp.cat/stable"
 }
 
 uci -q get qmp.networks.disable_mesh_dhcp || uci set qmp.networks.disable_mesh_dhcp=1
