@@ -296,7 +296,9 @@ qmp_configure_lan() {
   # LAN device (br-lan) configuration
   echo "Configuring LAN bridge"
   qmp_uci_set_raw network.lan="interface"
-  qmp_uci_set_raw network.lan.type="bridge"
+  # Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+  #qmp_uci_set_raw network.lan.type="bridge"
+  qmp_uci_set_raw network.lan.device="br-lan"
   qmp_uci_set_raw network.lan.auto='1'
   qmp_uci_set_raw network.lan.proto="static"
   qmp_uci_set_raw network.lan.ipaddr="$lan_addr"
