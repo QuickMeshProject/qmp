@@ -373,7 +373,9 @@ qmp_get_openwrt_default_network() {
 
 	# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
 	#grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "ifname" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
-	grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "device" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
+	[ "$role" == "lan" ] && grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "device" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
+	[ "$role" == "lan" ] && cat /etc/board.json  | jsonfilter -e '@.network.lan.ports' | sed -e s/"\["//g | sed -e s/"]"//g | sed -e s/","//g | sed -e s/\"//g | sed -e s/"^ "//g
+	[ "$role" == "wan" ] && grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "device" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
 }
 
 qmp_attach_device_to_interface() {
