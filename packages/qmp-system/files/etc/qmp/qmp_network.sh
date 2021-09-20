@@ -269,12 +269,12 @@ qmp_configure_lan() {
     [ $(qmp_uci_get roaming.ignore) -eq 0 ] && {
       lan_addr="172.30.22.1"
       lan_mask="255.255.0.0"
-      qmp_log No LAN ip address configured, roaming mode enabled, autoconfiguring $lan_addr/$lan_mask
+      qmp_log "No LAN IP address configured, roaming mode enabled, autoconfiguring $lan_addr/$lan_mask"
     } || {
       lan_addr="10.$(qmp_get_id_ip 1).$(qmp_get_id_ip 2).1"
       lan_mask="255.255.255.0"
       qmp_uci_set networks.bmx6_ipv4_address $lan_addr/24
-      qmp_log No LAN ip address configured, community mode enabled, autoconfiguring $lan_addr/$lan_mask
+      qmp_log "No LAN IP address configured, community mode enabled, autoconfiguring $lan_addr/$lan_mask"
     }
     qmp_uci_set networks.lan_address $lan_addr
     qmp_uci_set networks.lan_netmask $lan_mask
@@ -311,10 +311,10 @@ qmp_configure_lan() {
     echo " -> LAN device $device"
       qmp_log "Current wifi devices (with qmp_get_wifi_devices()):"
       for ldev in $(qmp_get_wifi_devices); do
-        qmp_log ${ldev}
+        qmp_log "${ldev}"
       done
       qmp_log "Current network devices (with ls /sys/class/net):"
-      qmp_log $(ls /sys/class/net)
+      qmp_log "$(ls /sys/class/net)"
       if qmp_is_in "$device" $(qmp_get_wifi_devices) || [ -e "/sys/class/net/$device/phy80211" ] ; then
         # Do not attach to br-lan wireless devices, they do it themselves
         # somewhere else via /etc/config/wireless
