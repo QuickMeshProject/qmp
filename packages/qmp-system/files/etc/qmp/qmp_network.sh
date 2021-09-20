@@ -39,6 +39,11 @@ qmp_configure_prepare_network() {
 	for i in $toRemove; do
 		uci del network.$i
 	done
+
+	# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+	# Delete the unnamed br-lan device section
+	uci del "network.$(qmp_uci_get_unnamed_section_id_by_type_and_name network device br-lan)"
+
 	uci commit network
 }
 
@@ -295,6 +300,14 @@ qmp_configure_lan() {
 
   # LAN device (br-lan) configuration
   echo "Configuring LAN bridge"
+
+  # Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+  # Create the bridge device
+  local sectionid=$(uci add network device)
+  uci set network.${sectionid}.type="bridge"
+  uci set network.${sectionid}.name="br-lan"
+  uci commit
+
   qmp_uci_set_raw network.lan="interface"
   # Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
   #qmp_uci_set_raw network.lan.type="bridge"

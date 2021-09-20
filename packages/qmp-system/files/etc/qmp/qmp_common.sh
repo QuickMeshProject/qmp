@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh /etc/rc.common
 SOURCE_COMMON=1
 #DEBUG="/tmp/qmp_common.debug"
 
@@ -22,6 +22,34 @@ qmp_uci_get_raw() {
 	[ $r -ne 0 ] && logger -t qMp "UCI returned an error (uci get $@)"
 	qmp_debug "qmp_uci_get_raw: uci -q get $@"
 	return $r
+}
+
+qmp_uci_get_raw_item_space() {
+	u="$(uci -q get ${4}.${1}.${3})"
+	r=$?
+	echo "$u"
+	[ $r -ne 0 ] && logger -t qMp "UCI returned an error (uci get $@)"
+	qmp_debug "qmp_uci_get_raw: uci -q get $@"
+	return $r
+}
+
+qmp_uci_get_raw_id_space() {
+	u="$(qmp_uci_get_raw_item_space ${1} dummy ${3} ${4})"
+	if [ "$u" == "$2" ]; then
+		echo $1
+	fi
+}
+
+qmp_uci_get_item_by_unnamed_section_type_and_name() {
+	config_load $1
+	local u="$(config_foreach qmp_uci_get_raw_item_space $2 $3 $4 $1)"
+	echo $u
+}
+
+qmp_uci_get_unnamed_section_id_by_type_and_name() {
+	config_load $1
+	local u="$(config_foreach qmp_uci_get_raw_id_space $2 $3 name $1)"
+	echo $u
 }
 
 qmp_uci_set() {
@@ -59,7 +87,7 @@ qmp_uci_del() {
 }
 
 qmp_uci_del_raw() {
-        uci -q delete $@
+	uci -q delete $@
 	r=$?
 	uci commit
 	r=$(( $r + $? ))

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh /etc/rc.common
 # requires ip ipv6calc awk sed grep
 QMP_PATH="/etc/qmp"
 SOURCE_FUNCTIONS=1
@@ -380,6 +380,10 @@ qmp_attach_device_to_interface() {
 	local device=$1
 	local interface=$2
 	local intype="$(qmp_uci_get_raw network.$interface.type)"
+	# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+	local inucibrlan="$(qmp_uci_get_raw network.$interface.device)"
+	local inucitype="$(qmp_uci_get_item_by_unnamed_section_type_and_name network device ${inucibrlan} type)"
+	local brlanid="$(qmp_uci_get_unnamed_section_id_by_type_and_name network device ${inucibrlan})"
 
 	echo "Attaching device $device to interface $interface"
 
@@ -390,11 +394,12 @@ qmp_attach_device_to_interface() {
 
 	# if it is not
 	else
-			if [ "$intype" == "bridge" ]; then
-				qmp_uci_add_list_raw network.$interface.ifname=$device
+			# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+			if [ "$intype" == "bridge" ] || [ "$inucitype" == "bridge" ]; then
+				qmp_uci_add_list_raw network.$brlanid.ports=$device
 				echo " -> $device attached to $interface bridge"
 			else
-				qmp_uci_set_raw network.$interface.ifname=$device
+				qmp_uci_set_raw network.$interface.device=$device
 				echo " -> $device attached to $interface"
 			fi
 	fi
