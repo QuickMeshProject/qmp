@@ -957,7 +957,7 @@ qmp_configure_initial() {
 	/etc/init.d/network reload
 	/etc/init.d/network restart
 	sleep 5 # Let WiFi devices start up
-	qmp_configure_smart_network force
+	qmp_configure_smart_network
 }
 
 qmp_configure() {
