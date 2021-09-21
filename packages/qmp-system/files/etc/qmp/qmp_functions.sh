@@ -213,6 +213,20 @@ qmp_configure_smart_network() {
 	done
 	echo "Network devices detected in /sys/class/net:"
 	echo " - ${all_sysclassnet_devices}"
+	echo "OpenWrt default LAN interfaces:"
+	echo " - ${default_lan}"
+	echo "OpenWrt default WAN interfaces:"
+	echo " - ${default_wan}"
+
+	[ "$force" == "default" ] && {
+		qmp_wait_for_interface_to_appear "br-lan"
+		for dev in $default_lan; do
+			qmp_wait_for_interface_to_appear "${dev}"
+		done
+		for dev in $default_wan; do
+			qmp_wait_for_interface_to_appear "${dev}"
+		done
+	}
 
 	[ "$force" != "force" ] && {
 		ignore_devs="$(qmp_uci_get interfaces.ignore_devices) "
@@ -259,8 +273,8 @@ qmp_configure_smart_network() {
 	phydevs=$(for i in ${phydevs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t | xargs)
 	ignore_devs=$(for i in ${ignore_devs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t | xargs)
 
-	# Add OpenWrt defaults to phydevs when force is enabled
-	[ "$force" == "force" ] && {
+	# Add OpenWrt defaults to phydevs when force or default is enabled
+	( [ "$force" == "force" ] || [ "$force" == "default" ] ) && {
 		phydevs="$(echo ${phydevs} ${default_lan} ${default_wan} | tr ' ' '\n' | sort -u | xargs)"
 	}
 
@@ -950,14 +964,26 @@ qmp_check_force_internet() {
 	[ "$(qmp_uci_get networks.force_internet)" == "0" ] && qmp_gw_search_default
 }
 
+# Actively wait for br-lan to appear
+qmp_wait_for_interface_to_appear() {
+	maxwait=30
+	while [ ! -e "/sys/class/net/${1}" ] && [ $maxwait -ge 0 ] ; do
+		echo "Waiting for ${1} to appear"
+		sleep 1
+		echo $maxwait
+		let "--maxwait"
+	done
+}
+
 qmp_configure_initial() {
 	qmp_hooks_exec firstboot
 	qmp_configure_wifi_initial
 	qmp_configure_wifi
 	/etc/init.d/network reload
 	/etc/init.d/network restart
-	sleep 5 # Let WiFi devices start up
-	qmp_configure_smart_network
+	# Let WiFi devices start up
+	sleep 5
+	qmp_configure_smart_network default
 }
 
 qmp_configure() {
