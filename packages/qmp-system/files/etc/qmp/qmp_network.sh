@@ -306,7 +306,7 @@ qmp_configure_lan() {
   local sectionid=$(uci add network device)
   uci set network.${sectionid}.type="bridge"
   uci set network.${sectionid}.name="br-lan"
-  uci commit
+  uci commit network
 
   qmp_uci_set_raw network.lan="interface"
   # Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)

@@ -33,6 +33,14 @@ qmp_uci_get_raw_item_space() {
 	return $r
 }
 
+qmp_uci_get_raw_item_space_filter_by_name() {
+	u="$(qmp_uci_get_raw_item_space ${1} dummy name ${4})"
+	qmp_log "$u"
+	if [ "$u" == "$2" ]; then
+		echo "$(qmp_uci_get_raw_item_space ${1} ${3} ${3} ${4})"
+	fi
+}
+
 qmp_uci_get_raw_id_space() {
 	u="$(qmp_uci_get_raw_item_space ${1} dummy ${3} ${4})"
 	if [ "$u" == "$2" ]; then
@@ -40,9 +48,12 @@ qmp_uci_get_raw_id_space() {
 	fi
 }
 
+# Get an item from an unnamed section by its name and type
+# qmp_uci_get_item_by_unnamed_section_type_and_name file section_type name value_type
+# qmp_uci_get_item_by_unnamed_section_type_and_name network device br-lan type
 qmp_uci_get_item_by_unnamed_section_type_and_name() {
 	config_load $1
-	local u="$(config_foreach qmp_uci_get_raw_item_space $2 $3 $4 $1)"
+	local u="$(config_foreach qmp_uci_get_raw_item_space_filter_by_name $2 $3 $4 $1)"
 	echo $u
 }
 
