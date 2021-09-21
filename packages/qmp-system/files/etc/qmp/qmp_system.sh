@@ -113,7 +113,7 @@ qmp_set_maps() {
 # -----------------------------------
 
 qmp_enable_netserver() {
-	qmp_log Enabling service netserver
+	qmp_log "Enabling service netserver"
 	qmp_disable_service netserver
 	killall -9 netserver 2>/dev/null
 	netserver -6 -p 12865
@@ -121,21 +121,21 @@ qmp_enable_netserver() {
 }
 
 qmp_disable_netserver() {
-	qmp_log Disabling service netserver
+	qmp_log "Disabling service netserver"
 	qmp_disable_service netserver
 	killall -9 netserver 2>/dev/null
 	return 0
 }
 
 qmp_enable_service() {
-	qmp_log Enabling service $1
+	qmp_log "Enabling service $1"
 	/etc/init.d/$1 start
 	/etc/init.d/$1 enable
 	return 0
 }
 
 qmp_disable_service() {
-	qmp_log Disabling service $1
+	qmp_log "Disabling service $1"
 	/etc/init.d/$1 stop 2>/dev/null
 	/etc/init.d/$1 disable
 	return 0

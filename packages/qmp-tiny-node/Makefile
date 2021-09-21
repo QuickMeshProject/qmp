@@ -53,7 +53,7 @@ define Package/qmp-tiny-node
   URL:=https://qmp.cat
   DEPENDS:= +qmp-system \
 	+luci-app-bmx6 +luci-mod-status +uhttpd \
-	+uhttpd-mod-ubus
+	+uhttpd-mod-ubus +kmod-cfg80211
 endef
 
 define Package/qmp-tiny-node/description

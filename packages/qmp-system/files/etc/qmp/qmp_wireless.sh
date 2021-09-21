@@ -657,7 +657,7 @@ qmp_configure_wifi_initial() {
 				else
 					newchan="$(qmp_check_channel $device $channel $mode)"
 					if [ "$newchan" != "$channel" ]; then
-						qmp_log Warning: "Channel $channel for device $device in mode $mode is not right, using default one"
+						qmp_log "Warning: Channel $channel for device $device in mode $mode is not right, using default one"
 						qmp_uci_set @wireless[$j].channel $newchan
 					fi
 				fi

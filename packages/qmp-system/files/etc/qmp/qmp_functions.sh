@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh /etc/rc.common
 # requires ip ipv6calc awk sed grep
 QMP_PATH="/etc/qmp"
 SOURCE_FUNCTIONS=1
@@ -117,8 +117,8 @@ qmp_get_virtual_iface() {
 			if [ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices); then
 				qmp_log "LOG: 5"
 				qmp_log "Viface: $viface"
-				qmp_log $device $viface
-				qmp_log $(qmp_get_wifi_devices)
+				qmp_log "$device $viface"
+				qmp_log "$(qmp_get_wifi_devices)"
 				echo $viface
 				return
 			fi
@@ -127,13 +127,13 @@ qmp_get_virtual_iface() {
 
 	qmp_log "LOG: 6"
 	qmp_log "Viface: $viface"
-	qmp_log $device $viface
+	qmp_log "$device $viface"
 
 	[ ! -e "/sys/class/net/$device/phy80211" ] && ! qmp_is_in "$device" $(qmp_get_wifi_devices) && [ -n "$viface" ] && {
 		echo $viface;
 		qmp_log "LOG: 7"
 		qmp_log "Viface: $viface"
-		qmp_log $device $viface
+		qmp_log "$device $viface"
 		echo "$viface"
 		return;
 	}
@@ -151,7 +151,7 @@ qmp_get_virtual_iface() {
 			viface="wan_${id_char}${id_num}"
 			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "$device $viface"
 			echo $viface
 			return
 		fi
@@ -163,7 +163,7 @@ qmp_get_virtual_iface() {
 			viface="mesh_${id_char}${id_num}${id_extra}"
 			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
-			qmp_log $device $viface
+			qmp_log "$device $viface"
 			echo "$viface"
 			return
 		fi
@@ -371,13 +371,21 @@ qmp_get_openwrt_default_network() {
 
 	[ "$role" != "lan" ] && [ "$role" != "wan" ] && return
 
-	grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "ifname" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
+	# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+	#grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "ifname" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
+	[ "$role" == "lan" ] && grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "device" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
+	[ "$role" == "lan" ] && cat /etc/board.json  | jsonfilter -e '@.network.lan.ports' | sed -e s/"\["//g | sed -e s/"]"//g | sed -e s/","//g | sed -e s/\"//g | sed -e s/"^ "//g
+	[ "$role" == "wan" ] && grep -A${flen} "network" $board_file | grep -A${flen} $role | grep -m 1 -B${flen} "}" | grep -m 1 "device" | cut -d ":" -f2 | sed -e 's/^[ \t]*//' | cut -d '"' -f 2
 }
 
 qmp_attach_device_to_interface() {
 	local device=$1
 	local interface=$2
 	local intype="$(qmp_uci_get_raw network.$interface.type)"
+	# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+	local inucibrlan="$(qmp_uci_get_raw network.$interface.device)"
+	local inucitype="$(qmp_uci_get_item_by_unnamed_section_type_and_name network device ${inucibrlan} type)"
+	local brlanid="$(qmp_uci_get_unnamed_section_id_by_type_and_name network device ${inucibrlan})"
 
 	echo "Attaching device $device to interface $interface"
 
@@ -388,11 +396,12 @@ qmp_attach_device_to_interface() {
 
 	# if it is not
 	else
-			if [ "$intype" == "bridge" ]; then
-				qmp_uci_add_list_raw network.$interface.ifname=$device
+			# Fix for #489 after introduction of UCI bridge model (OpenWrt >= 21.02)
+			if [ "$intype" == "bridge" ] || [ "$inucitype" == "bridge" ]; then
+				qmp_uci_add_list_raw network.$brlanid.ports=$device
 				echo " -> $device attached to $interface bridge"
 			else
-				qmp_uci_set_raw network.$interface.ifname=$device
+				qmp_uci_set_raw network.$interface.device=$device
 				echo " -> $device attached to $interface"
 			fi
 	fi
@@ -738,7 +747,7 @@ qmp_add_qmp_bmx6_tunnels()
 	[ "$ignore" = "1" ] && return
 
 	local type="$(qmp_uci_get_raw gateways.$name.type)"
-	qmp_log Configuring gateway $name of type $type
+	qmp_log "Configuring gateway $name of type $type"
 	[ -z "$name" ] && name="qmp_$gateway" || name="qmp_$name"
 
 	if [ "$type" == "offer" ]
