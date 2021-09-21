@@ -256,8 +256,13 @@ qmp_configure_smart_network() {
 			fi
 		}
 	done
-	phydevs=$(for i in ${phydevs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t)
-	ignore_devs=$(for i in ${ignore_devs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t)
+	phydevs=$(for i in ${phydevs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t | xargs)
+	ignore_devs=$(for i in ${ignore_devs}; do echo $i | grep -v -e ".*ap$" | sed '/./,$!d'; done | sort -u | tr -d ' ' \t | xargs)
+
+	# Add OpenWrt defaults to phydevs when force is enabled
+	[ "$force" == "force" ] && {
+		phydevs="$(echo ${phydevs} ${default_lan} ${default_wan} | tr ' ' '\n' | sort -u | xargs)"
+	}
 
 	echo "Physical devices to process:"
 	echo " - "${phydevs}
@@ -952,7 +957,7 @@ qmp_configure_initial() {
 	/etc/init.d/network reload
 	/etc/init.d/network restart
 	sleep 5 # Let WiFi devices start up
-	qmp_configure_smart_network
+	qmp_configure_smart_network force
 }
 
 qmp_configure() {
