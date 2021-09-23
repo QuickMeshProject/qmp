@@ -90,8 +90,8 @@ qmp_set_vlan() {
 	uci set network.${uiface}_${vid}.vid=${vid}
 
   uci set network.${uiface}_${vid}_${vtype}=interface
-  uci set network.${uiface}_${vid}_${vtype}.ifname=${uiface}_${vid}
-  uci set network.${uiface}_${vid}_${vtype}.proto=${none}
+  uci set network.${uiface}_${vid}_${vtype}.device=${uiface}_${vid}
+  uci set network.${uiface}_${vid}_${vtype}.proto="none"
   uci set network.${uiface}_${vid}_${vtype}.auto=1
   uci commit network
 }
