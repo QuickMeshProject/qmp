@@ -363,69 +363,71 @@ qmp_configure_mesh() {
 	if qmp_uci_test qmp.interfaces.mesh_devices &&
 	qmp_uci_test qmp.networks.mesh_protocol_vids; then
 
-	for dev in $(qmp_get_devices mesh); do
-		echo "Configuring ${dev} for meshing"
+		for dev in $(qmp_get_devices mesh); do
+			echo "Configuring ${dev} for meshing"
 
-		# Check if the current device is configured as no-vlan
-		local use_vlan=1
-		for no_vlan_int in $(qmp_uci_get interfaces.no_vlan_devices 2>/dev/null); do
-			[ "$no_vlan_int" == "$dev" ] && use_vlan=0
-		done
-    echo " -> Using VLAN: $use_vlan"
+			# Check if the current device is configured as no-vlan
+			local use_vlan=1
+			for no_vlan_int in $(qmp_uci_get interfaces.no_vlan_devices 2>/dev/null); do
+				[ "$no_vlan_int" == "$dev" ] && use_vlan=0
+			done
+			echo " -> Using VLAN: $use_vlan"
 
-		local protocol_vids="$(qmp_uci_get networks.mesh_protocol_vids 2>/dev/null)"
-		[ -z "$protocol_vids" ] && protocol_vids="bmx6:12"
+			local protocol_vids="$(qmp_uci_get networks.mesh_protocol_vids 2>/dev/null)"
+			[ -z "$protocol_vids" ] && protocol_vids="bmx6:12"
 
-		local primary_mesh_device="$(qmp_get_primary_device)"
+			local primary_mesh_device="$(qmp_get_primary_device)"
 
-		for protocol_vid in $protocol_vids; do
-			local protocol_name="$(echo $protocol_vid | awk -F':' '{print $1}')"
-			local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
+			for protocol_vid in $protocol_vids; do
+				local protocol_name="$(echo $protocol_vid | awk -F':' '{print $1}')"
+				local vid="$(echo $protocol_vid | awk -F':' '{print $2}')"
 
-			# if no vlan is specified do not use vlan
-			[ -z "$vid" ] && vid=1 && use_vlan=0
+				# if no vlan is specified do not use vlan
+				[ -z "$vid" ] && vid=1 && use_vlan=0
 
-      # virtual interface
-      echo " -> Getting virtual interface for ${dev}"
-			local viface=$(qmp_get_virtual_iface $dev)
-      echo " -> Device ${dev} is in viface ${viface}"
-			# put typical IPv6 prefix (2002::), otherwise ipv6 calc assumes mapped or embedded ipv4 address
-			local ip6_suffix="2002::${counter}${vid}"
+				# virtual interface
+				echo " -> Getting virtual interface for ${dev}"
+				local viface=$(qmp_get_virtual_iface $dev)
+				echo " -> Device ${dev} is in viface ${viface}"
+				# put typical IPv6 prefix (2002::), otherwise ipv6 calc assumes mapped or embedded ipv4 address
+				local ip6_suffix="2002::${counter}${vid}"
 
-			# Since all interfaces are defined somewhere (LAN, WAN or with Rescue IP),
-			# in case of not use vlan tag, device definition is not needed.
-			[ $use_vlan -eq 1 ] && {
+				# Since all interfaces are defined somewhere (LAN, WAN or with Rescue IP),
+				# in case of not use vlan tag, device definition is not needed.
+				[ $use_vlan -eq 1 ] && {
+					qmp_set_vlan $dev $vid $viface
+				}
 
-      qmp_set_vlan $dev $vid $viface
-			}
+				dev="$(echo $dev | sed -r 's/\./_/g')"
+				# Configure IPv6 address only if mesh_prefix48 is defined (bmx6 does not need it)
+				if qmp_uci_test qmp.networks.${protocol_name}_mesh_prefix48; then
+					local ip6="$(qmp_get_ula96 $(uci get qmp.networks.${protocol_name}_mesh_prefix48):: $primary_mesh_device $ip6_suffix 128)"
+					echo "Configuring $ip6 for $protocol_name"
+					qmp_uci_set_raw network.${dev}_$vid.proto=static
+					qmp_uci_set_raw network.${dev}_$vid.ip6addr="$ip6"
+				else
+					qmp_uci_set_raw network.${dev}_$vid.proto=none
+					qmp_uci_set_raw network.${dev}_$vid.auto=1
+				fi
+			done
 
-      dev="$(echo $dev | sed -r 's/\./_/g')"
-			# Configure IPv6 address only if mesh_prefix48 is defined (bmx6 does not need it)
-			if qmp_uci_test qmp.networks.${protocol_name}_mesh_prefix48; then
-				local ip6="$(qmp_get_ula96 $(uci get qmp.networks.${protocol_name}_mesh_prefix48):: $primary_mesh_device $ip6_suffix 128)"
-				echo "Configuring $ip6 for $protocol_name"
-				qmp_uci_set_raw network.${dev}_$vid.proto=static
-				qmp_uci_set_raw network.${dev}_$vid.ip6addr="$ip6"
-			else
-				qmp_uci_set_raw network.${dev}_$vid.proto=none
-				qmp_uci_set_raw network.${dev}_$vid.auto=1
+			# Rescue IPs are no longer needed since all the interfaces have link-local
+			# IPv6 address. However, the radios must be "assigned" to some interface to
+			# bring them up; otherwise the VLAN interface on top of the radio interface
+			# can't be brought up
+			if ( [ -e "/sys/class/net/$dev" ] && [ -e "/sys/class/net/$dev/phy80211" ] ); then
+				local wireless_network="$(uci get wireless.${dev}.network)"
+				if [ -z "$wireless_network" ]; then
+					qmp_configure_rescue_ip_device "$dev" "$viface"
+				else
+					qmp_configure_rescue_ip_device "$dev" "$wireless_network"
+				fi
+			# Add to the virtual interface those wired interfaces that wouldn't be brought up (Fixes #493)
+			elif ( ! ( qmp_is_in "$dev" $(qmp_get_devices wan) || qmp_is_in "$dev" $(qmp_get_devices lan) ) ); then
+				qmp_set_viface $dev $viface
 			fi
+			counter=$(( $counter + 1 ))
 		done
-
-    # Rescue IPs are no longer needed since all the interfaces have link-local
-    # IPv6 address. However, the radios must be "assigned" to some interface to
-    # bring them up; otherwise the VLAN interface on top of the radio interface
-    # can't be brought up
-    if ! ( [ -e "/sys/class/net/$dev" ] && [ ! -e "/sys/class/net/$dev/phy80211" ] ); then
-      local wireless_network="$(uci get wireless.${dev}.network)"
-        if [ -z "$wireless_network" ]; then
-          qmp_configure_rescue_ip_device "$dev" "$viface"
-        else
-          qmp_configure_rescue_ip_device "$dev" "$wireless_network"
-        fi
-    fi
-		counter=$(( $counter + 1 ))
-	done
 	fi
 }
 

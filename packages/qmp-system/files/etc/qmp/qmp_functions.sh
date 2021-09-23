@@ -90,11 +90,33 @@ qmp_set_vlan() {
 	uci set network.${uiface}_${vid}.vid=${vid}
 
   uci set network.${uiface}_${vid}_${vtype}=interface
-  uci set network.${uiface}_${vid}_${vtype}.ifname=${uiface}_${vid}
-  uci set network.${uiface}_${vid}_${vtype}.proto=${none}
+  uci set network.${uiface}_${vid}_${vtype}.device=${uiface}_${vid}
+  uci set network.${uiface}_${vid}_${vtype}.proto="none"
   uci set network.${uiface}_${vid}_${vtype}.auto=1
   uci commit network
+}
 
+# Function qmp_set_viface()
+#
+# This function creates a virtual dummy interface (e.g., mesh_e2) on top of a
+# network device (e.g., eth2). This is needed for wired devices working only as
+# MESH, which otherwise are not brought up even if they have link. Fixes #493.
+qmp_set_viface() {
+	local dev="${1}"		# The physical interface
+	local viface="${2}"	# The virtual device
+
+	echo "Setting virtual interface ${viface} for device ${dev}"
+  [ -z "${dev}" ] || [ -z "${viface}" ] && return
+
+  # Replace dots by underscores, in case there is any
+  local viface="$(echo $viface | sed -r 's/\./_/g')"
+
+	uci set network.${viface}="interface"
+	uci set network.${viface}.device=${dev}
+	uci set network.${viface}.auto=1
+	uci set network.${viface}.proto="none"
+
+	uci commit network
 }
 
 qmp_get_virtual_iface() {
@@ -138,12 +160,12 @@ qmp_get_virtual_iface() {
 		return;
 	}
 
-	# id_char is the first char of the device: [e]th0 [w]lan1a
+	# id_char is the first char of the device: [e]th0, [e]th0.2, [w]lan1a
 	local id_char=$(echo $device | cut -c 1)
-	# id_num is the number of the device: eth[0], wlan[1]a
+	# id_num is the number of the device: eth[0], eth[0,2] wlan[1]a
 	local id_num=$(echo $device | tr -d "[A-z]" | tr - _ | tr . _)
-	# id_extra are the extra characters after the number: eth0[], wlan1[a]
-	local id_extra=$(echo $device | sed -e 's/^[a-z]*[0-9]*//g')
+	# id_extra are the extra characters after the number: eth0[], eth0.2[], wlan1[a]
+	local id_extra=$(echo $device | sed -e 's/\.//g' | sed -e 's/^[a-z]*[0-9]*//g')
 
 	# It it a WAN device?
 	for w in $(qmp_get_devices wan); do
@@ -160,8 +182,8 @@ qmp_get_virtual_iface() {
 	# Is it mesh?
 	for w in $(qmp_get_devices mesh); do
 		if [ "$w" == "$device" ]; then
+			qmp_log "LOG: 9"
 			viface="mesh_${id_char}${id_num}${id_extra}"
-			qmp_log "LOG: 8"
 			qmp_log "Viface: $viface"
 			qmp_log "$device $viface"
 			echo "$viface"
