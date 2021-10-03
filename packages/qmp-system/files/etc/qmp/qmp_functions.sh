@@ -160,8 +160,8 @@ qmp_get_virtual_iface() {
 		return;
 	}
 
-	# id_char is the first char of the device: [e]th0, [e]th0.2, [w]lan1a
-	local id_char=$(echo $device | cut -c 1)
+	# id_char are the two leading chararacters of the device name: [et]h0, [et]h0.2, [wl]an1a, [la]n1, [wa]n
+	local id_char=$(echo $device | cut -c 1,2)
 	# id_num is the number of the device: eth[0], eth[0,2] wlan[1]a
 	local id_num=$(echo $device | tr -d "[A-z]" | tr - _ | tr . _)
 	# id_extra are the extra characters after the number: eth0[], eth0.2[], wlan1[a]
