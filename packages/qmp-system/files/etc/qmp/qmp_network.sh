@@ -398,7 +398,9 @@ qmp_configure_mesh() {
 					qmp_set_vlan $dev $vid $viface
 				}
 
-				dev="$(echo $dev | sed -r 's/\./_/g')"
+				# This is not needed anymore, and caused virtual devices to be incorrectly assigned (fixes #495)
+				# dev="$(echo $dev | sed -r 's/\./_/g')"
+
 				# Configure IPv6 address only if mesh_prefix48 is defined (bmx6 does not need it)
 				if qmp_uci_test qmp.networks.${protocol_name}_mesh_prefix48; then
 					local ip6="$(qmp_get_ula96 $(uci get qmp.networks.${protocol_name}_mesh_prefix48):: $primary_mesh_device $ip6_suffix 128)"
