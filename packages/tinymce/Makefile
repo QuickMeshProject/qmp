@@ -20,14 +20,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tinymce
-PKG_VERSION:=3.4.9
+PKG_VERSION:=3.5.12
 PKG_RELEASE:=1
 
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
 PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION).zip
-PKG_SOURCE_URL:=http://github.com/downloads/tinymce/tinymce/
-PKG_MD5SUM:=6d56cbeefc9371257d837104dbe928d5
+PKG_SOURCE_URL:=https://download.tiny.cloud/tinymce/community/
+PKG_MD5SUM:=59195d8899b8cab8fd0e3971772be5c6
 PKG_UNPACK:=unzip -d $(PKG_BUILD_DIR)/ $(DL_DIR)/$(PKG_SOURCE)
 
 include $(INCLUDE_DIR)/package.mk
