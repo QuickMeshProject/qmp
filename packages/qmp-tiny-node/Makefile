@@ -32,9 +32,9 @@ QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
 QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
 QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
-QMP_RELEASE?=testing
+QMP_RELEASE?=5.2.0-rc1
 QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
-QMP_CODENAME?=Neumann
+QMP_CODENAME?=Dikti
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-tiny-node
