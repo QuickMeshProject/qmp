@@ -26,13 +26,10 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 QMP_FEED_DIR?=$(CURDIR)
-
-QMP_FEED_DIR?=$(CURDIR)
-
 QMP_GIT_BRANCH?=$(shell git -C $(QMP_FEED_DIR) rev-parse --abbrev-ref HEAD)
 QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
-QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
-QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
+QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y.%m.%d files)
+QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M files)
 
 QMP_RELEASE?=trunk
 QMP_PKGRELEASE=r$(QMP_GIT_DATE)_$(QMP_GIT_TIME)
@@ -40,8 +37,8 @@ QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=bmx6-mdns
-PKG_VERSION:=0.1.2-$(QMP_RELEASE)-$(QMP_PKGRELEASE)
-PKG_RELEASE:=$(QMP_CODENAME)-$(QMP_GIT_REV)
+PKG_VERSION:=0.1.2~$(call version_abbrev,$(QMP_GIT_REV))
+PKG_RELEASE:=$(QMP_GIT_TIME)
 PKG_LICENSE:=GPL-2.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)

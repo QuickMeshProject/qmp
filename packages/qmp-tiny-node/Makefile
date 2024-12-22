@@ -25,11 +25,11 @@
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
-QMP_FEED_DIR?=$(CURDIR)
 
+QMP_FEED_DIR?=$(CURDIR)
 QMP_GIT_BRANCH?=$(shell git -C $(QMP_FEED_DIR) rev-parse --abbrev-ref HEAD)
 QMP_GIT_REV?=$(shell git -C $(QMP_FEED_DIR) rev-parse --short HEAD)
-QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y%m%d)
+QMP_GIT_DATE?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%Y.%m.%d)
 QMP_GIT_TIME?=$(shell git -C $(QMP_FEED_DIR) log -1 --format=%cd --date=format:%H%M)
 
 QMP_RELEASE?=trunk
@@ -38,8 +38,8 @@ QMP_CODENAME?=Kalimotxo
 QMP_BUILDDATE:=$(shell date +%Y%m%d-%H%M)
 
 PKG_NAME:=qmp-tiny-node
-PKG_VERSION:=$(QMP_RELEASE)-$(QMP_PKGRELEASE)
-PKG_RELEASE:=$(QMP_CODENAME)-$(QMP_GIT_REV)
+PKG_VERSION:=$(QMP_GIT_DATE)~$(call version_abbrev,$(QMP_GIT_REV))
+PKG_RELEASE:=$(QMP_GIT_TIME)
 PKG_LICENSE:=GPL-3.0+
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -47,7 +47,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/qmp-tiny-node
-  TITLE:=Quick Mesh Project (qMp) minimalistic node (4 MB flash)
+  TITLE:=Quick Mesh Project (qMp) minimalistic node (8 MB flash)
   SECTION:=net
   CATEGORY:=qMp
   URL:=https://qmp.cat
@@ -63,7 +63,7 @@ define Package/qmp-tiny-node/description
   - BMX6 routing protocol
   - Minimalistic LuCI web interface (only for qMp settings)
 
- It is intended to be used on storage-constrained devices with 4 MB flash.
+ It is intended to be used on storage-constrained devices with 8 MB flash.
 endef
 
 define Build/Prepare
