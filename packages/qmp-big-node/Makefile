@@ -59,7 +59,7 @@ define Package/qmp-big-node
 	+luci-lib-libremap-system +luci-lib-libremap-location \
 	+luci-lib-libremap-bmx6 +luci-lib-libremap-qmp \
 	+luci-lib-libremap-contact +luci-lib-libremap-wireless \
-	+kmod-cfg80211
+	+kmod-cfg80211 +wpad-mesh-openssl
 endef
 
 define Package/qmp-big-node/description

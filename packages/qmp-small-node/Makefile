@@ -53,7 +53,7 @@ define Package/qmp-small-node
   DEPENDS:= +qmp-tiny-node \
 	+mtr +netperf +luci-mod-admin-full \
 	+munin-mesh +mini_snmpd +cgi-bin-zero \
-	+libremap-agent +luci +bmx6-mdns +kmod-cfg80211
+	+libremap-agent +luci +bmx6-mdns +kmod-cfg80211 +wpad-mesh-openssl
 endef
 
 define Package/qmp-small-node/description
