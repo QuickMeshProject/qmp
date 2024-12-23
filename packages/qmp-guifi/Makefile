@@ -36,7 +36,7 @@ define Package/qmp-guifi
   CATEGORY:=qMp
   URL:=http://guifi.net
   DEPENDS:= \
-  +qmp-system +kmod-cfg80211
+  +qmp-system
 endef
 
 
