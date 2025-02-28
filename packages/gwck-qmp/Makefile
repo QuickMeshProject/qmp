@@ -23,7 +23,7 @@ PKG_NAME:=gwck-qmp
 
 PKG_SOURCE_PROTO:=git
 
-PKG_SOURCE_URL:=git://dev.qmp.cat/gwck.git
+PKG_SOURCE_URL:=https://dev.qmp.cat/gwck.git
 PKG_REV:=49a799ffe3ca17c2c6eacf7832bc91473f4f481b
 PKG_VERSION:=r20140427
 
