@@ -21,21 +21,19 @@
 #	Axel Neumann, Simó Albert i Beltran, Pau Escrich
 #
 
-
 include $(TOPDIR)/rules.mk
-
-PKG_NAME:=bmx6
-PKG_VERSION:=0.1-alpha
-PKG_RELEASE:=$(AUTORELEASE)
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/bmx-routing/bmx6.git
-PKG_SOURCE_DATE:=2020-06-08
+PKG_SOURCE_DATE:=2020.06.08
 PKG_SOURCE_VERSION:=65cb0d542f16a4b4689f5ad2542c9f24215a6616
-PKG_MIRROR_HASH:=45501cfe9f82e08e8082147f90b94ba5b6bd11771a9140412bfbf5523a796177
+
+PKG_NAME:=bmx6
+PKG_VERSION:=$(PKG_SOURCE_DATE)~$(call version_abbrev,$(PKG_SOURCE_VERSION))
+PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Axel Neumann <neumann@cgws.de>
-PKG_LICENSE:=GPL-2.0-or-later
+PKG_LICENSE:=GPL-2.0+
 
 include $(INCLUDE_DIR)/package.mk
 
